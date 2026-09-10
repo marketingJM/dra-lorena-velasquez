@@ -127,14 +127,25 @@
   .benefit-card h3{font-family:'Jost',sans-serif; font-weight:600; font-size:1.05rem; color:var(--ink); margin-bottom:8px;}
   .benefit-card p{font-size:0.9rem; color:var(--ink-soft);}
 
-  /* ---------- Services (products style) ---------- */
-  .gallery{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
-  .gallery-card{background:var(--ivory); border:1px solid var(--line); border-radius:18px; overflow:hidden;}
-  .gallery-card .thumb{aspect-ratio:4/3; display:block;}
-  .gallery-card .thumb svg{width:100%; height:100%; display:block;}
-  .gallery-card .info{padding:18px 20px 22px;}
-  .gallery-card h3{font-family:'Jost',sans-serif; font-weight:600; font-size:1rem; color:var(--ink); margin-bottom:6px;}
-  .gallery-card p{font-size:0.85rem; color:var(--ink-soft);}
+  /* ---------- Services (button row + detail panel) ---------- */
+  .service-subnav{
+    display:flex; gap:10px; flex-wrap:wrap; margin-bottom:32px;
+  }
+  .service-btn{
+    background:transparent; border:1.5px solid var(--teal); color:var(--teal-deep);
+    border-radius:999px; padding:9px 18px; font-size:0.85rem; font-family:'Jost',sans-serif;
+    cursor:pointer; transition:background .2s ease, color .2s ease;
+  }
+  .service-btn:hover{background:rgba(14,74,68,0.08);}
+  .service-btn.active{background:var(--teal); color:var(--ivory);}
+
+  .service-panel{display:none;}
+  .service-panel.active{display:grid; grid-template-columns:0.9fr 1.1fr; gap:36px; align-items:start; animation:panelIn .25s ease;}
+  .service-media{grid-row:1 / -1; border-radius:16px; overflow:hidden; aspect-ratio:4/3;}
+  .service-media svg{width:100%;height:100%;display:block;}
+  .service-panel h3{grid-column:2; font-size:1.5rem; margin-top:-10px;}
+  .service-panel p{grid-column:2; color:var(--ink-soft); font-size:0.95rem; margin-top:14px; max-width:56ch;}
+  .service-panel p strong{color:var(--ink); font-weight:600;}
 
   /* ---------- About ---------- */
   .about{display:grid; grid-template-columns:0.85fr 1.15fr; gap:56px; align-items:center;}
@@ -186,9 +197,14 @@
     .pill-ghost{padding:6px 12px; font-size:0.72rem; white-space:nowrap;}
     .pill-ghost .flag{font-size:0.85rem;}
 
-    .hero-banner .hero-inner{
-      padding:26px 20px;
-    }
+    .service-panel.active{grid-template-columns:1fr; gap:18px;}
+    .service-media{grid-row:auto; max-width:280px; margin:0 auto;}
+    .service-panel h3{grid-column:1; margin-top:4px;}
+    .service-panel p{grid-column:1;}
+    .service-subnav{gap:8px;}
+    .service-btn{padding:8px 14px; font-size:0.78rem;}
+
+    .hero-banner .hero-inner{padding:26px 20px;}
     .hero-banner h1{font-size:1.4rem;}
     .hero-banner .sub{font-size:0.9rem;}
 
@@ -311,11 +327,23 @@
   <div class="wrap">
     <div class="head-block">
       <h2>Servicios</h2>
-      <p class="sub">Explora nuestra atención completa</p>
+      <p class="sub">Selecciona un servicio para ver el detalle</p>
     </div>
-    <div class="gallery">
-      <div class="gallery-card">
-        <div class="thumb">
+
+    <div class="service-subnav">
+      <button class="service-btn active" data-service="peso">Control de peso</button>
+      <button class="service-btn" data-service="expresion">Líneas de expresión</button>
+      <button class="service-btn" data-service="lifting">Lifting facial</button>
+      <button class="service-btn" data-service="armonizacion">Armonización facial</button>
+      <button class="service-btn" data-service="cicatrices">Manejo de cicatrices</button>
+      <button class="service-btn" data-service="alopecia">Alopecia androgénica</button>
+      <button class="service-btn" data-service="terapia">Terapia androgénica</button>
+    </div>
+
+    <div class="service-detail">
+
+      <div class="service-panel active" data-panel="peso">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#EFE9D8"/>
             <circle cx="80" cy="52" r="34" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -323,10 +351,13 @@
             <path d="M50 96 C50 78 62 66 80 66 C98 66 110 78 110 96" fill="none" stroke="#0E4A44" stroke-width="4" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="info"><h3>Control de sobrepeso y obesidad</h3><p>Planes de manejo de peso basados en tu metabolismo y hábitos.</p></div>
+        <h3>Control de sobrepeso y obesidad</h3>
+        <p><strong>Qué es:</strong> un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.</p>
+        <p><strong>Beneficio:</strong> pérdida de peso sostenible en el tiempo, mejora en tus marcadores metabólicos y reducción del riesgo cardiovascular asociado al sobrepeso.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="expresion">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#E8EFEC"/>
             <ellipse cx="80" cy="64" rx="34" ry="40" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -336,10 +367,13 @@
             <line x1="112" y1="45" x2="112" y2="58" stroke="#A8823D" stroke-width="3" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="info"><h3>Tratamiento para líneas de expresión</h3><p>Procedimientos para suavizar arrugas y marcas de expresión.</p></div>
+        <h3>Tratamiento para líneas de expresión</h3>
+        <p><strong>Qué es:</strong> aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.</p>
+        <p><strong>Beneficio:</strong> piel visiblemente más lisa y descansada, con resultados naturales que respetan la expresividad de tu rostro.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="lifting">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#EFE9D8"/>
             <ellipse cx="80" cy="66" rx="30" ry="38" fill="none" stroke="#A8823D" stroke-width="3"/>
@@ -348,10 +382,13 @@
             <path d="M80 22 L80 32" stroke="#0E4A44" stroke-width="3" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="info"><h3>Lifting facial</h3><p>Técnicas para reafirmar y devolver firmeza al rostro.</p></div>
+        <h3>Lifting facial</h3>
+        <p><strong>Qué es:</strong> un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.</p>
+        <p><strong>Beneficio:</strong> menos flacidez y rasgos más definidos, sin cirugía ni tiempos de recuperación prolongados.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="armonizacion">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#E8EFEC"/>
             <circle cx="80" cy="60" r="32" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -360,10 +397,13 @@
             <circle cx="80" cy="60" r="5" fill="#0E4A44"/>
           </svg>
         </div>
-        <div class="info"><h3>Armonización facial</h3><p>Equilibrio de proporciones y simetría facial de forma natural.</p></div>
+        <h3>Armonización facial</h3>
+        <p><strong>Qué es:</strong> un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.</p>
+        <p><strong>Beneficio:</strong> un rostro más armónico y simétrico, resaltando tus rasgos naturales de forma sutil, sin cambiar tu identidad facial.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="cicatrices">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#EFE9D8"/>
             <rect x="44" y="40" width="72" height="40" rx="8" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -372,10 +412,13 @@
             <line x1="70" y1="60" x2="90" y2="60" stroke="#0E4A44" stroke-width="2.5" stroke-dasharray="3 4"/>
           </svg>
         </div>
-        <div class="info"><h3>Manejo de cicatrices</h3><p>Tratamientos para mejorar la apariencia y textura de cicatrices.</p></div>
+        <h3>Manejo de cicatrices</h3>
+        <p><strong>Qué es:</strong> evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.</p>
+        <p><strong>Beneficio:</strong> mejora visible en textura, color y relieve de la piel afectada, con un plan adaptado a tu caso específico.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="alopecia">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#E8EFEC"/>
             <path d="M80 26 C64 40 64 60 80 74 C96 60 96 40 80 26" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -383,10 +426,13 @@
             <path d="M56 90 C68 100 92 100 104 90" stroke="#A8823D" stroke-width="2" fill="none" stroke-dasharray="2 5" opacity="0.6"/>
           </svg>
         </div>
-        <div class="info"><h3>Alopecia androgénica</h3><p>Diagnóstico y tratamiento de la caída de cabello de origen hormonal.</p></div>
+        <h3>Alopecia androgénica</h3>
+        <p><strong>Qué es:</strong> diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.</p>
+        <p><strong>Beneficio:</strong> frena la progresión de la caída y favorece la densidad capilar en las zonas donde aún hay folículos activos.</p>
       </div>
-      <div class="gallery-card">
-        <div class="thumb">
+
+      <div class="service-panel" data-panel="terapia">
+        <div class="service-media">
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
             <rect width="160" height="120" fill="#EFE9D8"/>
             <circle cx="60" cy="50" r="16" fill="none" stroke="#0E4A44" stroke-width="3"/>
@@ -394,8 +440,11 @@
             <line x1="70" y1="58" x2="86" y2="66" stroke="#0E4A44" stroke-width="2.5"/>
           </svg>
         </div>
-        <div class="info"><h3>Terapia androgénica</h3><p>Manejo hormonal especializado según tu perfil androgénico.</p></div>
+        <h3>Terapia androgénica</h3>
+        <p><strong>Qué es:</strong> manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.</p>
+        <p><strong>Beneficio:</strong> mejora en energía, composición corporal, salud capilar y bienestar general asociado al balance hormonal.</p>
       </div>
+
     </div>
   </div>
 </section>
@@ -488,6 +537,17 @@
       const targetId = link.getAttribute('href').slice(1);
       navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + targetId));
       panels.forEach(p => p.classList.toggle('active', p.id === targetId));
+    });
+  });
+
+  // 3) Botones de servicios: muestran el detalle correspondiente
+  const serviceBtns = document.querySelectorAll('.service-btn');
+  const servicePanels = document.querySelectorAll('.service-panel');
+  serviceBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-service');
+      serviceBtns.forEach(b => b.classList.toggle('active', b === btn));
+      servicePanels.forEach(p => p.classList.toggle('active', p.getAttribute('data-panel') === target));
     });
   });
 </script>
