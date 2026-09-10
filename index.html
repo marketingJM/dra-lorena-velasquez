@@ -1001,6 +1001,29 @@
     });
   });
 
+  // 4b) Contenido editable desde el admin (Beneficios, Servicios, Sobre mí, Proceso)
+  const EDITABLE_KEYS = [
+    'heroH1','heroSub',
+    'benef1h','benef1p','benef2h','benef2p','benef3h','benef3p','benef4h','benef4p',
+    'svcTitle1','svcWhat1','svcBenef1','svcTitle2','svcWhat2','svcBenef2',
+    'svcTitle3','svcWhat3','svcBenef3','svcTitle4','svcWhat4','svcBenef4',
+    'svcTitle5','svcWhat5','svcBenef5','svcTitle6','svcWhat6','svcBenef6',
+    'svcTitle7','svcWhat7','svcBenef7',
+    'aboutP1','aboutP2',
+    'step1h','step1p','step2h','step2p','step3h','step3p'
+  ];
+  db.collection('content').doc('site').get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      EDITABLE_KEYS.forEach(key => {
+        if (data[key] !== undefined && data[key] !== '') {
+          translations.es[key] = data[key];
+        }
+      });
+      applyLanguage(currentLang);
+    }
+  }).catch(() => { /* si falla, se queda el contenido por defecto */ });
+
   // 5) Botón Compartir: abre el panel nativo del teléfono, o un menú de respaldo en escritorio
   const shareBtn = document.getElementById('shareBtn');
   const shareMenu = document.getElementById('shareMenu');
