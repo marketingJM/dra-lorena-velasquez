@@ -137,6 +137,13 @@
   });
 
   function starRow(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+  function addMinutes(hhmm, mins) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const total = h * 60 + m + mins;
+    const nh = String(Math.floor(total / 60) % 24).padStart(2, '0');
+    const nm = String(total % 60).padStart(2, '0');
+    return `${nh}${nm}`;
+  }
 
   function loadReviews() {
     const pendingList = document.getElementById('pendingList');
@@ -194,8 +201,8 @@
         ? bookings.map(b => {
             const [y, m, d] = b.date.split('-');
             const startDT = `${y}${m}${d}T${b.time.replace(':', '')}00`;
-            const endHour = String(Number(b.time.split(':')[0]) + 1).padStart(2, '0');
-            const endDT = `${y}${m}${d}T${endHour}0000`;
+            const endHM = addMinutes(b.time, 30);
+            const endDT = `${y}${m}${d}T${endHM}00`;
             const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
             const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
             const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
