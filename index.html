@@ -22,7 +22,7 @@
     --max:1180px;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:auto;}
   body{margin:0;background:var(--ivory);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;}
   h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:500;color:var(--teal-deep);margin:0;}
   p{margin:0;}
@@ -33,21 +33,31 @@
   :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
   @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
 
-  /* ---------- Splash ---------- */
-  .splash{position:relative; text-align:center; padding:54px 24px 60px;}
+  /* ---------- Splash (cover / entry screen) ---------- */
+  .splash{
+    position:fixed; inset:0; z-index:100; background:var(--ivory);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; transition:opacity .4s ease, visibility .4s ease;
+  }
+  .splash.hidden{opacity:0; visibility:hidden; pointer-events:none;}
   .pill{
     display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--teal);
     color:var(--teal-deep); border-radius:999px; padding:7px 18px; font-size:0.86rem;
   }
   .pill.lang{position:absolute; top:24px; right:24px;}
   .flag{font-size:1rem;}
-  .splash .full-logo{width:min(70%,360px); margin:34px auto 0;}
-  .splash .cta-pill{
-    display:inline-block; margin-top:38px; background:var(--teal); color:var(--ivory);
-    padding:16px 40px; border-radius:999px; font-size:1rem; letter-spacing:0.01em;
-    transition:background .25s ease;
+  .splash .full-logo{width:min(70%,340px); margin:0 auto;}
+  .splash .enter-btn{
+    display:inline-flex; align-items:center; gap:10px; margin-top:40px; background:var(--teal); color:var(--ivory);
+    padding:17px 44px; border-radius:999px; font-size:1.02rem; letter-spacing:0.01em; border:none;
+    cursor:pointer; transition:background .25s ease, transform .2s ease; font-family:'Jost',sans-serif;
   }
-  .splash .cta-pill:hover{background:var(--teal-deep);}
+  .splash .enter-btn:hover{background:var(--teal-deep); transform:translateY(-2px);}
+  .splash .enter-btn svg{width:18px;height:18px;}
+
+  /* ---------- Main site wrapper ---------- */
+  #site{display:none;}
+  #site.visible{display:block;}
 
   /* ---------- Info bar ---------- */
   .infobar{
@@ -106,7 +116,12 @@
   }
   .tabnav a svg{width:22px;height:22px;}
   .tabnav a.active{color:var(--teal); border-bottom-color:var(--teal);}
-  .tabnav a:hover{color:var(--teal);}
+  .tabnav a:hover{color:var(--teal); cursor:pointer;}
+
+  /* ---------- Tab panels (switch like separate views, no scroll-slide) ---------- */
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block; animation:panelIn .25s ease;}
+  @keyframes panelIn{from{opacity:0;} to{opacity:1;}}
 
   /* ---------- Generic section ---------- */
   section{padding:64px 0 70px;}
@@ -178,12 +193,17 @@
 </head>
 <body>
 
-<!-- ================= SPLASH ================= -->
-<div class="splash">
+<!-- ================= PORTADA / ENTRADA ================= -->
+<div class="splash" id="splash">
   <div class="pill lang"><span class="flag">🇪🇸</span> ES</div>
   <img class="full-logo" src="Logoo.png" alt="Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento">
-  <a href="#servicios" class="cta-pill">Descubre tu equilibrio</a>
+  <button class="enter-btn" id="enterBtn">
+    Ingresar a la página
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 12 L19 12 M13 6 L19 12 L13 18" stroke="currentColor" stroke-width="1.8"/></svg>
+  </button>
 </div>
+
+<div id="site">
 
 <!-- ================= INFO BAR ================= -->
 <div class="infobar">
@@ -255,7 +275,7 @@
 </nav>
 
 <!-- ================= BENEFICIOS ================= -->
-<section id="beneficios">
+<section id="beneficios" class="tab-panel active">
   <div class="wrap">
     <div class="head-block">
       <h2>Beneficios</h2>
@@ -287,7 +307,7 @@
 </section>
 
 <!-- ================= SERVICIOS ================= -->
-<section class="section-alt" id="servicios">
+<section id="servicios" class="tab-panel section-alt">
   <div class="wrap">
     <div class="head-block">
       <h2>Servicios</h2>
@@ -315,7 +335,7 @@
 </section>
 
 <!-- ================= SOBRE MÍ ================= -->
-<section id="sobre-mi">
+<section id="sobre-mi" class="tab-panel">
   <div class="wrap about">
     <div class="about-art">
       <div class="frame">
@@ -334,7 +354,7 @@
 </section>
 
 <!-- ================= PROCESO ================= -->
-<section class="section-alt" id="proceso">
+<section id="proceso" class="tab-panel section-alt">
   <div class="wrap">
     <div class="head-block">
       <h2>Proceso</h2>
@@ -361,7 +381,7 @@
 </section>
 
 <!-- ================= CONTACTO ================= -->
-<section class="contact-block" id="contacto">
+<section id="contacto" class="tab-panel contact-block">
   <div class="head-block" style="text-align:center;">
     <h2>Contacto</h2>
     <p class="sub">Nos encantaría saber de ti</p>
@@ -381,18 +401,30 @@
   </div>
 </footer>
 
+</div><!-- /#site -->
+
 <script>
-  const links = document.querySelectorAll('.tabnav a');
-  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        const id = '#' + entry.target.id;
-        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === id));
-      }
+  // 1) Botón de entrada: oculta la portada y muestra el sitio
+  const splash = document.getElementById('splash');
+  const site = document.getElementById('site');
+  document.getElementById('enterBtn').addEventListener('click', () => {
+    splash.classList.add('hidden');
+    site.classList.add('visible');
+  });
+
+  // 2) Pestañas: cambian de panel al instante, sin deslizamiento
+  const tabLinks = document.querySelectorAll('.tabnav a, .explore');
+  const navLinks = document.querySelectorAll('.tabnav a');
+  const panels = document.querySelectorAll('.tab-panel');
+  tabLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').slice(1);
+      navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + targetId));
+      panels.forEach(p => p.classList.toggle('active', p.id === targetId));
+      window.scrollTo(0, 0);
     });
-  }, { rootMargin: '-40% 0px -50% 0px' });
-  sections.forEach(s => s && obs.observe(s));
+  });
 </script>
 
 </body>
