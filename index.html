@@ -239,6 +239,52 @@
   .review-form .send-btn:hover{background:var(--teal-deep);}
   .review-form .send-btn svg{width:18px;height:18px;}
 
+  /* ---------- Botón flotante de reserva ---------- */
+  .book-float-btn{
+    display:none; position:fixed; bottom:26px; right:22px; z-index:80;
+    align-items:center; gap:10px; background:var(--teal); color:var(--ivory);
+    border:none; border-radius:999px; padding:15px 24px; font-size:0.92rem;
+    font-family:'Jost',sans-serif; cursor:pointer; box-shadow:0 12px 28px rgba(9,52,48,0.35);
+    transition:background .2s ease, transform .2s ease;
+  }
+  .book-float-btn.visible{display:inline-flex;}
+  .book-float-btn:hover{background:var(--teal-deep); transform:translateY(-2px);}
+  .book-float-btn svg{width:20px;height:20px;}
+
+  /* ---------- Modal de reserva ---------- */
+  .book-modal-overlay{
+    display:none; position:fixed; inset:0; z-index:120; background:rgba(9,52,48,0.55);
+    align-items:flex-start; justify-content:center; padding:26px 16px; overflow-y:auto;
+  }
+  .book-modal-overlay.open{display:flex;}
+  .book-modal{
+    background:var(--ivory); border-radius:18px; padding:30px 26px; max-width:460px; width:100%;
+    position:relative; margin-top:20px;
+  }
+  .book-modal h3{font-size:1.35rem; margin-bottom:8px;}
+  .book-modal .hint{color:var(--ink-soft); font-size:0.85rem; margin-bottom:18px;}
+  .book-modal .field{margin-bottom:14px;}
+  .book-modal label{display:block; font-size:0.82rem; color:var(--ink-soft); margin-bottom:6px;}
+  .book-modal input, .book-modal select{
+    width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 13px;
+    font-family:'Jost',sans-serif; font-size:0.9rem; color:var(--ink); background:#fff;
+  }
+  .book-close{
+    position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.6rem;
+    color:var(--ink-soft); cursor:pointer; line-height:1;
+  }
+  .time-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .time-slot{
+    border:1px solid var(--line); border-radius:8px; padding:8px 4px; font-size:0.8rem;
+    background:#fff; color:var(--ink); cursor:pointer; text-align:center; font-family:'Jost',sans-serif;
+  }
+  .time-slot:hover{border-color:var(--teal);}
+  .time-slot.selected{background:var(--teal); color:var(--ivory); border-color:var(--teal);}
+  .time-slot.taken{background:var(--mist); color:var(--ink-soft); text-decoration:line-through; cursor:not-allowed;}
+  .cal-link{
+    display:inline-block; margin-top:14px; font-size:0.85rem; color:var(--teal); text-decoration:underline;
+  }
+
   /* ---------- Process (recipes style) ---------- */
   .ideas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
   .idea-card{background:var(--ivory); border:1px solid var(--line); border-radius:18px; padding:26px 24px;}
@@ -325,6 +371,9 @@
 
     .testimonial-grid{grid-template-columns:1fr;}
     .rating-summary{padding:22px 20px; gap:22px;}
+    .book-float-btn{padding:13px 18px; font-size:0.85rem; bottom:18px; right:16px;}
+    .time-grid{grid-template-columns:repeat(3,1fr);}
+    .book-modal{padding:24px 18px;}
   }
 </style>
 </head>
@@ -557,6 +606,66 @@
   </div>
 </section>
 
+<!-- ================= BOTÓN FLOTANTE DE RESERVA ================= -->
+<button type="button" id="bookFloatBtn" class="book-float-btn">
+  <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="14" r="1.2" fill="currentColor"/><circle cx="12" cy="14" r="1.2" fill="currentColor"/><circle cx="16" cy="14" r="1.2" fill="currentColor"/></svg>
+  <span data-i18n="bookFloatLabel">Reservar cita</span>
+</button>
+
+<!-- ================= MODAL DE RESERVA ================= -->
+<div class="book-modal-overlay" id="bookModal">
+  <div class="book-modal">
+    <button type="button" class="book-close" id="bookCloseBtn">&times;</button>
+    <h3 data-i18n="bookTitle">Reserva tu cita</h3>
+    <p class="hint" data-i18n="bookHint">Horario disponible de 7:00 am a 7:00 pm. El cupo se bloquea en cuanto se confirma.</p>
+
+    <div class="field">
+      <label for="bkName" data-i18n="bookName">Nombre del paciente</label>
+      <input type="text" id="bkName" placeholder="Ej. María González">
+    </div>
+
+    <div class="field">
+      <label for="bkService" data-i18n="bookService">Tipo de servicio</label>
+      <select id="bkService">
+        <option value="Control de sobrepeso y obesidad" data-i18n-opt="svcBtn1">Control de peso</option>
+        <option value="Tratamiento para líneas de expresión" data-i18n-opt="svcBtn2">Líneas de expresión</option>
+        <option value="Lifting facial" data-i18n-opt="svcBtn3">Lifting facial</option>
+        <option value="Armonización facial" data-i18n-opt="svcBtn4">Armonización facial</option>
+        <option value="Manejo de cicatrices" data-i18n-opt="svcBtn5">Manejo de cicatrices</option>
+        <option value="Alopecia androgénica" data-i18n-opt="svcBtn6">Alopecia androgénica</option>
+        <option value="Terapia androgénica" data-i18n-opt="svcBtn7">Terapia androgénica</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="bkEmail" data-i18n="bookEmail">Correo del paciente</label>
+      <input type="text" id="bkEmail" placeholder="correo@ejemplo.com">
+    </div>
+
+    <div class="field">
+      <label for="bkPhone" data-i18n="bookPhone">Número del paciente</label>
+      <input type="text" id="bkPhone" placeholder="+34 600 000 000">
+    </div>
+
+    <div class="field">
+      <label for="bkDate" data-i18n="bookDate">Fecha</label>
+      <input type="date" id="bkDate">
+    </div>
+
+    <div class="field">
+      <label data-i18n="bookTime">Hora disponible</label>
+      <div class="time-grid" id="timeGrid">
+        <p class="hint" data-i18n="bookPickDate">Elige primero una fecha.</p>
+      </div>
+    </div>
+
+    <button type="button" class="send-btn" id="bookConfirmBtn">
+      <span data-i18n="bookConfirm">Confirmar reserva</span>
+    </button>
+    <p class="testimonial-note" id="bookMsg" style="display:none;"></p>
+  </div>
+</div>
+
 <!-- ================= SOBRE MÍ ================= -->
 <section id="sobre-mi" class="tab-panel">
   <div class="wrap about">
@@ -709,14 +818,20 @@
   const tabLinks = document.querySelectorAll('.tabnav a');
   const navLinks = document.querySelectorAll('.tabnav a');
   const panels = document.querySelectorAll('.tab-panel');
+  const bookFloatBtn = document.getElementById('bookFloatBtn');
   tabLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = link.getAttribute('href').slice(1);
       navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + targetId));
       panels.forEach(p => p.classList.toggle('active', p.id === targetId));
+      bookFloatBtn.classList.toggle('visible', targetId === 'servicios');
     });
   });
+  // Muestra el botón flotante también si "servicios" ya es la pestaña activa al cargar
+  if (document.querySelector('.tabnav a.active')?.getAttribute('href') === '#servicios') {
+    bookFloatBtn.classList.add('visible');
+  }
 
   // 3) Botones de servicios: muestran el detalle correspondiente
   const serviceBtns = document.querySelectorAll('.service-btn');
@@ -771,6 +886,11 @@
       testi2: "\"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización.\"",
       testiNote: "Estas reseñas son de ejemplo, para mostrar el diseño. Reemplázalas por comentarios reales de tus pacientes (con su permiso) antes de publicar la página.",
       testiLoading: "Cargando reseñas...",
+      bookFloatLabel: "Reservar cita",
+      bookTitle: "Reserva tu cita", bookHint: "Horario disponible de 7:00 am a 7:00 pm. El cupo se bloquea en cuanto se confirma.",
+      bookName: "Nombre del paciente", bookService: "Tipo de servicio", bookEmail: "Correo del paciente",
+      bookPhone: "Número del paciente", bookDate: "Fecha", bookTime: "Hora disponible",
+      bookPickDate: "Elige primero una fecha.", bookConfirm: "Confirmar reserva",
       reviewFormTitle: "¿Nos quieres dejar tu opinión?",
       reviewFormHint: "Completa el formulario y se enviará directo por WhatsApp a la Dra. Velásquez Roa, quien revisará tu comentario antes de publicarlo.",
       reviewName: "Tu nombre", reviewStars: "Calificación", reviewComment: "Tu comentario", reviewSend: "Enviar por WhatsApp",
@@ -824,6 +944,11 @@
       testi2: "\"Example review — replace it with a real patient comment, with their permission.\"",
       testiNote: "These reviews are placeholders to show the design. Replace them with real patient comments (with their consent) before publishing the page.",
       testiLoading: "Loading reviews...",
+      bookFloatLabel: "Book appointment",
+      bookTitle: "Book your appointment", bookHint: "Available hours from 7:00 am to 7:00 pm. The slot is blocked as soon as it's confirmed.",
+      bookName: "Patient name", bookService: "Service type", bookEmail: "Patient email",
+      bookPhone: "Patient phone", bookDate: "Date", bookTime: "Available time",
+      bookPickDate: "Pick a date first.", bookConfirm: "Confirm booking",
       reviewFormTitle: "Want to leave us your feedback?",
       reviewFormHint: "Fill out the form and it will be sent directly via WhatsApp to Dr. Velásquez Roa, who will review your comment before publishing it.",
       reviewName: "Your name", reviewStars: "Rating", reviewComment: "Your comment", reviewSend: "Send via WhatsApp",
@@ -847,6 +972,12 @@
     document.documentElement.setAttribute('lang', lang);
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
+      if (translations[lang] && translations[lang][key] !== undefined) {
+        el.textContent = translations[lang][key];
+      }
+    });
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+      const key = el.getAttribute('data-i18n-opt');
       if (translations[lang] && translations[lang][key] !== undefined) {
         el.textContent = translations[lang][key];
       }
@@ -1005,6 +1136,120 @@
     .catch(() => {
       testimonialGrid.innerHTML = `<p class="testimonial-note">${currentLang === 'es' ? 'No se pudieron cargar las reseñas.' : 'Reviews could not be loaded.'}</p>`;
     });
+
+  // 8) Sistema de reservas de citas
+  const HOURS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+  const bookModal = document.getElementById('bookModal');
+  const bkDate = document.getElementById('bkDate');
+  const timeGrid = document.getElementById('timeGrid');
+  const bookMsg = document.getElementById('bookMsg');
+  let selectedTime = null;
+
+  // fecha mínima: hoy
+  const todayStr = new Date().toISOString().split('T')[0];
+  bkDate.setAttribute('min', todayStr);
+
+  function openBookModal() {
+    // preselecciona el servicio que el usuario está viendo
+    const activeBtn = document.querySelector('.service-btn.active');
+    if (activeBtn) {
+      const key = activeBtn.getAttribute('data-service');
+      const map = { peso:0, expresion:1, lifting:2, armonizacion:3, cicatrices:4, alopecia:5, terapia:6 };
+      const select = document.getElementById('bkService');
+      if (map[key] !== undefined) select.selectedIndex = map[key];
+    }
+    bookModal.classList.add('open');
+  }
+  function closeBookModal() { bookModal.classList.remove('open'); }
+
+  bookFloatBtn.addEventListener('click', openBookModal);
+  document.getElementById('bookCloseBtn').addEventListener('click', closeBookModal);
+  bookModal.addEventListener('click', (e) => { if (e.target === bookModal) closeBookModal(); });
+
+  function renderTimeGrid(takenTimes) {
+    timeGrid.innerHTML = HOURS.map(h => {
+      const isTaken = takenTimes.includes(h);
+      return `<button type="button" class="time-slot${isTaken ? ' taken' : ''}" data-time="${h}" ${isTaken ? 'disabled' : ''}>${h}</button>`;
+    }).join('');
+    timeGrid.querySelectorAll('.time-slot:not(.taken)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeGrid.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedTime = btn.getAttribute('data-time');
+      });
+    });
+  }
+
+  bkDate.addEventListener('change', () => {
+    selectedTime = null;
+    timeGrid.innerHTML = `<p class="hint">${currentLang === 'es' ? 'Buscando horarios disponibles...' : 'Checking available times...'}</p>`;
+    const date = bkDate.value;
+    if (!date) return;
+    db.collection('slots').where('date', '==', date).get().then(snapshot => {
+      const taken = [];
+      snapshot.forEach(doc => taken.push(doc.data().time));
+      renderTimeGrid(taken);
+    }).catch(() => {
+      renderTimeGrid([]);
+    });
+  });
+
+  function showBookMsg(text, isError) {
+    bookMsg.innerHTML = text;
+    bookMsg.style.display = 'block';
+    bookMsg.style.background = isError ? '#f4d9d9' : 'var(--mist)';
+  }
+
+  document.getElementById('bookConfirmBtn').addEventListener('click', () => {
+    const name = document.getElementById('bkName').value.trim();
+    const service = document.getElementById('bkService').value;
+    const email = document.getElementById('bkEmail').value.trim();
+    const phone = document.getElementById('bkPhone').value.trim();
+    const date = bkDate.value;
+
+    if (!name || !email || !phone || !date || !selectedTime) {
+      showBookMsg(currentLang === 'es'
+        ? 'Completa todos los campos y elige un horario disponible.'
+        : 'Please fill in all fields and pick an available time.', true);
+      return;
+    }
+
+    const slotId = `${date}_${selectedTime}`;
+    db.collection('slots').doc(slotId).set({ date, time: selectedTime, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(() => {
+        return db.collection('bookings').add({
+          name, service, email, phone, date, time: selectedTime,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => {
+        const [y, m, d] = date.split('-');
+        const startDT = `${y}${m}${d}T${selectedTime.replace(':','')}00`;
+        const endHour = String(Number(selectedTime.split(':')[0]) + 1).padStart(2, '0');
+        const endDT = `${y}${m}${d}T${endHour}0000`;
+        const calText = encodeURIComponent(`Cita: ${service} — ${name}`);
+        const calDetails = encodeURIComponent(`Paciente: ${name}\nServicio: ${service}\nCorreo: ${email}\nTeléfono: ${phone}`);
+        const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+
+        const okMsg = currentLang === 'es'
+          ? `¡Cita confirmada para el ${date} a las ${selectedTime}!`
+          : `Appointment confirmed for ${date} at ${selectedTime}!`;
+        const calLabel = currentLang === 'es' ? 'Agregar a Google Calendar' : 'Add to Google Calendar';
+        showBookMsg(`${okMsg}<br><a class="cal-link" href="${calUrl}" target="_blank" rel="noopener">${calLabel}</a>`, false);
+
+        document.getElementById('bkName').value = '';
+        document.getElementById('bkEmail').value = '';
+        document.getElementById('bkPhone').value = '';
+        selectedTime = null;
+        bkDate.dispatchEvent(new Event('change'));
+      })
+      .catch(() => {
+        showBookMsg(currentLang === 'es'
+          ? 'Ese horario se acaba de ocupar. Por favor elige otro.'
+          : 'That time slot was just taken. Please choose another.', true);
+        bkDate.dispatchEvent(new Event('change'));
+      });
+  });
 </script>
 
 </body>
