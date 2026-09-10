@@ -172,6 +172,30 @@
   .about-copy p{color:var(--ink-soft); margin-bottom:16px; max-width:52ch;}
   .about-copy p:last-child{margin-bottom:0;}
 
+  /* ---------- Testimonios ---------- */
+  .testimonials{margin-top:64px; padding-top:56px; border-top:1px solid var(--line);}
+  .testimonials-head{display:flex; align-items:center; gap:8px; margin-bottom:28px;}
+  .testimonials-head h3{font-size:1.4rem;}
+  .rating-summary{
+    display:flex; flex-wrap:wrap; gap:36px; align-items:center;
+    background:var(--mist); border-radius:18px; padding:28px 30px; margin-bottom:30px;
+  }
+  .rating-big{text-align:center;}
+  .rating-big .num{font-family:'Cormorant Garamond',serif; font-size:3.2rem; color:var(--teal-deep); line-height:1;}
+  .rating-big .count{margin-top:6px; font-size:0.85rem; color:var(--ink-soft); white-space:nowrap;}
+  .rating-bars{flex:1; min-width:200px; display:flex; flex-direction:column; gap:7px;}
+  .rating-bars .row{display:flex; align-items:center; gap:10px; font-size:0.82rem; color:var(--ink-soft);}
+  .rating-bars .row span:first-child{width:46px; flex:none;}
+  .rating-bars .row span:last-child{width:40px; flex:none; text-align:right;}
+  .bar-track{flex:1; height:7px; border-radius:99px; background:var(--line); overflow:hidden;}
+  .bar-fill{height:100%; background:var(--gold);}
+  .testimonial-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  .testimonial-card{background:var(--ivory); border:1px solid var(--line); border-radius:16px; padding:24px;}
+  .testimonial-card .stars{color:var(--gold); font-size:0.95rem; letter-spacing:2px; margin-bottom:10px;}
+  .testimonial-card .name{font-weight:600; color:var(--ink); margin-bottom:6px; font-size:0.95rem;}
+  .testimonial-card p{color:var(--ink-soft); font-size:0.9rem; font-style:italic;}
+  .testimonial-note{margin-top:20px; font-size:0.78rem; color:var(--ink-soft); background:var(--mist); border-radius:10px; padding:12px 16px;}
+
   /* ---------- Process (recipes style) ---------- */
   .ideas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
   .idea-card{background:var(--ivory); border:1px solid var(--line); border-radius:18px; padding:26px 24px;}
@@ -255,6 +279,9 @@
 
     .tabnav a{font-size:0.68rem; padding:12px 4px 10px;}
     .tabnav a svg{width:19px;height:19px;}
+
+    .testimonial-grid{grid-template-columns:1fr;}
+    .rating-summary{padding:22px 20px; gap:22px;}
   }
 </style>
 </head>
@@ -504,6 +531,40 @@
       <p data-i18n="aboutP2">Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.</p>
     </div>
   </div>
+
+  <div class="wrap testimonials">
+    <div class="testimonials-head">
+      <h3 data-i18n="testiTitle">🎤 Lo que dicen nuestras pacientes</h3>
+    </div>
+
+    <div class="rating-summary">
+      <div class="rating-big">
+        <div class="num">5.0</div>
+        <div class="count" data-i18n="testiCount">3 reseñas y contando</div>
+      </div>
+      <div class="rating-bars">
+        <div class="row"><span>5 <span style="color:var(--gold)">★</span></span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span>100%</span></div>
+        <div class="row"><span>4 <span style="color:var(--gold)">★</span></span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>3 <span style="color:var(--gold)">★</span></span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>2 <span style="color:var(--gold)">★</span></span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>1 <span style="color:var(--gold)">★</span></span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+      </div>
+    </div>
+
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <div class="name">María G.</div>
+        <p data-i18n="testi1">"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización."</p>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <div class="name">Carla R.</div>
+        <p data-i18n="testi2">"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización."</p>
+      </div>
+    </div>
+    <p class="testimonial-note" data-i18n="testiNote">Estas reseñas son de ejemplo, para mostrar el diseño. Reemplázalas por comentarios reales de tus pacientes (con su permiso) antes de publicar la página.</p>
+  </div>
 </section>
 
 <!-- ================= PROCESO ================= -->
@@ -640,6 +701,10 @@
       aboutTitle: "Nuestra historia", aboutSub: "Sobre la Dra. Velásquez Roa",
       aboutP1: "La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.",
       aboutP2: "Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.",
+      testiTitle: "🎤 Lo que dicen nuestras pacientes", testiCount: "3 reseñas y contando",
+      testi1: "\"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización.\"",
+      testi2: "\"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización.\"",
+      testiNote: "Estas reseñas son de ejemplo, para mostrar el diseño. Reemplázalas por comentarios reales de tus pacientes (con su permiso) antes de publicar la página.",
       processTitle: "Proceso", processSub: "Ideas claras de cómo empezamos",
       step1h: "Valoración inicial", step1p: "Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.",
       step2h: "Estudios y marcadores", step2p: "Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.",
@@ -685,6 +750,10 @@
       aboutTitle: "Our story", aboutSub: "About Dr. Velásquez Roa",
       aboutP1: "Dr. Lorena Velásquez Roa was born from the conviction that medicine should look at the whole person, not just the symptom. She combines functional, hormonal and clinical nutrition medicine in a single plan.",
       aboutP2: "Every assessment starts from your real history and your biological markers, so treatment responds to your body — not to a generic formula.",
+      testiTitle: "🎤 What our patients say", testiCount: "3 reviews and counting",
+      testi1: "\"Example review — replace it with a real patient comment, with their permission.\"",
+      testi2: "\"Example review — replace it with a real patient comment, with their permission.\"",
+      testiNote: "These reviews are placeholders to show the design. Replace them with real patient comments (with their consent) before publishing the page.",
       processTitle: "Process", processSub: "A clear idea of how we start",
       step1h: "Initial assessment", step1p: "We review your medical history, habits and goals in the first consultation.",
       step2h: "Studies and markers", step2p: "We analyze your hormonal, metabolic and nutritional profile in depth.",
