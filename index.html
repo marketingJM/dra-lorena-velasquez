@@ -73,11 +73,11 @@
 
   /* ---------- Hero banner (overlay text like kefify) ---------- */
   .hero-banner{
-    position:relative; width:100%; min-height:0; overflow:hidden;
-    background:linear-gradient(120deg,var(--teal) 0%, var(--teal-deep) 100%);
+    position:relative; width:100%; min-height:380px; overflow:hidden;
+    background-image:linear-gradient(100deg, rgba(9,52,48,0.82) 0%, rgba(9,52,48,0.55) 45%, rgba(9,52,48,0.18) 100%), url('hero-bg.jpg');
+    background-size:cover; background-position:center 38%;
     display:flex; align-items:center;
   }
-  .hero-banner .deco{position:absolute; inset:0; opacity:0.35;}
   .hero-banner .hero-inner{
     position:relative; z-index:2; max-width:var(--max); margin:0 auto; width:100%;
     padding:34px 28px; display:block;
@@ -205,6 +205,7 @@
     .service-btn{font-size:0.68rem; padding:12px 8px 10px; min-width:84px;}
     .service-btn svg{width:19px;height:19px;}
 
+    .hero-banner{min-height:300px; background-position:65% 30%;}
     .hero-banner .hero-inner{padding:26px 20px;}
     .hero-banner h1{font-size:1.4rem;}
     .hero-banner .sub{font-size:0.9rem;}
@@ -247,11 +248,6 @@
 
 <!-- ================= HERO BANNER ================= -->
 <div class="hero-banner">
-  <svg class="deco" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <g opacity="0.5" stroke="#C9A44E" stroke-width="1.5">
-      <path d="M980 -20 C1120 60 950 160 1080 240 C950 320 1120 420 980 500" fill="none"/>
-    </g>
-  </svg>
   <div class="hero-inner">
     <div>
       <h1>Salud y calidad para cada etapa de tu vida</h1>
