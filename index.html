@@ -145,8 +145,8 @@
   .service-panel{display:none;}
   .service-panel.active{display:block; animation:panelIn .25s ease;}
   .service-panel h3{font-size:1.5rem; margin-bottom:20px;}
-  .service-media{max-width:420px; border-radius:16px; overflow:hidden; aspect-ratio:4/3; margin-bottom:22px;}
-  .service-media svg{width:100%;height:100%;display:block;}
+  .service-media{max-width:420px; border-radius:16px; overflow:hidden; aspect-ratio:4/3; margin-bottom:22px; background:var(--mist);}
+  .service-media img, .service-media svg{width:100%;height:100%;display:block; object-fit:cover;}
   .service-panel p{color:var(--ink-soft); font-size:0.95rem; margin-top:12px; max-width:60ch;}
   .service-panel p strong{color:var(--ink); font-weight:600;}
 
@@ -362,12 +362,7 @@
       <div class="service-panel active" data-panel="peso">
         <h3>Control de sobrepeso y obesidad</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#EFE9D8"/>
-            <circle cx="80" cy="52" r="34" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <path d="M80 30 L80 52 L96 60" stroke="#A8823D" stroke-width="4" stroke-linecap="round" fill="none"/>
-            <path d="M50 96 C50 78 62 66 80 66 C98 66 110 78 110 96" fill="none" stroke="#0E4A44" stroke-width="4" stroke-linecap="round"/>
-          </svg>
+          <img src="1.png" alt="Control de sobrepeso y obesidad">
         </div>
         
         <p><strong>Qué es:</strong> un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.</p>
@@ -377,14 +372,7 @@
       <div class="service-panel" data-panel="expresion">
         <h3>Tratamiento para líneas de expresión</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#E8EFEC"/>
-            <ellipse cx="80" cy="64" rx="34" ry="40" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <path d="M62 50 C68 44 92 44 98 50" stroke="#0E4A44" stroke-width="2.5" fill="none"/>
-            <path d="M58 66 L102 66 M60 76 L100 76" stroke="#A8823D" stroke-width="2" opacity="0.7"/>
-            <circle cx="112" cy="40" r="5" fill="#A8823D"/>
-            <line x1="112" y1="45" x2="112" y2="58" stroke="#A8823D" stroke-width="3" stroke-linecap="round"/>
-          </svg>
+          <img src="2.png" alt="Tratamiento para líneas de expresión">
         </div>
         
         <p><strong>Qué es:</strong> aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.</p>
@@ -394,13 +382,7 @@
       <div class="service-panel" data-panel="lifting">
         <h3>Lifting facial</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#EFE9D8"/>
-            <ellipse cx="80" cy="66" rx="30" ry="38" fill="none" stroke="#A8823D" stroke-width="3"/>
-            <path d="M60 50 C66 44 94 44 100 50" stroke="#0E4A44" stroke-width="2.5" fill="none"/>
-            <path d="M56 40 L64 48 M104 40 L96 48" stroke="#0E4A44" stroke-width="3" stroke-linecap="round"/>
-            <path d="M80 22 L80 32" stroke="#0E4A44" stroke-width="3" stroke-linecap="round"/>
-          </svg>
+          <img src="3.png" alt="Lifting facial">
         </div>
         
         <p><strong>Qué es:</strong> un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.</p>
@@ -410,13 +392,7 @@
       <div class="service-panel" data-panel="armonizacion">
         <h3>Armonización facial</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#E8EFEC"/>
-            <circle cx="80" cy="60" r="32" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <line x1="80" y1="28" x2="80" y2="92" stroke="#A8823D" stroke-width="2"/>
-            <line x1="48" y1="60" x2="112" y2="60" stroke="#A8823D" stroke-width="2"/>
-            <circle cx="80" cy="60" r="5" fill="#0E4A44"/>
-          </svg>
+          <img src="4.png" alt="Armonización facial">
         </div>
         
         <p><strong>Qué es:</strong> un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.</p>
@@ -426,13 +402,7 @@
       <div class="service-panel" data-panel="cicatrices">
         <h3>Manejo de cicatrices</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#EFE9D8"/>
-            <rect x="44" y="40" width="72" height="40" rx="8" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <line x1="58" y1="34" x2="58" y2="86" stroke="#A8823D" stroke-width="3"/>
-            <line x1="102" y1="34" x2="102" y2="86" stroke="#A8823D" stroke-width="3"/>
-            <line x1="70" y1="60" x2="90" y2="60" stroke="#0E4A44" stroke-width="2.5" stroke-dasharray="3 4"/>
-          </svg>
+          <img src="5.png" alt="Manejo de cicatrices">
         </div>
         
         <p><strong>Qué es:</strong> evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.</p>
@@ -442,12 +412,7 @@
       <div class="service-panel" data-panel="alopecia">
         <h3>Alopecia androgénica</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#E8EFEC"/>
-            <path d="M80 26 C64 40 64 60 80 74 C96 60 96 40 80 26" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <path d="M62 78 C70 90 90 90 98 78" stroke="#A8823D" stroke-width="2.5" fill="none" stroke-dasharray="2 5"/>
-            <path d="M56 90 C68 100 92 100 104 90" stroke="#A8823D" stroke-width="2" fill="none" stroke-dasharray="2 5" opacity="0.6"/>
-          </svg>
+          <img src="6.png" alt="Alopecia androgénica">
         </div>
         
         <p><strong>Qué es:</strong> diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.</p>
@@ -457,12 +422,7 @@
       <div class="service-panel" data-panel="terapia">
         <h3>Terapia androgénica</h3>
         <div class="service-media">
-          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="160" height="120" fill="#EFE9D8"/>
-            <circle cx="60" cy="50" r="16" fill="none" stroke="#0E4A44" stroke-width="3"/>
-            <circle cx="94" cy="72" r="16" fill="none" stroke="#A8823D" stroke-width="3"/>
-            <line x1="70" y1="58" x2="86" y2="66" stroke="#0E4A44" stroke-width="2.5"/>
-          </svg>
+          <img src="7.png" alt="Terapia androgénica">
         </div>
         
         <p><strong>Qué es:</strong> manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.</p>
