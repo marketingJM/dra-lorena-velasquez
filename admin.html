@@ -189,13 +189,14 @@
 
   function loadBookings() {
     const bookingsList = document.getElementById('bookingsList');
-    db.collection('bookings').orderBy('date').orderBy('time').get().then(snapshot => {
+    db.collection('bookings').get().then(snapshot => {
       const bookings = [];
       snapshot.forEach(doc => {
         const data = doc.data();
         data.id = doc.id;
         bookings.push(data);
       });
+      bookings.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
       bookingsList.innerHTML = bookings.length
         ? bookings.map(b => {
@@ -218,6 +219,8 @@
           </div>`;
           }).join('')
         : '<p class="empty">No hay citas agendadas.</p>';
+    }).catch(err => {
+      bookingsList.innerHTML = `<p class="empty">No se pudieron cargar las citas (${err.message}).</p>`;
     });
   }
 
