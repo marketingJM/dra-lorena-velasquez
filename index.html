@@ -1317,6 +1317,16 @@
           patient_phone: phone
         }).catch(() => { /* si falla el correo, la reserva ya quedó guardada de todas formas */ });
 
+        // Notifica por correo al paciente
+        emailjs.send('service_orhl7ec', 'template_ger44ar', {
+          patient_name: name,
+          service: service,
+          date: date,
+          time: selectedTime,
+          patient_email: email,
+          patient_phone: phone
+        }).catch(() => { /* si falla el correo, la reserva ya quedó guardada de todas formas */ });
+
         const okMsg = currentLang === 'es'
           ? `¡Cita confirmada para el ${date} a las ${selectedTime}!`
           : `Appointment confirmed for ${date} at ${selectedTime}!`;
