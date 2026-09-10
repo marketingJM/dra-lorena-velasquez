@@ -422,7 +422,6 @@
       const targetId = link.getAttribute('href').slice(1);
       navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + targetId));
       panels.forEach(p => p.classList.toggle('active', p.id === targetId));
-      window.scrollTo(0, 0);
     });
   });
 </script>
