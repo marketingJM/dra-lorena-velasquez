@@ -71,6 +71,9 @@
   .approve-btn:hover{background:var(--teal-deep);}
   .reject-btn, .delete-btn{background:var(--mist); color:var(--ink);}
   .reject-btn:hover, .delete-btn:hover{background:#e3d9d9;}
+  .cal-btn{background:var(--gold); color:#fff; text-decoration:none; display:inline-block;}
+  .cal-btn:hover{opacity:0.9;}
+  .booking-when{font-weight:600; color:var(--teal-deep);}
   .empty{color:var(--ink-soft); font-size:0.9rem;}
 </style>
 </head>
@@ -98,6 +101,11 @@
   <section>
     <h2>Publicadas actualmente</h2>
     <div id="approvedList"><p class="empty">Cargando...</p></div>
+  </section>
+
+  <section>
+    <h2>Citas agendadas</h2>
+    <div id="bookingsList"><p class="empty">Cargando...</p></div>
   </section>
 </div>
 
@@ -168,6 +176,49 @@
           </div>`).join('')
         : '<p class="empty">Todavía no hay reseñas publicadas.</p>';
     });
+
+    loadBookings();
+  }
+
+  function loadBookings() {
+    const bookingsList = document.getElementById('bookingsList');
+    db.collection('bookings').orderBy('date').orderBy('time').get().then(snapshot => {
+      const bookings = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        data.id = doc.id;
+        bookings.push(data);
+      });
+
+      bookingsList.innerHTML = bookings.length
+        ? bookings.map(b => {
+            const [y, m, d] = b.date.split('-');
+            const startDT = `${y}${m}${d}T${b.time.replace(':', '')}00`;
+            const endHour = String(Number(b.time.split(':')[0]) + 1).padStart(2, '0');
+            const endDT = `${y}${m}${d}T${endHour}0000`;
+            const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
+            const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
+            const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+            return `
+          <div class="card">
+            <div class="booking-when">${b.date} — ${b.time}</div>
+            <div class="name">${b.name} (${b.service})</div>
+            <div class="comment">${b.email} · ${b.phone}</div>
+            <div class="actions">
+              <a class="cal-btn" href="${calUrl}" target="_blank" rel="noopener">Agregar a Google Calendar</a>
+              <button class="delete-btn" onclick="cancelBooking('${b.id}', '${b.date}', '${b.time}')">Cancelar cita</button>
+            </div>
+          </div>`;
+          }).join('')
+        : '<p class="empty">No hay citas agendadas.</p>';
+    });
+  }
+
+  function cancelBooking(id, date, time) {
+    if (!confirm('¿Cancelar esta cita? El horario quedará libre de nuevo.')) return;
+    db.collection('bookings').doc(id).delete()
+      .then(() => db.collection('slots').doc(`${date}_${time}`).delete())
+      .then(loadBookings);
   }
 
   function approveReview(id) {
