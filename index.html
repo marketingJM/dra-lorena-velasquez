@@ -35,6 +35,12 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 </script>
+
+<!-- ===== EmailJS (notificación de reserva nueva) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("jraHTQEiLA8iXEw80");
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1300,6 +1306,16 @@
         const calText = encodeURIComponent(`Cita: ${service} — ${name}`);
         const calDetails = encodeURIComponent(`Paciente: ${name}\nServicio: ${service}\nCorreo: ${email}\nTeléfono: ${phone}`);
         const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+
+        // Notifica por correo a la Dra. Velásquez Roa
+        emailjs.send('service_orhl7ec', 'template_vbtwuve', {
+          patient_name: name,
+          service: service,
+          date: date,
+          time: selectedTime,
+          patient_email: email,
+          patient_phone: phone
+        }).catch(() => { /* si falla el correo, la reserva ya quedó guardada de todas formas */ });
 
         const okMsg = currentLang === 'es'
           ? `¡Cita confirmada para el ${date} a las ${selectedTime}!`
