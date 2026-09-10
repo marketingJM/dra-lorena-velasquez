@@ -31,3 +31,287 @@
   img,svg{display:block;max-width:100%;}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
   ::selection{background:var(--gold-light);color:var(--teal-deep);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 32px; font-size:0.8rem; color:var(--ink-soft);
+    border-bottom:1px solid var(--line); max-width:var(--max); margin:0 auto;
+  }
+  .topbar .tagline{display:flex; align-items:center; gap:8px;}
+  .topbar .tagline svg{width:16px;height:16px;color:var(--gold);}
+  .topbar .lang{letter-spacing:0.04em;}
+
+  /* ---------- Intro / logo block ---------- */
+  .intro{text-align:center; padding:56px 24px 40px;}
+  .intro .full-logo{width:min(78%,460px);margin:0 auto;}
+  .intro h1.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
+
+  /* ---------- Hero banner (full width) ---------- */
+  .hero-banner{position:relative; width:100%; height:min(62vh,560px); overflow:hidden; background:linear-gradient(160deg,var(--teal),var(--teal-deep)); display:flex; align-items:center; justify-content:center;}
+  .hero-banner .bg-lines{position:absolute; inset:0; width:100%; height:100%; opacity:0.9;}
+  .hero-banner .logo-watermark{position:relative; width:min(46%,420px); filter:drop-shadow(0 18px 40px rgba(0,0,0,0.35));}
+  .hero-tag{
+    position:absolute; left:24px; bottom:24px; background:rgba(250,246,239,0.92);
+    padding:10px 18px; font-size:0.82rem; color:var(--teal-deep); display:flex; align-items:center; gap:8px;
+  }
+  .hero-tag svg{width:14px;height:14px;color:var(--gold);}
+
+  /* ---------- Section nav ---------- */
+  .section-nav{
+    position:sticky; top:0; z-index:40; background:rgba(250,246,239,0.95); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .section-nav ul{
+    list-style:none; margin:0; padding:0; display:flex; justify-content:center; gap:46px;
+    max-width:var(--max); margin:0 auto; padding:18px 32px; flex-wrap:wrap;
+  }
+  .section-nav a{font-size:0.9rem; color:var(--ink); position:relative;}
+  .section-nav a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:1px;background:var(--gold);transition:width .25s ease;}
+  .section-nav a:hover::after{width:100%;}
+
+  /* ---------- Generic section ---------- */
+  section{padding:96px 0;}
+  .section-alt{background:var(--mist);}
+  .head-block{text-align:center; max-width:600px; margin:0 auto 60px;}
+  .head-block .eyebrow{font-size:0.82rem; color:var(--gold); letter-spacing:0.06em; margin-bottom:12px;}
+  .head-block h2{font-size:clamp(1.9rem,3vw,2.5rem);}
+
+  /* ---------- Benefits (icon grid, kefify style) ---------- */
+  .benefits-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:44px;}
+  .benefit{text-align:center;}
+  .benefit .icon-wrap{
+    width:66px;height:66px;border-radius:50%;background:var(--ivory-deep);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  }
+  .benefit .icon-wrap svg{width:28px;height:28px;color:var(--teal);}
+  .benefit h3{font-size:1.15rem;font-weight:600;margin-bottom:10px;}
+  .benefit p{font-size:0.9rem;color:var(--ink-soft);}
+
+  /* ---------- Products/Servicios gallery ---------- */
+  .gallery{display:grid; grid-template-columns:repeat(4,1fr); gap:22px;}
+  .gallery-card{background:var(--ivory);border:1px solid var(--line);overflow:hidden;transition:transform .3s ease, box-shadow .3s ease;}
+  .gallery-card:hover{transform:translateY(-4px); box-shadow:0 14px 30px rgba(9,52,48,0.08);}
+  .gallery-card .thumb{aspect-ratio:1/1;background:linear-gradient(160deg,var(--ivory-deep),var(--mist));display:flex;align-items:center;justify-content:center;}
+  .gallery-card .thumb svg{width:44%;color:var(--teal);}
+  .gallery-card .info{padding:20px;}
+  .gallery-card h3{font-size:1.05rem;font-weight:600;margin-bottom:6px;}
+  .gallery-card p{font-size:0.85rem;color:var(--ink-soft);}
+
+  /* ---------- About (two column, kefify style) ---------- */
+  .about{display:grid; grid-template-columns:0.85fr 1.15fr; gap:70px; align-items:center;}
+  .about-art .frame{aspect-ratio:4/5;border:1px solid var(--line);background:linear-gradient(160deg,var(--ivory-deep),var(--mist));display:flex;align-items:center;justify-content:center;}
+  .about-art .frame svg{width:52%;}
+  .about-copy .eyebrow{font-size:0.82rem;color:var(--gold);letter-spacing:0.06em;margin-bottom:14px;}
+  .about-copy h2{font-size:clamp(1.9rem,3vw,2.4rem);margin-bottom:22px;}
+  .about-copy p{color:var(--ink-soft);margin-bottom:18px;max-width:52ch;}
+  .about-copy p:last-child{margin-bottom:0;}
+
+  /* ---------- Recetas / ideas simples ---------- */
+  .ideas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;}
+  .idea-card{border-top:2px solid var(--gold);padding-top:22px;}
+  .idea-card h3{font-size:1.15rem;font-weight:600;margin-bottom:10px;}
+  .idea-card p{font-size:0.92rem;color:var(--ink-soft);}
+
+  /* ---------- Contact (single CTA, kefify style) ---------- */
+  .contact-block{text-align:center;background:var(--teal);color:var(--ivory);padding:100px 24px;}
+  .contact-block .head-block h2{color:var(--ivory);}
+  .contact-block .head-block .eyebrow{color:var(--gold-light);}
+  .contact-block p.lede{color:rgba(250,246,239,0.8);max-width:480px;margin:0 auto 36px;}
+  .cta-big{
+    display:inline-flex; align-items:center; gap:12px; background:var(--gold);
+    color:var(--teal-deep); padding:18px 40px; font-size:0.98rem; letter-spacing:0.02em;
+    transition:background .25s ease;
+  }
+  .cta-big:hover{background:var(--gold-light);}
+  .cta-big svg{width:20px;height:20px;}
+  .contact-note{margin-top:22px;font-size:0.82rem;color:rgba(250,246,239,0.65);}
+
+  /* ---------- Footer ---------- */
+  footer{padding:36px 0;}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  footer p{font-size:0.8rem;color:var(--ink-soft);}
+  footer .foot-links{display:flex;gap:22px;}
+  footer .foot-links a{font-size:0.8rem;color:var(--ink-soft);}
+  footer .foot-links a:hover{color:var(--teal-deep);}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:940px){
+    .benefits-grid{grid-template-columns:repeat(2,1fr);}
+    .gallery{grid-template-columns:repeat(2,1fr);}
+    .about{grid-template-columns:1fr;}
+    .about-art{max-width:320px;margin:0 auto;}
+    .ideas-grid{grid-template-columns:1fr;}
+    .section-nav ul{gap:22px;overflow-x:auto; justify-content:flex-start;}
+    section{padding:64px 0;}
+    .wrap{padding:0 22px;}
+    .topbar{padding:12px 22px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tagline">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 C16 8 16 16 12 22 C8 16 8 8 12 2" stroke="currentColor" stroke-width="1.4"/></svg>
+    Descubre tu equilibrio
+  </div>
+  <div class="lang">ES</div>
+</div>
+
+<div class="intro">
+  <img class="full-logo" src="Logoo.png" alt="Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento">
+  <h1 class="visually-hidden">Dra. Lorena Velásquez Roa</h1>
+</div>
+
+<div class="hero-banner">
+  <svg class="bg-lines" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g opacity="0.18" stroke="#C9A44E" stroke-width="2">
+      <path d="M60 0 C260 120 -40 260 160 380 C-40 500 260 620 60 720" fill="none"/>
+    </g>
+    <g opacity="0.18" stroke="#C9A44E" stroke-width="2">
+      <path d="M1140 0 C940 120 1240 260 1040 380 C1240 500 940 620 1140 720" fill="none"/>
+    </g>
+  </svg>
+  <img class="logo-watermark" src="Icono.png" alt="Dra. Lorena Velásquez Roa">
+  <div class="hero-tag">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 22 C12 22 20 14.5 20 9 C20 4.5 16.5 1 12 1 C7.5 1 4 4.5 4 9 C4 14.5 12 22 12 22Z" stroke="currentColor" stroke-width="1.4"/></svg>
+    España
+  </div>
+</div>
+
+<nav class="section-nav">
+  <ul>
+    <li><a href="#beneficios">Beneficios</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#sobre-mi">Sobre mí</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<section id="beneficios">
+  <div class="wrap">
+    <div class="head-block">
+      <div class="eyebrow">Beneficios</div>
+      <h2>Por qué elegir un enfoque integral</h2>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M8 12 L11 15 L16 9" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <h3>Causa raíz</h3>
+        <p>Buscamos el origen del síntoma en vez de solo controlarlo.</p>
+      </div>
+      <div class="benefit">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 C16 8 16 16 12 22 C8 16 8 8 12 2" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <h3>Balance hormonal</h3>
+        <p>Ajustes precisos para recuperar energía, sueño y ánimo.</p>
+      </div>
+      <div class="benefit">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 L4 7 L4 13 C4 18 8 21 12 22 C16 21 20 18 20 13 L20 7 Z" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <h3>Prevención real</h3>
+        <p>Marcadores biológicos revisados antes de que aparezca el problema.</p>
+      </div>
+      <div class="benefit">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20 L4 10 L9 10 L9 20 M9 20 L9 4 L15 4 L15 20 M15 20 L15 13 L20 13 L20 20" stroke="currentColor" stroke-width="1.4"/></svg></div>
+        <h3>Resultados medibles</h3>
+        <p>Seguimiento con datos claros en cada etapa del plan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt" id="servicios">
+  <div class="wrap">
+    <div class="head-block">
+      <div class="eyebrow">Servicios</div>
+      <h2>Explora nuestra atención completa</h2>
+    </div>
+    <div class="gallery">
+      <div class="gallery-card">
+        <div class="thumb"><svg viewBox="0 0 40 40" fill="none"><path d="M20 6 C10 14 30 20 20 28 C10 20 30 14 20 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="info"><h3>Antienvejecimiento</h3><p>Protocolos clínicos para retrasar el deterioro celular.</p></div>
+      </div>
+      <div class="gallery-card">
+        <div class="thumb"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="1.6"/><path d="M20 12 L20 20 L26 24" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="info"><h3>Medicina funcional</h3><p>Análisis completo para llegar a la causa de los síntomas.</p></div>
+      </div>
+      <div class="gallery-card">
+        <div class="thumb"><svg viewBox="0 0 40 40" fill="none"><path d="M12 26 C12 18 18 12 26 12" stroke="currentColor" stroke-width="1.6"/><path d="M28 14 C28 22 22 28 14 28" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="info"><h3>Terapias hormonales</h3><p>Seguimiento individualizado de tu perfil hormonal.</p></div>
+      </div>
+      <div class="gallery-card">
+        <div class="thumb"><svg viewBox="0 0 40 40" fill="none"><path d="M20 8 C24 14 24 26 20 32 C16 26 16 14 20 8" stroke="currentColor" stroke-width="1.6"/></svg></div>
+        <div class="info"><h3>Nutrición y estética</h3><p>Planes clínicos que acompañan tu imagen y tu bienestar.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sobre-mi">
+  <div class="wrap about">
+    <div class="about-art">
+      <div class="frame">
+        <svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="70" stroke="#A8823D" stroke-width="1.2" opacity="0.5"/><path d="M70 40 C130 70 60 100 130 130 C60 160 130 190 70 220" stroke="#0E4A44" stroke-width="2.6" transform="translate(0,-20)"/><path d="M130 40 C70 70 140 100 70 130 C140 160 70 190 130 220" stroke="#A8823D" stroke-width="2.6" transform="translate(0,-20)"/></svg>
+      </div>
+    </div>
+    <div class="about-copy">
+      <div class="eyebrow">Sobre mí</div>
+      <h2>Nuestra historia</h2>
+      <p>La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.</p>
+      <p>Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt" id="proceso">
+  <div class="wrap">
+    <div class="head-block">
+      <div class="eyebrow">Proceso</div>
+      <h2>Ideas claras de cómo empezamos</h2>
+    </div>
+    <div class="ideas-grid">
+      <div class="idea-card">
+        <h3>Valoración inicial</h3>
+        <p>Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.</p>
+      </div>
+      <div class="idea-card">
+        <h3>Estudios y marcadores</h3>
+        <p>Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.</p>
+      </div>
+      <div class="idea-card">
+        <h3>Plan y seguimiento</h3>
+        <p>Diseñamos tu protocolo y lo ajustamos con revisiones periódicas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="contact-block" id="contacto">
+  <div class="head-block">
+    <div class="eyebrow">Contacto</div>
+    <h2>Nos encantaría saber de ti</h2>
+  </div>
+  <p class="lede">Escríbenos directamente y te responderemos lo antes posible para agendar tu primera valoración.</p>
+  <a href="#" class="cta-big">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 C21 16.75 16.75 21 11.5 21 C9.8 21 8.2 20.55 6.8 19.75 L3 21 L4.25 17.2 C3.45 15.8 3 14.2 3 12.5 C3 7.25 7.25 3 12.5 3 C17.75 3 21 6.25 21 11.5 Z" stroke="currentColor" stroke-width="1.4"/></svg>
+    Escríbenos ahora
+  </a>
+  <p class="contact-note">Canal de contacto (WhatsApp / teléfono) pendiente de confirmar — este botón queda listo para enlazarlo.</p>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento.</p>
+    <div class="foot-links">
+      <a href="#beneficios">Beneficios</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
