@@ -75,6 +75,22 @@
   .cal-btn:hover{opacity:0.9;}
   .booking-when{font-weight:600; color:var(--teal-deep);}
   .empty{color:var(--ink-soft); font-size:0.9rem;}
+
+  .content-group{margin-bottom:26px; border-top:1px solid var(--line); padding-top:18px;}
+  .content-group h3{font-size:0.95rem; color:var(--teal-deep); margin:0 0 12px;}
+  .content-field{margin-bottom:12px;}
+  .content-field label{display:block; font-size:0.78rem; color:var(--ink-soft); margin-bottom:4px;}
+  .content-field input, .content-field textarea{
+    width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+    font-family:'Jost',sans-serif; font-size:0.88rem; color:var(--ink);
+  }
+  .content-field textarea{min-height:60px; resize:vertical;}
+  #saveContentBtn{
+    background:var(--teal); color:var(--ivory); border:none; border-radius:10px;
+    padding:13px 28px; font-size:0.92rem; cursor:pointer; font-family:'Jost',sans-serif; margin-top:10px;
+  }
+  #saveContentBtn:hover{background:var(--teal-deep);}
+  #contentSaveMsg{font-size:0.85rem; margin-top:10px; min-height:18px; color:var(--teal-deep);}
 </style>
 </head>
 <body>
@@ -107,6 +123,12 @@
     <h2>Citas agendadas</h2>
     <div id="bookingsList"><p class="empty">Cargando...</p></div>
   </section>
+
+  <section>
+    <h2>Contenido del sitio</h2>
+    <p class="sub" style="margin-bottom:20px;">Edita los textos de la página. Los cambios se ven al instante para todos los visitantes al guardar.</p>
+    <div id="contentForm"><p class="empty">Cargando...</p></div>
+  </section>
 </div>
 
 <script>
@@ -130,6 +152,7 @@
       loginBox.style.display = 'none';
       adminPanel.style.display = 'block';
       loadReviews();
+      loadContentForm();
     } else {
       loginBox.style.display = 'block';
       adminPanel.style.display = 'none';
@@ -229,6 +252,108 @@
     db.collection('bookings').doc(id).delete()
       .then(() => db.collection('slots').doc(`${date}_${time}`).delete())
       .then(loadBookings);
+  }
+
+  // ---- Contenido editable del sitio ----
+  const DEFAULT_CONTENT = {
+    heroH1: "Salud y calidad para cada etapa de tu vida",
+    heroSub: "Descubre los beneficios de la medicina integral y cuida tu cuerpo desde la raíz, con un plan hecho a tu medida.",
+    benef1h: "Causa raíz", benef1p: "Buscamos el origen del síntoma en vez de solo controlarlo.",
+    benef2h: "Balance hormonal", benef2p: "Ajustes precisos para recuperar energía, sueño y ánimo.",
+    benef3h: "Prevención real", benef3p: "Marcadores biológicos revisados antes de que aparezca el problema.",
+    benef4h: "Resultados medibles", benef4p: "Seguimiento con datos claros en cada etapa del plan.",
+    svcTitle1: "Control de sobrepeso y obesidad",
+    svcWhat1: "un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.",
+    svcBenef1: "pérdida de peso sostenible en el tiempo, mejora en tus marcadores metabólicos y reducción del riesgo cardiovascular asociado al sobrepeso.",
+    svcTitle2: "Tratamiento para líneas de expresión",
+    svcWhat2: "aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.",
+    svcBenef2: "piel visiblemente más lisa y descansada, con resultados naturales que respetan la expresividad de tu rostro.",
+    svcTitle3: "Lifting facial",
+    svcWhat3: "un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.",
+    svcBenef3: "menos flacidez y rasgos más definidos, sin cirugía ni tiempos de recuperación prolongados.",
+    svcTitle4: "Armonización facial",
+    svcWhat4: "un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.",
+    svcBenef4: "un rostro más armónico y simétrico, resaltando tus rasgos naturales de forma sutil, sin cambiar tu identidad facial.",
+    svcTitle5: "Manejo de cicatrices",
+    svcWhat5: "evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.",
+    svcBenef5: "mejora visible en textura, color y relieve de la piel afectada, con un plan adaptado a tu caso específico.",
+    svcTitle6: "Alopecia androgénica",
+    svcWhat6: "diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.",
+    svcBenef6: "frena la progresión de la caída y favorece la densidad capilar en las zonas donde aún hay folículos activos.",
+    svcTitle7: "Terapia androgénica",
+    svcWhat7: "manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.",
+    svcBenef7: "mejora en energía, composición corporal, salud capilar y bienestar general asociado al balance hormonal.",
+    aboutP1: "La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.",
+    aboutP2: "Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.",
+    step1h: "Valoración inicial", step1p: "Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.",
+    step2h: "Estudios y marcadores", step2p: "Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.",
+    step3h: "Plan y seguimiento", step3p: "Diseñamos tu protocolo y lo ajustamos con revisiones periódicas."
+  };
+
+  const CONTENT_GROUPS = [
+    { title: 'Portada', fields: [
+      ['heroH1', 'Título principal', 'input'], ['heroSub', 'Subtítulo', 'textarea']
+    ]},
+    { title: 'Beneficios', fields: [
+      ['benef1h','Beneficio 1 - título','input'], ['benef1p','Beneficio 1 - texto','textarea'],
+      ['benef2h','Beneficio 2 - título','input'], ['benef2p','Beneficio 2 - texto','textarea'],
+      ['benef3h','Beneficio 3 - título','input'], ['benef3p','Beneficio 3 - texto','textarea'],
+      ['benef4h','Beneficio 4 - título','input'], ['benef4p','Beneficio 4 - texto','textarea']
+    ]},
+    { title: 'Servicios', fields: [
+      ['svcTitle1','Servicio 1 - título','input'], ['svcWhat1','Servicio 1 - Qué es','textarea'], ['svcBenef1','Servicio 1 - Beneficio','textarea'],
+      ['svcTitle2','Servicio 2 - título','input'], ['svcWhat2','Servicio 2 - Qué es','textarea'], ['svcBenef2','Servicio 2 - Beneficio','textarea'],
+      ['svcTitle3','Servicio 3 - título','input'], ['svcWhat3','Servicio 3 - Qué es','textarea'], ['svcBenef3','Servicio 3 - Beneficio','textarea'],
+      ['svcTitle4','Servicio 4 - título','input'], ['svcWhat4','Servicio 4 - Qué es','textarea'], ['svcBenef4','Servicio 4 - Beneficio','textarea'],
+      ['svcTitle5','Servicio 5 - título','input'], ['svcWhat5','Servicio 5 - Qué es','textarea'], ['svcBenef5','Servicio 5 - Beneficio','textarea'],
+      ['svcTitle6','Servicio 6 - título','input'], ['svcWhat6','Servicio 6 - Qué es','textarea'], ['svcBenef6','Servicio 6 - Beneficio','textarea'],
+      ['svcTitle7','Servicio 7 - título','input'], ['svcWhat7','Servicio 7 - Qué es','textarea'], ['svcBenef7','Servicio 7 - Beneficio','textarea']
+    ]},
+    { title: 'Sobre mí', fields: [
+      ['aboutP1','Párrafo 1','textarea'], ['aboutP2','Párrafo 2','textarea']
+    ]},
+    { title: 'Proceso', fields: [
+      ['step1h','Paso 1 - título','input'], ['step1p','Paso 1 - texto','textarea'],
+      ['step2h','Paso 2 - título','input'], ['step2p','Paso 2 - texto','textarea'],
+      ['step3h','Paso 3 - título','input'], ['step3p','Paso 3 - texto','textarea']
+    ]}
+  ];
+
+  function loadContentForm() {
+    const form = document.getElementById('contentForm');
+    db.collection('content').doc('site').get().then(doc => {
+      const current = Object.assign({}, DEFAULT_CONTENT, doc.exists ? doc.data() : {});
+      form.innerHTML = CONTENT_GROUPS.map(group => `
+        <div class="content-group">
+          <h3>${group.title}</h3>
+          ${group.fields.map(([key, label, type]) => `
+            <div class="content-field">
+              <label>${label}</label>
+              ${type === 'textarea'
+                ? `<textarea data-key="${key}">${current[key] || ''}</textarea>`
+                : `<input type="text" data-key="${key}" value="${(current[key] || '').replace(/"/g, '&quot;')}">`}
+            </div>
+          `).join('')}
+        </div>
+      `).join('') + `<button id="saveContentBtn">Guardar cambios</button><p id="contentSaveMsg"></p>`;
+
+      document.getElementById('saveContentBtn').addEventListener('click', saveContent);
+    });
+  }
+
+  function saveContent() {
+    const values = {};
+    document.querySelectorAll('#contentForm [data-key]').forEach(el => {
+      values[el.getAttribute('data-key')] = el.value;
+    });
+    const msg = document.getElementById('contentSaveMsg');
+    msg.textContent = 'Guardando...';
+    db.collection('content').doc('site').set(values, { merge: true }).then(() => {
+      msg.textContent = '¡Guardado! Los cambios ya se ven en la página.';
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+    }).catch(err => {
+      msg.textContent = 'Error al guardar: ' + err.message;
+    });
   }
 
   function approveReview(id) {
