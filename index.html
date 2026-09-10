@@ -237,6 +237,8 @@
   .testimonial-card .name{font-weight:600; color:var(--ink); margin-bottom:6px; font-size:0.95rem;}
   .testimonial-card p{color:var(--ink-soft); font-size:0.9rem; font-style:italic;}
   .testimonial-note{margin-top:20px; font-size:0.78rem; color:var(--ink-soft); background:var(--mist); border-radius:10px; padding:12px 16px;}
+  #bookMsg{font-size:1.05rem; font-weight:600; color:var(--teal-deep); line-height:1.5;}
+  #bookMsg .cal-link{font-size:0.9rem; font-weight:500;}
 
   /* ---------- Formulario "Deja tu reseña" ---------- */
   .review-form{
@@ -1274,6 +1276,7 @@
     bookMsg.innerHTML = text;
     bookMsg.style.display = 'block';
     bookMsg.style.background = isError ? '#f4d9d9' : 'var(--mist)';
+    bookMsg.style.color = isError ? '#8a2b2b' : 'var(--teal-deep)';
   }
 
   document.getElementById('bookConfirmBtn').addEventListener('click', () => {
