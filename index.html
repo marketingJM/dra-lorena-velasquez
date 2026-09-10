@@ -267,16 +267,17 @@
   .review-form .send-btn svg{width:18px;height:18px;}
 
   /* ---------- Botón flotante de reserva ---------- */
+  @keyframes bookPulse{0%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 0 rgba(168,130,61,0.55);} 70%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 12px rgba(168,130,61,0);} 100%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 0 rgba(168,130,61,0);}}
   .book-float-btn{
     display:none; position:fixed; bottom:26px; right:22px; z-index:80;
     align-items:center; gap:10px; background:var(--teal); color:var(--ivory);
-    border:none; border-radius:999px; padding:15px 24px; font-size:0.92rem;
-    font-family:'Jost',sans-serif; cursor:pointer; box-shadow:0 12px 28px rgba(9,52,48,0.35);
-    transition:background .2s ease, transform .2s ease;
+    border:2px solid var(--gold-light); border-radius:999px; padding:17px 28px; font-size:1rem;
+    font-weight:600; font-family:'Jost',sans-serif; cursor:pointer;
+    animation:bookPulse 2.2s infinite; transition:background .2s ease, transform .2s ease;
   }
   .book-float-btn.visible{display:inline-flex;}
-  .book-float-btn:hover{background:var(--teal-deep); transform:translateY(-2px);}
-  .book-float-btn svg{width:20px;height:20px;}
+  .book-float-btn:hover{background:var(--teal-deep); transform:translateY(-2px) scale(1.03);}
+  .book-float-btn svg{width:22px;height:22px;}
 
   /* ---------- Modal de reserva ---------- */
   .book-modal-overlay{
@@ -400,7 +401,7 @@
 
     .testimonial-grid{grid-template-columns:1fr;}
     .rating-summary{padding:22px 20px; gap:22px;}
-    .book-float-btn{padding:13px 18px; font-size:0.85rem; bottom:18px; right:16px;}
+    .book-float-btn{padding:14px 22px; font-size:0.9rem; bottom:18px; right:16px;}
     .time-grid{grid-template-columns:repeat(3,1fr);}
     .book-modal{padding:24px 18px;}
   }
