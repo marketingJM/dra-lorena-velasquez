@@ -1138,7 +1138,14 @@
     });
 
   // 8) Sistema de reservas de citas
-  const HOURS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+  const HOURS = ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30'];
+  function addMinutes(hhmm, mins) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const total = h * 60 + m + mins;
+    const nh = String(Math.floor(total / 60) % 24).padStart(2, '0');
+    const nm = String(total % 60).padStart(2, '0');
+    return `${nh}${nm}`;
+  }
   const bookModal = document.getElementById('bookModal');
   const bkDate = document.getElementById('bkDate');
   const timeGrid = document.getElementById('timeGrid');
@@ -1225,8 +1232,8 @@
       .then(() => {
         const [y, m, d] = date.split('-');
         const startDT = `${y}${m}${d}T${selectedTime.replace(':','')}00`;
-        const endHour = String(Number(selectedTime.split(':')[0]) + 1).padStart(2, '0');
-        const endDT = `${y}${m}${d}T${endHour}0000`;
+        const endHM = addMinutes(selectedTime, 30);
+        const endDT = `${y}${m}${d}T${endHM}00`;
         const calText = encodeURIComponent(`Cita: ${service} — ${name}`);
         const calDetails = encodeURIComponent(`Paciente: ${name}\nServicio: ${service}\nCorreo: ${email}\nTeléfono: ${phone}`);
         const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
