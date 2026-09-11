@@ -219,18 +219,26 @@
 
   /* ---------- About ---------- */
   .about{display:block;}
-  .about-card{
-    display:flex; align-items:center; gap:16px; background:var(--ivory-deep);
-    border-radius:14px; padding:16px 18px; margin:24px 0 26px;
+  .about-banner{
+    position:relative; overflow:hidden; border-radius:16px;
+    background:linear-gradient(135deg,var(--teal),var(--teal-deep));
+    padding:30px 24px; margin:24px 0 26px; display:flex; align-items:center; gap:16px;
+  }
+  .about-banner::before{
+    content:""; position:absolute; right:-40px; top:-40px; width:200px; height:200px;
+    background-image:url('Icono.png'); background-size:contain; background-repeat:no-repeat;
+    opacity:0.12; transform:rotate(8deg);
   }
   .about-portrait{
-    width:72px; height:92px; border-radius:12px; background:linear-gradient(160deg,var(--teal),var(--teal-deep));
+    position:relative; z-index:1; width:74px; height:74px; border-radius:50%;
+    background:rgba(250,246,239,0.12); border:1.5px solid var(--gold-light);
     flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden;
   }
-  .about-portrait img{width:60%;}
-  .about-name{font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:600; color:var(--teal-deep); margin:0 0 8px;}
+  .about-portrait img{width:56%;}
+  .about-banner-info{position:relative; z-index:1;}
+  .about-name{font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--ivory); margin:0 0 10px;}
   .about-chips{display:flex; flex-wrap:wrap; gap:6px;}
-  .chip{background:var(--mist); color:var(--teal-deep); font-size:0.72rem; padding:4px 11px; border-radius:99px;}
+  .chip{background:rgba(250,246,239,0.16); color:var(--ivory); font-size:0.72rem; padding:4px 12px; border-radius:99px;}
   .about-copy p{color:var(--ink-soft); margin-bottom:16px; max-width:60ch;}
   .about-copy p:last-child{margin-bottom:0;}
 
@@ -743,15 +751,11 @@
 <section id="sobre-mi" class="tab-panel">
   <div class="wrap about">
     <div class="about-copy">
-      <div class="head-block">
-        <h2 data-i18n="aboutTitle">Nuestra historia</h2>
-      </div>
-
-      <div class="about-card">
+      <div class="about-banner">
         <div class="about-portrait">
           <img src="Icono.png" alt="Monograma LVR">
         </div>
-        <div class="about-card-info">
+        <div class="about-banner-info">
           <p class="about-name">Dra. Lorena Velásquez Roa</p>
           <div class="about-chips">
             <span class="chip">Medicina Estética</span>
