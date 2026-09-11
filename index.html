@@ -99,20 +99,24 @@
   /* ---------- Info bar ---------- */
   .infobar{
     position:relative;
-    display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:repeat(3,auto);
-    column-gap:16px; row-gap:8px; align-items:center;
+    display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:repeat(2,auto);
+    column-gap:16px; row-gap:10px; align-items:center;
     padding:18px 28px; max-width:var(--max); margin:0 auto;
     border-top:1px solid var(--line); border-bottom:1px solid var(--line);
   }
-  .ib-icon{grid-column:1; grid-row:1 / span 3; width:52px; height:auto; align-self:center;}
+  .ib-icon{grid-column:1; grid-row:1 / span 2; width:58px; height:auto; align-self:center;}
   .ib-title{
-    grid-column:2; grid-row:3; align-self:end;
-    font-size:1.1rem; font-weight:700; letter-spacing:0.02em; color:var(--teal-deep);
-    font-family:'Jost',sans-serif; text-align:left;
+    grid-column:2; grid-row:1; align-self:end;
+    font-size:0.72rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink); font-family:'Jost',sans-serif; text-align:left; line-height:1.4;
   }
-  .ib-lang{grid-column:3; grid-row:1; justify-self:end;}
-  .ib-socials{grid-column:3; grid-row:2; justify-self:end; display:flex; gap:8px;}
-  .ib-share{grid-column:3; grid-row:3; justify-self:end;}
+  .ib-lang{grid-column:3; grid-row:1; align-self:start; justify-self:end;}
+  .ib-row2{grid-column:2 / span 2; grid-row:2; display:flex; align-items:center; gap:8px;}
+  .ib-share{
+    background:none; border:none; color:var(--gold); font-size:0.78rem; font-weight:600;
+    text-decoration:underline; cursor:pointer; padding:0; margin-left:2px; font-family:'Jost',sans-serif;
+  }
+  .ib-socials{display:flex; gap:8px;}
   .pill-ghost{border:1.5px solid var(--teal); color:var(--teal-deep); border-radius:999px; padding:8px 20px; font-size:0.84rem; background:transparent; font-family:'Jost',sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
   .icon-btn{
     width:38px; height:38px; border-radius:50%; border:1.5px solid var(--teal); color:var(--teal-deep);
@@ -379,8 +383,9 @@
   /* ---------- Infobar en móvil: mismo grid de 3 filas, un poco más compacto ---------- */
   @media (max-width:800px){
     .infobar{padding:16px 18px; column-gap:12px; row-gap:6px;}
-    .ib-icon{width:40px;}
-    .ib-title{font-size:0.95rem;}
+    .ib-icon{width:44px;}
+    .ib-title{font-size:0.62rem;}
+    .ib-share{font-size:0.7rem;}
   }
 
   @media (max-width:600px){
@@ -433,18 +438,20 @@
   <img src="Icono.png" alt="Icono LVR" class="ib-icon">
   <h2 data-i18n="infobarTitle" class="ib-title">Medicina integral y antienvejecimiento</h2>
   <button class="pill-ghost lang-toggle ib-lang" type="button"><span class="flag">🇪🇸</span> <span class="lang-label">ES</span></button>
-  <div class="ib-socials">
-    <a href="https://www.instagram.com/dravr26?stkn=OTcwMTB6aG9scGRt" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
-    </a>
-    <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Facebook">
-      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M14 8.5 L12.6 8.5 C11.7 8.5 11 9.2 11 10.1 L11 12 M11 12 L9.5 12 M11 12 L11 17 M14 12 L11 12" stroke="currentColor" stroke-width="1.6"/></svg>
-    </a>
-    <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="TikTok">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M16 3 C16 6 18 8 21 8" stroke="currentColor" stroke-width="1.6"/><path d="M16 3 L16 15.5 C16 17.5 14.3 19 12.3 19 C10.3 19 8.7 17.4 8.7 15.5 C8.7 13.6 10.3 12 12.3 12" stroke="currentColor" stroke-width="1.6"/></svg>
-    </a>
+  <div class="ib-row2">
+    <div class="ib-socials">
+      <a href="https://www.instagram.com/dravr26?stkn=OTcwMTB6aG9scGRt" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M14 8.5 L12.6 8.5 C11.7 8.5 11 9.2 11 10.1 L11 12 M11 12 L9.5 12 M11 12 L11 17 M14 12 L11 12" stroke="currentColor" stroke-width="1.6"/></svg>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M16 3 C16 6 18 8 21 8" stroke="currentColor" stroke-width="1.6"/><path d="M16 3 L16 15.5 C16 17.5 14.3 19 12.3 19 C10.3 19 8.7 17.4 8.7 15.5 C8.7 13.6 10.3 12 12.3 12" stroke="currentColor" stroke-width="1.6"/></svg>
+      </a>
+    </div>
+    <button type="button" id="shareBtn" class="ib-share" data-i18n="share">Compartir</button>
   </div>
-  <button type="button" id="shareBtn" class="pill-ghost ib-share" data-i18n="share">Compartir</button>
 
   <div class="share-menu" id="shareMenu">
     <a href="#" id="shareWhatsapp" target="_blank" rel="noopener">
