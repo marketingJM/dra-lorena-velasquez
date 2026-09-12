@@ -1277,6 +1277,10 @@
       return;
     }
 
+    // Abre la pestaña YA MISMO (dentro del clic) para que el navegador no la bloquee.
+    // Le asignamos la URL real de WhatsApp más abajo, cuando ya tengamos todo guardado.
+    const waWindow = window.open('', '_blank');
+
     const slotId = `${date}_${selectedTime}`;
     db.collection('slots').doc(slotId).set({ date, time: selectedTime, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
       .then(() => {
@@ -1317,7 +1321,7 @@
           ? `Hola, acabo de reservar una cita:\n\nNombre: ${name}\nServicio: ${service}\nFecha: ${date}\nHora: ${selectedTime}\n\n¿Me podrías confirmar el costo de la cita? ¡Gracias!`
           : `Hi, I just booked an appointment:\n\nName: ${name}\nService: ${service}\nDate: ${date}\nTime: ${selectedTime}\n\nCould you confirm the cost of the appointment? Thank you!`;
         const waUrl = `https://wa.me/34634322874?text=${encodeURIComponent(waText)}`;
-        window.open(waUrl, '_blank');
+        if (waWindow) { waWindow.location.href = waUrl; }
 
         const okMsg = currentLang === 'es'
           ? `¡Cita confirmada para el ${date} a las ${selectedTime}!`
@@ -1333,6 +1337,7 @@
         bkDate.dispatchEvent(new Event('change'));
       })
       .catch(() => {
+        if (waWindow) { waWindow.close(); }
         showBookMsg(currentLang === 'es'
           ? 'Ese horario se acaba de ocupar. Por favor elige otro.'
           : 'That time slot was just taken. Please choose another.', true);
