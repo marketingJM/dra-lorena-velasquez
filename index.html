@@ -308,6 +308,9 @@
     width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 13px;
     font-family:'Jost',sans-serif; font-size:0.9rem; color:var(--ink); background:#fff;
   }
+  .phone-row{display:flex; gap:8px;}
+  .phone-row select{width:auto; flex:0 0 96px;}
+  .phone-row input{flex:1;}
   .book-close{
     position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.6rem;
     color:var(--ink-soft); cursor:pointer; line-height:1;
@@ -687,7 +690,23 @@
 
     <div class="field">
       <label for="bkPhone" data-i18n="bookPhone">Número del paciente</label>
-      <input type="text" id="bkPhone" placeholder="+34 600 000 000">
+      <div class="phone-row">
+        <select id="bkCountryCode">
+          <option value="34" selected>🇪🇸 +34</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="52">🇲🇽 +52</option>
+          <option value="57">🇨🇴 +57</option>
+          <option value="54">🇦🇷 +54</option>
+          <option value="56">🇨🇱 +56</option>
+          <option value="51">🇵🇪 +51</option>
+          <option value="593">🇪🇨 +593</option>
+          <option value="58">🇻🇪 +58</option>
+          <option value="44">🇬🇧 +44</option>
+          <option value="33">🇫🇷 +33</option>
+          <option value="49">🇩🇪 +49</option>
+        </select>
+        <input type="tel" id="bkPhone" placeholder="600 000 000">
+      </div>
     </div>
 
     <div class="field">
@@ -1205,6 +1224,12 @@
   }
   const bookModal = document.getElementById('bookModal');
   const bkDate = document.getElementById('bkDate');
+
+  // Limpia automáticamente el teléfono mientras se escribe (solo números)
+  const bkPhoneInput = document.getElementById('bkPhone');
+  bkPhoneInput.addEventListener('input', () => {
+    bkPhoneInput.value = bkPhoneInput.value.replace(/[^\d]/g, '');
+  });
   const timeGrid = document.getElementById('timeGrid');
   const bookMsg = document.getElementById('bookMsg');
   let selectedTime = null;
@@ -1267,7 +1292,9 @@
     const name = document.getElementById('bkName').value.trim();
     const service = document.getElementById('bkService').value;
     const email = document.getElementById('bkEmail').value.trim();
-    const phone = document.getElementById('bkPhone').value.trim();
+    const countryCode = document.getElementById('bkCountryCode').value;
+    const phoneDigits = document.getElementById('bkPhone').value.trim();
+    const phone = phoneDigits ? `+${countryCode}${phoneDigits}` : '';
     const date = bkDate.value;
 
     if (!name || !email || !phone || !date || !selectedTime) {
