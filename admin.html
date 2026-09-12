@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Reseñas | Dra. Lorena Velásquez Roa</title>
+<title>Admin | Dra. Lorena Velásquez Roa</title>
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -11,7 +11,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
-  // ⬇️ PEGA AQUÍ el mismo firebaseConfig que pusiste en index.html
   const firebaseConfig = {
     apiKey: "AIzaSyBUY1oFoZGhztpyHJfHclBSqYpGTttJ7vo",
     authDomain: "lvr-medicina-integral.firebaseapp.com",
@@ -24,7 +23,6 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 </script>
-</script>
 
 <style>
   :root{
@@ -33,11 +31,10 @@
   }
   *{box-sizing:border-box;}
   body{margin:0; background:var(--ivory); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300;}
-  .wrap{max-width:760px; margin:0 auto; padding:40px 24px 80px;}
+  .wrap{max-width:760px; margin:0 auto; padding:24px 24px 80px;}
   h1{font-size:1.5rem; font-weight:600; margin:0 0 6px;}
-  .sub{color:var(--ink-soft); font-size:0.9rem; margin-bottom:36px;}
+  .sub{color:var(--ink-soft); font-size:0.9rem; margin-bottom:20px;}
 
-  /* Login */
   #loginBox{max-width:340px; margin:80px auto; text-align:center;}
   #loginBox input{
     width:100%; padding:12px 14px; margin-bottom:12px; border:1px solid var(--line);
@@ -49,12 +46,43 @@
   }
   #loginBox button:hover{background:var(--teal-deep);}
   #loginError{color:#b23; font-size:0.85rem; margin-top:10px; min-height:18px;}
+
+  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;}
   #logoutBtn{
     background:none; border:1px solid var(--line); border-radius:999px; padding:7px 16px;
-    font-size:0.82rem; cursor:pointer; color:var(--ink-soft); float:right;
+    font-size:0.82rem; cursor:pointer; color:var(--ink-soft);
   }
 
-  section{margin-bottom:44px;}
+  /* ---------- Pestañas principales ---------- */
+  .admin-tabs{
+    display:flex; gap:6px; margin-bottom:28px; border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .admin-tab-btn{
+    background:none; border:none; padding:12px 18px; font-size:0.9rem; font-weight:600;
+    color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent;
+    font-family:'Jost',sans-serif; white-space:nowrap; display:flex; align-items:center; gap:8px;
+  }
+  .admin-tab-btn.active{color:var(--teal); border-bottom-color:var(--teal);}
+  .badge{
+    background:var(--gold); color:#fff; font-size:0.72rem; font-weight:700;
+    border-radius:99px; padding:1px 8px; min-width:18px; text-align:center;
+  }
+  .admin-panel{display:none;}
+  .admin-panel.active{display:block;}
+
+  /* ---------- Sub-pestañas de citas ---------- */
+  .sub-tabs{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
+  .sub-tab-btn{
+    background:var(--mist); border:none; border-radius:999px; padding:8px 16px; font-size:0.84rem;
+    color:var(--ink-soft); cursor:pointer; font-family:'Jost',sans-serif; display:flex; align-items:center; gap:6px;
+  }
+  .sub-tab-btn.active{background:var(--teal); color:var(--ivory);}
+  .sub-tab-btn .badge{background:var(--gold);}
+  .sub-tab-btn.active .badge{background:rgba(255,255,255,0.3);}
+  .booking-panel{display:none;}
+  .booking-panel.active{display:block;}
+
   h2{font-size:1.1rem; margin-bottom:16px;}
   .card{
     background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px;
@@ -63,7 +91,7 @@
   .card .stars{color:var(--gold);}
   .card .name{font-weight:600;}
   .card .comment{color:var(--ink-soft); font-style:italic; font-size:0.92rem;}
-  .card .actions{display:flex; gap:10px; margin-top:6px;}
+  .card .actions{display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;}
   .card button{
     border:none; border-radius:8px; padding:8px 16px; font-size:0.85rem; cursor:pointer;
     font-family:'Jost',sans-serif;
@@ -72,8 +100,14 @@
   .approve-btn:hover{background:var(--teal-deep);}
   .reject-btn, .delete-btn{background:var(--mist); color:var(--ink);}
   .reject-btn:hover, .delete-btn:hover{background:#e3d9d9;}
-  .cal-btn{background:var(--gold); color:#fff; text-decoration:none; display:inline-block;}
+  .cal-btn{background:var(--gold); color:#fff; text-decoration:none; display:inline-block; border:none; cursor:pointer; font-family:'Jost',sans-serif; padding:8px 16px; border-radius:8px; font-size:0.85rem;}
   .cal-btn:hover{opacity:0.9;}
+  .status-tag{
+    display:inline-block; font-size:0.72rem; font-weight:600; padding:3px 10px; border-radius:99px;
+    width:fit-content;
+  }
+  .status-tag.accepted{background:#DDEEE9; color:var(--teal-deep);}
+  .status-tag.cancelled{background:#F4D9D9; color:#8a2b2b;}
   .booking-when{font-weight:600; color:var(--teal-deep);}
   .empty{color:var(--ink-soft); font-size:0.9rem;}
 
@@ -93,7 +127,6 @@
   #saveContentBtn:hover{background:var(--teal-deep);}
   #contentSaveMsg{font-size:0.85rem; margin-top:10px; min-height:18px; color:var(--teal-deep);}
 
-  /* ---------- Modal de cancelación ---------- */
   .cancel-overlay{
     display:none; position:fixed; inset:0; z-index:200; background:rgba(9,52,48,0.55);
     align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;
@@ -117,8 +150,8 @@
 <body>
 
 <div id="loginBox">
-  <h1 style="text-align:center;">Administración de reseñas</h1>
-  <p class="sub" style="text-align:center;">Inicia sesión para aprobar comentarios</p>
+  <h1 style="text-align:center;">Administración</h1>
+  <p class="sub" style="text-align:center;">Inicia sesión para gestionar tu página</p>
   <input type="email" id="loginEmail" placeholder="Correo electrónico">
   <input type="password" id="loginPass" placeholder="Contraseña">
   <button id="loginBtn">Entrar</button>
@@ -126,30 +159,45 @@
 </div>
 
 <div class="wrap" id="adminPanel" style="display:none;">
-  <button id="logoutBtn">Cerrar sesión</button>
-  <h1>Reseñas</h1>
-  <p class="sub">Aprueba o rechaza los comentarios enviados desde la página.</p>
+  <div class="topbar">
+    <h1>Panel de administración</h1>
+    <button id="logoutBtn">Cerrar sesión</button>
+  </div>
 
-  <section>
+  <div class="admin-tabs">
+    <button class="admin-tab-btn active" data-panel="reviews">Reseñas</button>
+    <button class="admin-tab-btn" data-panel="bookings">Citas <span class="badge" id="pendingBadgeTop">0</span></button>
+    <button class="admin-tab-btn" data-panel="content">Contenido</button>
+  </div>
+
+  <!-- ===== RESEÑAS ===== -->
+  <div class="admin-panel active" id="panel-reviews">
     <h2>Pendientes de revisión</h2>
     <div id="pendingList"><p class="empty">Cargando...</p></div>
-  </section>
 
-  <section>
-    <h2>Publicadas actualmente</h2>
+    <h2 style="margin-top:32px;">Publicadas actualmente</h2>
     <div id="approvedList"><p class="empty">Cargando...</p></div>
-  </section>
+  </div>
 
-  <section>
-    <h2>Citas agendadas</h2>
-    <div id="bookingsList"><p class="empty">Cargando...</p></div>
-  </section>
+  <!-- ===== CITAS ===== -->
+  <div class="admin-panel" id="panel-bookings">
+    <div class="sub-tabs">
+      <button class="sub-tab-btn active" data-status="pending">Pendientes <span class="badge" id="pendingBadge">0</span></button>
+      <button class="sub-tab-btn" data-status="accepted">Aceptadas</button>
+      <button class="sub-tab-btn" data-status="cancelled">Canceladas</button>
+    </div>
 
-  <section>
+    <div class="booking-panel active" id="bp-pending"><p class="empty">Cargando...</p></div>
+    <div class="booking-panel" id="bp-accepted"><p class="empty">Cargando...</p></div>
+    <div class="booking-panel" id="bp-cancelled"><p class="empty">Cargando...</p></div>
+  </div>
+
+  <!-- ===== CONTENIDO ===== -->
+  <div class="admin-panel" id="panel-content">
     <h2>Contenido del sitio</h2>
-    <p class="sub" style="margin-bottom:20px;">Edita los textos de la página. Los cambios se ven al instante para todos los visitantes al guardar.</p>
+    <p class="sub">Edita los textos de la página. Los cambios se ven al instante para todos los visitantes al guardar.</p>
     <div id="contentForm"><p class="empty">Cargando...</p></div>
-  </section>
+  </div>
 </div>
 
 <!-- ================= MODAL DE CANCELACIÓN ================= -->
@@ -175,7 +223,6 @@
     <p id="cancelStatusMsg"></p>
   </div>
 </div>
-
 
 <script>
   const loginBox = document.getElementById('loginBox');
@@ -203,6 +250,26 @@
       loginBox.style.display = 'block';
       adminPanel.style.display = 'none';
     }
+  });
+
+  // ---- Navegación entre pestañas principales ----
+  document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-panel');
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + target));
+    });
+  });
+
+  // ---- Navegación entre sub-pestañas de citas ----
+  document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const status = btn.getAttribute('data-status');
+      document.querySelectorAll('.booking-panel').forEach(p => p.classList.toggle('active', p.id === 'bp-' + status));
+    });
   });
 
   function starRow(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
@@ -256,42 +323,82 @@
     loadBookings();
   }
 
+  function calUrlFor(b) {
+    const [y, m, d] = b.date.split('-');
+    const startDT = `${y}${m}${d}T${b.time.replace(':', '')}00`;
+    const endHM = addMinutes(b.time, 30);
+    const endDT = `${y}${m}${d}T${endHM}00`;
+    const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
+    const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+  }
+
   function loadBookings() {
-    const bookingsList = document.getElementById('bookingsList');
     db.collection('bookings').get().then(snapshot => {
       const bookings = [];
       snapshot.forEach(doc => {
         const data = doc.data();
         data.id = doc.id;
+        if (!data.status) data.status = 'pending'; // compatibilidad con citas creadas antes de este cambio
         bookings.push(data);
       });
       bookings.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
       window.currentBookings = bookings;
 
-      bookingsList.innerHTML = bookings.length
-        ? bookings.map(b => {
-            const [y, m, d] = b.date.split('-');
-            const startDT = `${y}${m}${d}T${b.time.replace(':', '')}00`;
-            const endHM = addMinutes(b.time, 30);
-            const endDT = `${y}${m}${d}T${endHM}00`;
-            const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
-            const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
-            const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
-            return `
+      const pending = bookings.filter(b => b.status === 'pending');
+      const accepted = bookings.filter(b => b.status === 'accepted');
+      const cancelled = bookings.filter(b => b.status === 'cancelled');
+
+      document.getElementById('pendingBadge').textContent = pending.length;
+      document.getElementById('pendingBadgeTop').textContent = pending.length;
+
+      document.getElementById('bp-pending').innerHTML = pending.length
+        ? pending.map(b => `
           <div class="card">
             <div class="booking-when">${b.date} — ${b.time}</div>
             <div class="name">${b.name} (${b.service})</div>
             <div class="comment">${b.email} · ${b.phone}</div>
             <div class="actions">
-              <a class="cal-btn" href="${calUrl}" target="_blank" rel="noopener">Agregar a Google Calendar</a>
+              <button class="cal-btn" onclick="acceptBooking('${b.id}')">Agregar a Google Calendar</button>
               <button class="delete-btn" onclick="cancelBooking('${b.id}')">Cancelar cita</button>
             </div>
-          </div>`;
-          }).join('')
-        : '<p class="empty">No hay citas agendadas.</p>';
+          </div>`).join('')
+        : '<p class="empty">No hay citas pendientes.</p>';
+
+      document.getElementById('bp-accepted').innerHTML = accepted.length
+        ? accepted.map(b => `
+          <div class="card">
+            <div class="booking-when">${b.date} — ${b.time}</div>
+            <span class="status-tag accepted">✓ En el calendario</span>
+            <div class="name">${b.name} (${b.service})</div>
+            <div class="comment">${b.email} · ${b.phone}</div>
+            <div class="actions">
+              <a class="cal-btn" href="${calUrlFor(b)}" target="_blank" rel="noopener">Ver en Google Calendar</a>
+              <button class="delete-btn" onclick="cancelBooking('${b.id}')">Cancelar cita</button>
+            </div>
+          </div>`).join('')
+        : '<p class="empty">Todavía no hay citas aceptadas.</p>';
+
+      document.getElementById('bp-cancelled').innerHTML = cancelled.length
+        ? cancelled.map(b => `
+          <div class="card">
+            <div class="booking-when">${b.date} — ${b.time}</div>
+            <span class="status-tag cancelled">✕ Cancelada</span>
+            <div class="name">${b.name} (${b.service})</div>
+            <div class="comment">${b.email} · ${b.phone}</div>
+            ${b.cancelReason ? `<div class="comment">Motivo: ${b.cancelReason}</div>` : ''}
+          </div>`).join('')
+        : '<p class="empty">No hay citas canceladas.</p>';
     }).catch(err => {
-      bookingsList.innerHTML = `<p class="empty">No se pudieron cargar las citas (${err.message}).</p>`;
+      document.getElementById('bp-pending').innerHTML = `<p class="empty">No se pudieron cargar las citas (${err.message}).</p>`;
     });
+  }
+
+  function acceptBooking(id) {
+    const booking = (window.currentBookings || []).find(b => b.id === id);
+    if (!booking) return;
+    window.open(calUrlFor(booking), '_blank');
+    db.collection('bookings').doc(id).update({ status: 'accepted' }).then(loadBookings);
   }
 
   function cancelBooking(id) {
@@ -345,8 +452,8 @@
       window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`, '_blank');
     }
 
-    // 2) Borra la reserva y libera el horario
-    db.collection('bookings').doc(b.id).delete()
+    // 2) Pasa la cita a "Cancelada" (se conserva como registro) y libera el horario
+    db.collection('bookings').doc(b.id).update({ status: 'cancelled', cancelReason: reason })
       .then(() => db.collection('slots').doc(`${b.date}_${b.time}`).delete())
       .then(() => {
         closeCancelModal();
