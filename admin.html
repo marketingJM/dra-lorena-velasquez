@@ -330,7 +330,9 @@
     const endDT = `${y}${m}${d}T${endHM}00`;
     const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
     const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+    const rawUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+    // Fuerza que el evento se agregue siempre a este correo, sin importar qué cuenta de Google esté activa en el navegador
+    return `https://accounts.google.com/AccountChooser?Email=dravelasquezroa%40gmail.com&continue=${encodeURIComponent(rawUrl)}`;
   }
 
   function loadBookings() {
