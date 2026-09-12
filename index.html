@@ -1313,6 +1313,7 @@
       .then(() => {
         return db.collection('bookings').add({
           name, service, email, phone, date, time: selectedTime,
+          status: 'pending',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       })
