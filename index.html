@@ -1035,7 +1035,7 @@
       contactLede: "Write to us directly and we'll get back to you as soon as possible to schedule your first assessment.",
       contactBtn: "Message us on WhatsApp",
       footerCopy: "© 2026 Dr. Lorena Velásquez Roa — Integrative medicine & anti-aging.",
-      footerLoc: "Valencian Community and Catalonia · Spain | In-person and online consultations"
+      footerLoc: "Catalonia · Spain | In-person and online consultations"
     }
   };
 
@@ -1242,7 +1242,6 @@
   const bookModal = document.getElementById('bookModal');
   const bkDate = document.getElementById('bkDate');
 
-  // Limpia automáticamente el teléfono mientras se escribe (solo números)
   const bkPhoneInput = document.getElementById('bkPhone');
   bkPhoneInput.addEventListener('input', () => {
     bkPhoneInput.value = bkPhoneInput.value.replace(/[^\d]/g, '');
@@ -1328,8 +1327,6 @@
       return;
     }
 
-    // Abre la pestaña YA MISMO (dentro del clic) para que el navegador no la bloquee.
-    // Le asignamos la URL real de WhatsApp más abajo, cuando ya tengamos todo guardado.
     const waWindow = window.open('', '_blank');
 
     const slotId = `${date}_${selectedTime}`;
@@ -1368,7 +1365,6 @@
           patient_phone: phone
         }).catch(() => { });
 
-        // Abre WhatsApp con el mensaje ya escrito, de la paciente hacia la doctora
         const waText = currentLang === 'es'
           ? `Hola, acabo de reservar una cita:\n\nNombre: ${name}\nServicio: ${service}\nFecha: ${date}\nHora: ${selectedTime}\n\n¿Me podrías confirmar el costo de la cita? ¡Gracias!`
           : `Hi, I just booked an appointment:\n\nName: ${name}\nService: ${service}\nDate: ${date}\nTime: ${selectedTime}\n\nCould you confirm the cost of the appointment? Thank you!`;
