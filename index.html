@@ -1250,7 +1250,24 @@
   const bookMsg = document.getElementById('bookMsg');
   let selectedTime = null;
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  // Siempre calcula la fecha/hora según el horario de España (Europa/Madrid),
+  // sin importar desde qué país o zona horaria se conecte quien visita la página.
+  function getMadridNow() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Madrid',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(new Date());
+    const map = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    let hour = parseInt(map.hour, 10);
+    if (hour === 24) hour = 0;
+    return {
+      dateStr: `${map.year}-${map.month}-${map.day}`,
+      minutes: hour * 60 + parseInt(map.minute, 10)
+    };
+  }
+  const todayStr = getMadridNow().dateStr;
   bkDate.setAttribute('min', todayStr);
 
   function openBookModal() {
@@ -1269,9 +1286,15 @@
   document.getElementById('bookCloseBtn').addEventListener('click', closeBookModal);
   bookModal.addEventListener('click', (e) => { if (e.target === bookModal) closeBookModal(); });
 
-  function renderTimeGrid(takenTimes) {
+  function renderTimeGrid(takenTimes, forDate) {
+    const isToday = forDate === todayStr;
+    const nowMinutes = getMadridNow().minutes;
+
     timeGrid.innerHTML = HOURS.map(h => {
-      const isTaken = takenTimes.includes(h);
+      const [hh, mm] = h.split(':').map(Number);
+      const slotMinutes = hh * 60 + mm;
+      const isPast = isToday && slotMinutes <= nowMinutes;
+      const isTaken = takenTimes.includes(h) || isPast;
       return `<button type="button" class="time-slot${isTaken ? ' taken' : ''}" data-time="${h}" ${isTaken ? 'disabled' : ''}>${h}</button>`;
     }).join('');
     timeGrid.querySelectorAll('.time-slot:not(.taken)').forEach(btn => {
@@ -1291,9 +1314,9 @@
     db.collection('slots').where('date', '==', date).get().then(snapshot => {
       const taken = [];
       snapshot.forEach(doc => taken.push(doc.data().time));
-      renderTimeGrid(taken);
+      renderTimeGrid(taken, date);
     }).catch(() => {
-      renderTimeGrid([]);
+      renderTimeGrid([], date);
     });
   });
 
