@@ -24,6 +24,7 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 </script>
+</script>
 
 <style>
   :root{
@@ -91,6 +92,26 @@
   }
   #saveContentBtn:hover{background:var(--teal-deep);}
   #contentSaveMsg{font-size:0.85rem; margin-top:10px; min-height:18px; color:var(--teal-deep);}
+
+  /* ---------- Modal de cancelación ---------- */
+  .cancel-overlay{
+    display:none; position:fixed; inset:0; z-index:200; background:rgba(9,52,48,0.55);
+    align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;
+  }
+  .cancel-overlay.open{display:flex;}
+  .cancel-modal{background:#fff; border-radius:16px; padding:26px 24px; max-width:420px; width:100%; margin-top:20px;}
+  .cancel-modal h3{font-size:1.2rem; margin:0 0 6px;}
+  .cancel-modal .sub{color:var(--ink-soft); font-size:0.85rem; margin-bottom:18px;}
+  .cancel-modal label{display:block; font-size:0.82rem; color:var(--ink-soft); margin-bottom:6px;}
+  .cancel-modal select, .cancel-modal textarea{
+    width:100%; border:1px solid var(--line); border-radius:8px; padding:10px 12px;
+    font-family:'Jost',sans-serif; font-size:0.88rem; margin-bottom:14px;
+  }
+  .cancel-modal textarea{min-height:70px; resize:vertical;}
+  .cancel-actions{display:flex; gap:10px; margin-top:6px;}
+  .btn-secondary{background:var(--mist); color:var(--ink); border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
+  .btn-danger{background:#b23; color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
+  #cancelStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
 </style>
 </head>
 <body>
@@ -130,6 +151,31 @@
     <div id="contentForm"><p class="empty">Cargando...</p></div>
   </section>
 </div>
+
+<!-- ================= MODAL DE CANCELACIÓN ================= -->
+<div class="cancel-overlay" id="cancelOverlay">
+  <div class="cancel-modal">
+    <h3>Cancelar cita</h3>
+    <p class="sub" id="cancelSummary"></p>
+
+    <label for="cancelReason">Motivo (se le enviará a la paciente)</label>
+    <select id="cancelReason">
+      <option value="Un imprevisto médico obliga a reprogramar la agenda de la doctora.">Imprevisto médico de la doctora</option>
+      <option value="La doctora tuvo una emergencia y no podrá atender en el horario agendado.">Emergencia de último momento</option>
+      <option value="Por motivos de fuerza mayor, la cita debe ser reprogramada.">Motivo de fuerza mayor</option>
+      <option value="Se presentó un ajuste en la agenda médica por atención prioritaria a otro caso.">Ajuste de agenda</option>
+      <option value="__custom__">Escribir un motivo personalizado...</option>
+    </select>
+    <textarea id="cancelCustomReason" placeholder="Escribe el motivo aquí..." style="display:none;"></textarea>
+
+    <div class="cancel-actions">
+      <button id="cancelBackBtn" class="btn-secondary">Volver</button>
+      <button id="cancelConfirmBtn" class="btn-danger">Cancelar y notificar</button>
+    </div>
+    <p id="cancelStatusMsg"></p>
+  </div>
+</div>
+
 
 <script>
   const loginBox = document.getElementById('loginBox');
@@ -220,6 +266,7 @@
         bookings.push(data);
       });
       bookings.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+      window.currentBookings = bookings;
 
       bookingsList.innerHTML = bookings.length
         ? bookings.map(b => {
@@ -237,7 +284,7 @@
             <div class="comment">${b.email} · ${b.phone}</div>
             <div class="actions">
               <a class="cal-btn" href="${calUrl}" target="_blank" rel="noopener">Agregar a Google Calendar</a>
-              <button class="delete-btn" onclick="cancelBooking('${b.id}', '${b.date}', '${b.time}')">Cancelar cita</button>
+              <button class="delete-btn" onclick="cancelBooking('${b.id}')">Cancelar cita</button>
             </div>
           </div>`;
           }).join('')
@@ -247,12 +294,65 @@
     });
   }
 
-  function cancelBooking(id, date, time) {
-    if (!confirm('¿Cancelar esta cita? El horario quedará libre de nuevo.')) return;
-    db.collection('bookings').doc(id).delete()
-      .then(() => db.collection('slots').doc(`${date}_${time}`).delete())
-      .then(loadBookings);
+  function cancelBooking(id) {
+    const booking = (window.currentBookings || []).find(b => b.id === id);
+    if (!booking) return;
+    openCancelModal(booking);
   }
+
+  const cancelOverlay = document.getElementById('cancelOverlay');
+  const cancelSummary = document.getElementById('cancelSummary');
+  const cancelReasonSelect = document.getElementById('cancelReason');
+  const cancelCustomReason = document.getElementById('cancelCustomReason');
+  const cancelStatusMsg = document.getElementById('cancelStatusMsg');
+  let bookingToCancel = null;
+
+  function openCancelModal(booking) {
+    bookingToCancel = booking;
+    cancelSummary.textContent = `${booking.name} — ${booking.date} a las ${booking.time} (${booking.service})`;
+    cancelReasonSelect.value = cancelReasonSelect.options[0].value;
+    cancelCustomReason.style.display = 'none';
+    cancelCustomReason.value = '';
+    cancelStatusMsg.textContent = '';
+    cancelOverlay.classList.add('open');
+  }
+
+  function closeCancelModal() {
+    cancelOverlay.classList.remove('open');
+    bookingToCancel = null;
+  }
+
+  document.getElementById('cancelBackBtn').addEventListener('click', closeCancelModal);
+  cancelOverlay.addEventListener('click', (e) => { if (e.target === cancelOverlay) closeCancelModal(); });
+
+  cancelReasonSelect.addEventListener('change', () => {
+    cancelCustomReason.style.display = cancelReasonSelect.value === '__custom__' ? 'block' : 'none';
+  });
+
+  document.getElementById('cancelConfirmBtn').addEventListener('click', () => {
+    if (!bookingToCancel) return;
+    const b = bookingToCancel;
+    const reason = cancelReasonSelect.value === '__custom__'
+      ? (cancelCustomReason.value.trim() || 'Debemos reprogramar tu cita por motivos de agenda.')
+      : cancelReasonSelect.value;
+
+    cancelStatusMsg.textContent = 'Cancelando y notificando...';
+
+    // 1) WhatsApp al teléfono de la paciente (abre pestaña con el mensaje ya escrito)
+    const waPhone = (b.phone || '').replace(/[^\d]/g, '');
+    const waText = `Hola ${b.name}, te escribimos de la Dra. Lorena Velásquez Roa.\n\nLamentamos informarte que tu cita del ${b.date} a las ${b.time} (${b.service}) debe ser reprogramada.\n\nMotivo: ${reason}\n\nPor favor contáctanos para agendar un nuevo horario. ¡Disculpa las molestias!`;
+    if (waPhone) {
+      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`, '_blank');
+    }
+
+    // 2) Borra la reserva y libera el horario
+    db.collection('bookings').doc(b.id).delete()
+      .then(() => db.collection('slots').doc(`${b.date}_${b.time}`).delete())
+      .then(() => {
+        closeCancelModal();
+        loadBookings();
+      });
+  });
 
   // ---- Contenido editable del sitio ----
   const DEFAULT_CONTENT = {
