@@ -163,6 +163,11 @@
   }
   .record-modal textarea{min-height:60px; resize:vertical;}
   #recordStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
+  .consulta-card{background:var(--mist); border-radius:10px; padding:14px 16px; margin-bottom:10px;}
+  .consulta-card .cdate{font-weight:600; color:var(--teal-deep); font-size:0.88rem; margin-bottom:8px;}
+  .consulta-card .cfield{font-size:0.82rem; margin-bottom:6px;}
+  .consulta-card .cfield b{color:var(--ink); font-weight:600;}
+  .consulta-card .cfield span{color:var(--ink-soft);}
 </style>
 </head>
 <body>
@@ -228,34 +233,60 @@
   </div>
 </div>
 
-<!-- ================= MODAL DE HISTORIA CLÍNICA ================= -->
+<!-- ================= MODAL: NUEVO PACIENTE ================= -->
+<div class="cancel-overlay" id="newPatientOverlay">
+  <div class="cancel-modal record-modal">
+    <h3>Nuevo paciente</h3>
+    <label>Nombre del paciente</label>
+    <input type="text" id="npName" placeholder="Ej. María González">
+    <label>Correo</label>
+    <input type="text" id="npEmail" placeholder="correo@ejemplo.com">
+    <label>Teléfono (con código de país, ej. +34600000000)</label>
+    <input type="text" id="npPhone" placeholder="+34600000000">
+    <div class="cancel-actions">
+      <button id="npBackBtn" class="btn-secondary">Cancelar</button>
+      <button id="npSaveBtn" class="approve-btn">Crear y abrir historia</button>
+    </div>
+    <p id="npStatusMsg"></p>
+  </div>
+</div>
+
+<!-- ================= MODAL: HISTORIA DEL PACIENTE (ACUMULATIVA) ================= -->
 <div class="cancel-overlay" id="recordOverlay">
   <div class="cancel-modal record-modal">
     <h3 id="recordModalTitle">Historia clínica</h3>
-    <label>Nombre del paciente</label>
-    <input type="text" id="recName" placeholder="Ej. María González">
-    <label>Correo</label>
-    <input type="text" id="recEmail" placeholder="correo@ejemplo.com">
-    <label>Teléfono (con código de país, ej. +34600000000)</label>
-    <input type="text" id="recPhone" placeholder="+34600000000">
-    <label>Motivo de consulta</label>
-    <textarea id="recMotivo"></textarea>
-    <label>Antecedentes médicos</label>
-    <textarea id="recAntecedentes"></textarea>
-    <label>Exploración / hallazgos</label>
-    <textarea id="recExploracion"></textarea>
-    <label>Diagnóstico</label>
-    <textarea id="recDiagnostico"></textarea>
-    <label>Medicamentos</label>
-    <textarea id="recMedicamentos"></textarea>
-    <label>Plan de tratamiento</label>
-    <textarea id="recPlan"></textarea>
-    <label>Notas de seguimiento</label>
-    <textarea id="recNotas"></textarea>
+    <p class="sub" id="recordPatientInfo"></p>
 
-    <div class="cancel-actions">
+    <div id="consultasTimeline"></div>
+
+    <button id="addConsultaBtn" class="approve-btn" style="margin-top:14px;">+ Agregar nueva consulta</button>
+
+    <!-- Formulario de nueva consulta (oculto hasta que se pulse el botón de arriba) -->
+    <div id="consultaForm" style="display:none; margin-top:18px; border-top:1px solid var(--line); padding-top:16px;">
+      <label>Fecha de la consulta</label>
+      <input type="date" id="cxDate">
+      <label>Motivo de consulta</label>
+      <textarea id="cxMotivo"></textarea>
+      <label>Antecedentes médicos</label>
+      <textarea id="cxAntecedentes"></textarea>
+      <label>Exploración / hallazgos</label>
+      <textarea id="cxExploracion"></textarea>
+      <label>Diagnóstico</label>
+      <textarea id="cxDiagnostico"></textarea>
+      <label>Medicamentos</label>
+      <textarea id="cxMedicamentos"></textarea>
+      <label>Plan de tratamiento</label>
+      <textarea id="cxPlan"></textarea>
+      <label>Notas de seguimiento</label>
+      <textarea id="cxNotas"></textarea>
+      <div class="cancel-actions">
+        <button id="cxCancelBtn" class="btn-secondary">Cancelar</button>
+        <button id="cxSaveBtn" class="approve-btn">Guardar consulta</button>
+      </div>
+    </div>
+
+    <div class="cancel-actions" style="margin-top:18px;">
       <button id="recordBackBtn" class="btn-secondary">Cerrar</button>
-      <button id="recordSaveBtn" class="approve-btn">Guardar historia</button>
     </div>
     <p id="recordStatusMsg"></p>
   </div>
@@ -627,20 +658,30 @@
     });
   }
 
-  // ---- Historias clínicas ----
+  // ---- Historias clínicas (acumulativas: paciente + consultas) ----
   const recordsList = document.getElementById('recordsList');
   const recordSearch = document.getElementById('recordSearch');
   const recordOverlay = document.getElementById('recordOverlay');
   const recordModalTitle = document.getElementById('recordModalTitle');
+  const recordPatientInfo = document.getElementById('recordPatientInfo');
   const recordStatusMsg = document.getElementById('recordStatusMsg');
-  let currentRecordId = null;
-  let allRecords = [];
+  const consultasTimeline = document.getElementById('consultasTimeline');
+  const consultaForm = document.getElementById('consultaForm');
+  const newPatientOverlay = document.getElementById('newPatientOverlay');
+  const npStatusMsg = document.getElementById('npStatusMsg');
 
-  const RECORD_FIELDS = [
-    ['recName', 'name'], ['recEmail', 'email'], ['recPhone', 'phone'],
-    ['recMotivo', 'motivo'], ['recAntecedentes', 'antecedentes'], ['recExploracion', 'exploracion'],
-    ['recDiagnostico', 'diagnostico'], ['recMedicamentos', 'medicamentos'],
-    ['recPlan', 'plan'], ['recNotas', 'notas']
+  let allRecords = [];
+  let currentPatientId = null;
+  let currentPatientConsultas = [];
+
+  const CONSULTA_FIELDS = [
+    ['cxMotivo', 'motivo', 'Motivo de consulta'],
+    ['cxAntecedentes', 'antecedentes', 'Antecedentes médicos'],
+    ['cxExploracion', 'exploracion', 'Exploración / hallazgos'],
+    ['cxDiagnostico', 'diagnostico', 'Diagnóstico'],
+    ['cxMedicamentos', 'medicamentos', 'Medicamentos'],
+    ['cxPlan', 'plan', 'Plan de tratamiento'],
+    ['cxNotas', 'notas', 'Notas de seguimiento']
   ];
 
   function loadRecords() {
@@ -664,7 +705,7 @@
           <div class="name">${r.name}</div>
           <div class="comment">${r.email || ''} ${r.phone ? '· ' + r.phone : ''}</div>
           <div class="record-card-actions">
-            <button class="approve-btn" onclick="openRecordModal('${r.id}')">Editar</button>
+            <button class="approve-btn" onclick="openPatientHistory('${r.id}')">Abrir historia</button>
             <button class="cal-btn" onclick="downloadRecordPdf('${r.id}')">Descargar PDF</button>
             <button class="delete-btn" onclick="shareRecordEmail('${r.id}')">Enviar por correo</button>
             <button class="delete-btn" onclick="shareRecordWhatsapp('${r.id}')">Enviar por WhatsApp</button>
@@ -678,121 +719,217 @@
     renderRecordsList(allRecords.filter(r => r.name.toLowerCase().includes(q)));
   });
 
-  document.getElementById('newRecordBtn').addEventListener('click', () => openRecordModal(null));
-  document.getElementById('recordBackBtn').addEventListener('click', closeRecordModal);
-  recordOverlay.addEventListener('click', (e) => { if (e.target === recordOverlay) closeRecordModal(); });
+  // --- Modal: nuevo paciente ---
+  document.getElementById('newRecordBtn').addEventListener('click', () => {
+    document.getElementById('npName').value = '';
+    document.getElementById('npEmail').value = '';
+    document.getElementById('npPhone').value = '';
+    npStatusMsg.textContent = '';
+    newPatientOverlay.classList.add('open');
+  });
+  document.getElementById('npBackBtn').addEventListener('click', () => newPatientOverlay.classList.remove('open'));
+  newPatientOverlay.addEventListener('click', (e) => { if (e.target === newPatientOverlay) newPatientOverlay.classList.remove('open'); });
 
-  function openRecordModal(id) {
-    currentRecordId = id;
-    recordStatusMsg.textContent = '';
-    if (id) {
-      const r = allRecords.find(x => x.id === id);
-      recordModalTitle.textContent = 'Editar historia — ' + r.name;
-      RECORD_FIELDS.forEach(([elId, key]) => { document.getElementById(elId).value = r[key] || ''; });
-    } else {
-      recordModalTitle.textContent = 'Nueva historia clínica';
-      RECORD_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
-    }
-    recordOverlay.classList.add('open');
-  }
-
-  function closeRecordModal() {
-    recordOverlay.classList.remove('open');
-    currentRecordId = null;
-  }
-
-  document.getElementById('recordSaveBtn').addEventListener('click', () => {
-    const data = {};
-    RECORD_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
-    if (!data.name) {
-      recordStatusMsg.textContent = 'El nombre del paciente es obligatorio.';
-      return;
-    }
-    data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    recordStatusMsg.textContent = 'Guardando...';
-
-    const ref = currentRecordId
-      ? db.collection('patientRecords').doc(currentRecordId)
-      : db.collection('patientRecords').doc();
-
-    ref.set(data, { merge: true }).then(() => {
-      closeRecordModal();
+  document.getElementById('npSaveBtn').addEventListener('click', () => {
+    const name = document.getElementById('npName').value.trim();
+    if (!name) { npStatusMsg.textContent = 'El nombre del paciente es obligatorio.'; return; }
+    const data = {
+      name,
+      email: document.getElementById('npEmail').value.trim(),
+      phone: document.getElementById('npPhone').value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    npStatusMsg.textContent = 'Creando...';
+    db.collection('patientRecords').add(data).then(ref => {
+      newPatientOverlay.classList.remove('open');
       loadRecords();
-    }).catch(err => {
-      recordStatusMsg.textContent = 'Error al guardar: ' + err.message;
-    });
+      openPatientHistory(ref.id, { ...data, id: ref.id });
+    }).catch(err => { npStatusMsg.textContent = 'Error: ' + err.message; });
   });
 
-  function buildRecordPdf(r) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const teal = [14, 74, 68];
-    let y = 20;
+  // --- Modal: historia del paciente (timeline + agregar consulta) ---
+  function openPatientHistory(id, patientDataIfNew) {
+    currentPatientId = id;
+    recordStatusMsg.textContent = '';
+    consultaForm.style.display = 'none';
+    const r = patientDataIfNew || allRecords.find(x => x.id === id);
+    recordModalTitle.textContent = 'Historia clínica — ' + r.name;
+    recordPatientInfo.textContent = [r.email, r.phone].filter(Boolean).join(' · ');
+    consultasTimeline.innerHTML = '<p class="empty">Cargando consultas...</p>';
+    recordOverlay.classList.add('open');
 
-    doc.setFontSize(16); doc.setTextColor(...teal);
-    doc.text('Dra. Lorena Velásquez Roa', 14, y);
-    doc.setFontSize(10); doc.setTextColor(100);
-    y += 6;
-    doc.text('Medicina Integral y Antienvejecimiento — Historia clínica', 14, y);
-    y += 10;
-    doc.setDrawColor(...teal);
-    doc.line(14, y, 196, y);
-    y += 10;
-
-    doc.setFontSize(12); doc.setTextColor(20);
-    doc.text(`Paciente: ${r.name}`, 14, y); y += 7;
-    if (r.email) { doc.text(`Correo: ${r.email}`, 14, y); y += 7; }
-    if (r.phone) { doc.text(`Teléfono: ${r.phone}`, 14, y); y += 7; }
-    const fecha = new Date().toLocaleDateString('es-ES');
-    doc.text(`Fecha del documento: ${fecha}`, 14, y); y += 12;
-
-    const sections = [
-      ['Motivo de consulta', r.motivo],
-      ['Antecedentes médicos', r.antecedentes],
-      ['Exploración / hallazgos', r.exploracion],
-      ['Diagnóstico', r.diagnostico],
-      ['Medicamentos', r.medicamentos],
-      ['Plan de tratamiento', r.plan],
-      ['Notas de seguimiento', r.notas]
-    ];
-
-    sections.forEach(([label, text]) => {
-      if (!text) return;
-      if (y > 260) { doc.addPage(); y = 20; }
-      doc.setFontSize(11); doc.setTextColor(...teal);
-      doc.text(label, 14, y); y += 6;
-      doc.setFontSize(10); doc.setTextColor(40);
-      const lines = doc.splitTextToSize(text, 180);
-      doc.text(lines, 14, y);
-      y += lines.length * 5 + 8;
+    db.collection('patientRecords').doc(id).collection('consultas').orderBy('date', 'desc').get().then(snapshot => {
+      currentPatientConsultas = [];
+      snapshot.forEach(doc => currentPatientConsultas.push({ id: doc.id, ...doc.data() }));
+      renderConsultasTimeline();
+    }).catch(() => {
+      consultasTimeline.innerHTML = '<p class="empty">No se pudieron cargar las consultas.</p>';
     });
+  }
 
-    return doc;
+  function renderConsultasTimeline() {
+    consultasTimeline.innerHTML = currentPatientConsultas.length
+      ? currentPatientConsultas.map(c => `
+        <div class="consulta-card">
+          <div class="cdate">${formatDateEs(c.date)}</div>
+          ${CONSULTA_FIELDS.filter(([, key]) => c[key]).map(([, key, label]) =>
+            `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`
+          ).join('')}
+        </div>`).join('')
+      : '<p class="empty">Todavía no hay consultas registradas para este paciente.</p>';
+  }
+
+  function formatDateEs(isoDate) {
+    if (!isoDate) return '';
+    const [y, m, d] = isoDate.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  document.getElementById('recordBackBtn').addEventListener('click', () => {
+    recordOverlay.classList.remove('open');
+    currentPatientId = null;
+  });
+  recordOverlay.addEventListener('click', (e) => { if (e.target === recordOverlay) { recordOverlay.classList.remove('open'); currentPatientId = null; } });
+
+  // --- Agregar nueva consulta ---
+  const todayStrAdmin = new Date().toISOString().split('T')[0];
+  document.getElementById('addConsultaBtn').addEventListener('click', () => {
+    document.getElementById('cxDate').value = todayStrAdmin;
+    CONSULTA_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
+    consultaForm.style.display = 'block';
+  });
+  document.getElementById('cxCancelBtn').addEventListener('click', () => { consultaForm.style.display = 'none'; });
+
+  document.getElementById('cxSaveBtn').addEventListener('click', () => {
+    if (!currentPatientId) return;
+    const date = document.getElementById('cxDate').value;
+    if (!date) { recordStatusMsg.textContent = 'Elige la fecha de la consulta.'; return; }
+    const data = { date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    CONSULTA_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
+
+    recordStatusMsg.textContent = 'Guardando consulta...';
+    db.collection('patientRecords').doc(currentPatientId).collection('consultas').add(data)
+      .then(() => db.collection('patientRecords').doc(currentPatientId).update({ updatedAt: firebase.firestore.FieldValue.serverTimestamp() }))
+      .then(() => {
+        recordStatusMsg.textContent = '';
+        consultaForm.style.display = 'none';
+        openPatientHistory(currentPatientId);
+      }).catch(err => {
+        recordStatusMsg.textContent = 'Error al guardar: ' + err.message;
+      });
+  });
+
+  // --- Generación de PDF (incluye todas las consultas, de más antigua a más reciente) ---
+  function loadImageAsDataURL(url) {
+    return fetch(url).then(r => r.blob()).then(blob => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    }));
+  }
+
+  function buildRecordPdf(r, consultas) {
+    return loadImageAsDataURL('Icono.png').catch(() => null).then(iconDataUrl => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const teal = [14, 74, 68];
+      let y = 20;
+
+      // Ícono con tamaño limitado en la cabecera (12x12 mm), a la izquierda del nombre
+      const ICON_SIZE = 12;
+      let textX = 14;
+      if (iconDataUrl) {
+        try { doc.addImage(iconDataUrl, 'PNG', 14, y - 9, ICON_SIZE, ICON_SIZE); textX = 14 + ICON_SIZE + 4; } catch (e) {}
+      }
+
+      doc.setFontSize(16); doc.setTextColor(...teal);
+      doc.text('Dra. Lorena Velásquez Roa', textX, y);
+      doc.setFontSize(10); doc.setTextColor(100);
+      y += 6;
+      doc.text('Medicina Integral y Antienvejecimiento — Historia clínica', textX, y);
+      y = Math.max(y, 20 - 9 + ICON_SIZE) + 4;
+      doc.setDrawColor(...teal);
+      doc.line(14, y, 196, y);
+      y += 10;
+
+      doc.setFontSize(12); doc.setTextColor(20);
+      doc.text(`Paciente: ${r.name}`, 14, y); y += 7;
+      if (r.email) { doc.text(`Correo: ${r.email}`, 14, y); y += 7; }
+      if (r.phone) { doc.text(`Teléfono: ${r.phone}`, 14, y); y += 7; }
+      const fechaDoc = new Date().toLocaleDateString('es-ES');
+      doc.text(`Fecha del documento: ${fechaDoc}`, 14, y); y += 12;
+
+      const ordered = [...consultas].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+      if (ordered.length === 0) {
+        doc.setFontSize(10); doc.setTextColor(100);
+        doc.text('Este paciente todavía no tiene consultas registradas.', 14, y);
+      }
+
+      ordered.forEach((c, idx) => {
+        if (y > 250) { doc.addPage(); y = 20; }
+        doc.setFontSize(12); doc.setTextColor(...teal);
+        doc.text(`Consulta del ${formatDateEs(c.date)}`, 14, y); y += 3;
+        doc.setDrawColor(200); doc.setLineWidth(0.3);
+        doc.line(14, y, 196, y);
+        y += 7;
+
+        CONSULTA_FIELDS.forEach(([, key, label]) => {
+          const text = c[key];
+          if (!text) return;
+          if (y > 260) { doc.addPage(); y = 20; }
+          doc.setFontSize(10); doc.setTextColor(...teal);
+          doc.text(label + ':', 14, y); y += 5;
+          doc.setFontSize(10); doc.setTextColor(40);
+          const lines = doc.splitTextToSize(text, 180);
+          doc.text(lines, 14, y);
+          y += lines.length * 5 + 5;
+        });
+        y += 6;
+      });
+
+      return doc;
+    });
+  }
+
+  function getPatientAndConsultas(id) {
+    const r = allRecords.find(x => x.id === id);
+    return db.collection('patientRecords').doc(id).collection('consultas').get().then(snapshot => {
+      const consultas = [];
+      snapshot.forEach(doc => consultas.push(doc.data()));
+      return { r, consultas };
+    });
   }
 
   function downloadRecordPdf(id) {
-    const r = allRecords.find(x => x.id === id);
-    if (!r) return;
-    const doc = buildRecordPdf(r);
-    doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
+    getPatientAndConsultas(id).then(({ r, consultas }) => {
+      return buildRecordPdf(r, consultas).then(doc => {
+        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
+      });
+    });
   }
 
   function shareRecordEmail(id) {
-    const r = allRecords.find(x => x.id === id);
-    if (!r) return;
-    downloadRecordPdf(id);
-    const subject = encodeURIComponent(`Historia clínica — ${r.name}`);
-    const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
-    window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
+    getPatientAndConsultas(id).then(({ r, consultas }) => {
+      buildRecordPdf(r, consultas).then(doc => {
+        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
+        const subject = encodeURIComponent(`Historia clínica — ${r.name}`);
+        const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
+        window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
+      });
+    });
   }
 
   function shareRecordWhatsapp(id) {
-    const r = allRecords.find(x => x.id === id);
-    if (!r) return;
-    downloadRecordPdf(id);
-    const phone = (r.phone || '').replace(/[^\d]/g, '');
-    const text = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
-    window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+    getPatientAndConsultas(id).then(({ r, consultas }) => {
+      buildRecordPdf(r, consultas).then(doc => {
+        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
+        const phone = (r.phone || '').replace(/[^\d]/g, '');
+        const text = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
+        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+      });
+    });
   }
 
   function approveReview(id) {
