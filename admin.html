@@ -815,6 +815,7 @@
             <button class="cal-btn" onclick="downloadRecordPdf('${r.id}')">Descargar PDF</button>
             <button class="delete-btn" onclick="shareRecordEmail('${r.id}')">Enviar por correo</button>
             <button class="delete-btn" onclick="shareRecordWhatsapp('${r.id}')">Enviar por WhatsApp</button>
+            <button class="delete-btn" onclick="deletePatientRecord('${r.id}')" style="background:#f4d9d9; color:#8a2b2b;">Eliminar</button>
           </div>
         </div>`).join('')
       : '<p class="empty">No hay historias clínicas guardadas todavía.</p>';
@@ -1216,6 +1217,28 @@
           window.open(`https://wa.me/${phone}?text=${waText}`, '_blank');
         });
       });
+    });
+  }
+
+  const DELETE_RECORD_PASSWORD = 'Johanpipe1';
+
+  function deletePatientRecord(id) {
+    const pass = window.prompt('Para eliminar esta historia clínica, escribe la clave de confirmación:');
+    if (pass === null) return; // canceló
+    if (pass !== DELETE_RECORD_PASSWORD) {
+      alert('Clave incorrecta. No se eliminó la historia.');
+      return;
+    }
+    const r = allRecords.find(x => x.id === id);
+    if (!confirm(`¿Seguro que quieres eliminar la historia de ${r ? r.name : 'este paciente'}? Esto borrará también todas sus consultas y no se puede deshacer.`)) return;
+
+    db.collection('patientRecords').doc(id).collection('consultas').get().then(snapshot => {
+      const batch = db.batch();
+      snapshot.forEach(doc => batch.delete(doc.ref));
+      batch.delete(db.collection('patientRecords').doc(id));
+      return batch.commit();
+    }).then(loadRecords).catch(err => {
+      alert('No se pudo eliminar: ' + err.message);
     });
   }
 
