@@ -231,7 +231,7 @@
   <!-- ===== HISTORIAS CLÍNICAS ===== -->
   <div class="admin-panel" id="panel-records">
     <div class="records-toolbar">
-      <input type="text" id="recordSearch" placeholder="Buscar paciente por nombre...">
+      <input type="text" id="recordSearch" placeholder="Buscar por nombre o número de ID...">
       <button id="newRecordBtn" class="approve-btn">+ Nueva historia</button>
     </div>
     <div id="recordsList"><p class="empty">Cargando...</p></div>
@@ -810,7 +810,7 @@
       ? records.map(r => `
         <div class="card">
           <div class="name">${r.name}</div>
-          <div class="comment">${r.email || ''} ${r.phone ? '· ' + r.phone : ''}</div>
+          <div class="comment">${r.documento ? 'ID: ' + r.documento + ' · ' : ''}${r.email || ''} ${r.phone ? '· ' + r.phone : ''}</div>
           <div class="record-card-actions">
             <button class="approve-btn" onclick="openPatientHistory('${r.id}')">Abrir historia</button>
             <button class="cal-btn" onclick="downloadRecordPdf('${r.id}')">Descargar PDF</button>
@@ -824,7 +824,10 @@
 
   recordSearch.addEventListener('input', () => {
     const q = recordSearch.value.trim().toLowerCase();
-    renderRecordsList(allRecords.filter(r => r.name.toLowerCase().includes(q)));
+    renderRecordsList(allRecords.filter(r =>
+      (r.name || '').toLowerCase().includes(q) ||
+      (r.documento || '').toLowerCase().includes(q)
+    ));
   });
 
   // --- Modal: nuevo paciente ---
