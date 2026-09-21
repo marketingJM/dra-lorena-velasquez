@@ -168,6 +168,18 @@
   .consulta-card .cfield{font-size:0.82rem; margin-bottom:6px;}
   .consulta-card .cfield b{color:var(--ink); font-weight:600;}
   .consulta-card .cfield span{color:var(--ink-soft);}
+  .consulta-card .csection{font-weight:700; color:var(--teal-deep); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.03em; margin:10px 0 4px;}
+
+  .form-section-title{
+    background:var(--teal); color:#fff; font-size:0.78rem; font-weight:700;
+    padding:7px 12px; border-radius:6px; margin:16px 0 10px; text-transform:uppercase; letter-spacing:0.02em;
+  }
+  .form-section-title:first-of-type{margin-top:4px;}
+  .vitals-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .vitals-row label{font-size:0.7rem;}
+  .vitals-row input{padding:7px 8px; font-size:0.82rem;}
+  .patient-data-view{background:var(--mist); border-radius:10px; padding:12px 16px; font-size:0.85rem; color:var(--ink-soft); margin-bottom:6px;}
+  .patient-data-view b{color:var(--ink);}
 </style>
 </head>
 <body>
@@ -237,12 +249,25 @@
 <div class="cancel-overlay" id="newPatientOverlay">
   <div class="cancel-modal record-modal">
     <h3>Nuevo paciente</h3>
-    <label>Nombre del paciente</label>
-    <input type="text" id="npName" placeholder="Ej. María González">
-    <label>Correo</label>
-    <input type="text" id="npEmail" placeholder="correo@ejemplo.com">
+    <div class="form-section-title">I. Datos del paciente</div>
+    <label>Apellidos y nombres</label>
+    <input type="text" id="npName" placeholder="Ej. María González Pérez">
+    <label>C.C. / ID</label>
+    <input type="text" id="npDocumento" placeholder="Documento de identidad">
+    <label>Fecha de nacimiento</label>
+    <input type="date" id="npFechaNacimiento">
+    <label>Edad</label>
+    <input type="text" id="npEdad" placeholder="Ej. 34">
+    <label>Ocupación</label>
+    <input type="text" id="npOcupacion">
+    <label>Dirección</label>
+    <input type="text" id="npDireccion">
     <label>Teléfono (con código de país, ej. +34600000000)</label>
     <input type="text" id="npPhone" placeholder="+34600000000">
+    <label>Correo</label>
+    <input type="text" id="npEmail" placeholder="correo@ejemplo.com">
+    <label>Aseguradora / EPS</label>
+    <input type="text" id="npAseguradora">
     <div class="cancel-actions">
       <button id="npBackBtn" class="btn-secondary">Cancelar</button>
       <button id="npSaveBtn" class="approve-btn">Crear y abrir historia</button>
@@ -255,9 +280,35 @@
 <div class="cancel-overlay" id="recordOverlay">
   <div class="cancel-modal record-modal">
     <h3 id="recordModalTitle">Historia clínica</h3>
-    <p class="sub" id="recordPatientInfo"></p>
 
-    <div id="consultasTimeline"></div>
+    <div class="form-section-title">I. Datos del paciente <button id="editPatientToggle" class="btn-secondary" style="float:right; padding:4px 12px; font-size:0.75rem;">Editar</button></div>
+    <div id="patientDataView" class="patient-data-view"></div>
+    <div id="patientDataEdit" style="display:none;">
+      <label>Apellidos y nombres</label>
+      <input type="text" id="pdName">
+      <label>C.C. / ID</label>
+      <input type="text" id="pdDocumento">
+      <label>Fecha de nacimiento</label>
+      <input type="date" id="pdFechaNacimiento">
+      <label>Edad</label>
+      <input type="text" id="pdEdad">
+      <label>Ocupación</label>
+      <input type="text" id="pdOcupacion">
+      <label>Dirección</label>
+      <input type="text" id="pdDireccion">
+      <label>Teléfono</label>
+      <input type="text" id="pdPhone">
+      <label>Correo</label>
+      <input type="text" id="pdEmail">
+      <label>Aseguradora / EPS</label>
+      <input type="text" id="pdAseguradora">
+      <div class="cancel-actions">
+        <button id="pdCancelBtn" class="btn-secondary">Cancelar</button>
+        <button id="pdSaveBtn" class="approve-btn">Guardar datos</button>
+      </div>
+    </div>
+
+    <div id="consultasTimeline" style="margin-top:20px;"></div>
 
     <button id="addConsultaBtn" class="approve-btn" style="margin-top:14px;">+ Agregar nueva consulta</button>
 
@@ -265,20 +316,46 @@
     <div id="consultaForm" style="display:none; margin-top:18px; border-top:1px solid var(--line); padding-top:16px;">
       <label>Fecha de la consulta</label>
       <input type="date" id="cxDate">
-      <label>Motivo de consulta</label>
+
+      <div class="form-section-title">II. Motivo de la consulta</div>
       <textarea id="cxMotivo"></textarea>
-      <label>Antecedentes médicos</label>
-      <textarea id="cxAntecedentes"></textarea>
-      <label>Exploración / hallazgos</label>
-      <textarea id="cxExploracion"></textarea>
-      <label>Diagnóstico</label>
+
+      <div class="form-section-title">III. Enfermedad actual</div>
+      <textarea id="cxEnfermedadActual"></textarea>
+
+      <div class="form-section-title">IV. Antecedentes</div>
+      <label>Personales / Médicos</label>
+      <input type="text" id="cxAntPersonales">
+      <label>Familiares</label>
+      <input type="text" id="cxAntFamiliares">
+      <label>Quirúrgicos</label>
+      <input type="text" id="cxAntQuirurgicos">
+      <label>Alérgicos</label>
+      <input type="text" id="cxAntAlergicos">
+      <label>Farmacológicos (medicamentos actuales)</label>
+      <input type="text" id="cxAntFarmacologicos">
+      <label>Gineco-obstétricos</label>
+      <input type="text" id="cxAntGineco">
+
+      <div class="form-section-title">V. Examen físico</div>
+      <div class="vitals-row">
+        <div><label>Signos vitales</label><input type="text" id="cxSignosVitales"></div>
+        <div><label>Peso</label><input type="text" id="cxPeso"></div>
+        <div><label>Talla</label><input type="text" id="cxTalla"></div>
+        <div><label>IMC</label><input type="text" id="cxImc"></div>
+      </div>
+      <label>Descripción por sistemas</label>
+      <textarea id="cxDescripcionSistemas"></textarea>
+
+      <div class="form-section-title">VI. Impresión diagnóstica</div>
       <textarea id="cxDiagnostico"></textarea>
-      <label>Medicamentos</label>
-      <textarea id="cxMedicamentos"></textarea>
-      <label>Plan de tratamiento</label>
+
+      <div class="form-section-title">VII. Plan de tratamiento y recomendaciones</div>
       <textarea id="cxPlan"></textarea>
-      <label>Notas de seguimiento</label>
+
+      <div class="form-section-title">Notas de seguimiento</div>
       <textarea id="cxNotas"></textarea>
+
       <div class="cancel-actions">
         <button id="cxCancelBtn" class="btn-secondary">Cancelar</button>
         <button id="cxSaveBtn" class="approve-btn">Guardar consulta</button>
@@ -663,26 +740,55 @@
   const recordSearch = document.getElementById('recordSearch');
   const recordOverlay = document.getElementById('recordOverlay');
   const recordModalTitle = document.getElementById('recordModalTitle');
-  const recordPatientInfo = document.getElementById('recordPatientInfo');
   const recordStatusMsg = document.getElementById('recordStatusMsg');
   const consultasTimeline = document.getElementById('consultasTimeline');
   const consultaForm = document.getElementById('consultaForm');
   const newPatientOverlay = document.getElementById('newPatientOverlay');
   const npStatusMsg = document.getElementById('npStatusMsg');
+  const patientDataView = document.getElementById('patientDataView');
+  const patientDataEdit = document.getElementById('patientDataEdit');
 
   let allRecords = [];
   let currentPatientId = null;
   let currentPatientConsultas = [];
 
-  const CONSULTA_FIELDS = [
-    ['cxMotivo', 'motivo', 'Motivo de consulta'],
-    ['cxAntecedentes', 'antecedentes', 'Antecedentes médicos'],
-    ['cxExploracion', 'exploracion', 'Exploración / hallazgos'],
-    ['cxDiagnostico', 'diagnostico', 'Diagnóstico'],
-    ['cxMedicamentos', 'medicamentos', 'Medicamentos'],
-    ['cxPlan', 'plan', 'Plan de tratamiento'],
-    ['cxNotas', 'notas', 'Notas de seguimiento']
+  // Datos fijos del paciente (encabezado de la historia)
+  const PATIENT_FIELDS = [
+    ['Name', 'name', 'Apellidos y nombres'],
+    ['Documento', 'documento', 'C.C. / ID'],
+    ['FechaNacimiento', 'fechaNacimiento', 'Fecha de nacimiento'],
+    ['Edad', 'edad', 'Edad'],
+    ['Ocupacion', 'ocupacion', 'Ocupación'],
+    ['Direccion', 'direccion', 'Dirección'],
+    ['Phone', 'phone', 'Teléfono'],
+    ['Email', 'email', 'Correo'],
+    ['Aseguradora', 'aseguradora', 'Aseguradora / EPS']
   ];
+
+  // Campos de cada consulta, agrupados igual que las secciones del formulario en papel
+  const CONSULTA_SECTIONS = [
+    { title: 'II. Motivo de la consulta', fields: [['cxMotivo', 'motivo', 'Motivo de la consulta']] },
+    { title: 'III. Enfermedad actual', fields: [['cxEnfermedadActual', 'enfermedadActual', 'Enfermedad actual']] },
+    { title: 'IV. Antecedentes', fields: [
+      ['cxAntPersonales', 'antPersonales', 'Personales / Médicos'],
+      ['cxAntFamiliares', 'antFamiliares', 'Familiares'],
+      ['cxAntQuirurgicos', 'antQuirurgicos', 'Quirúrgicos'],
+      ['cxAntAlergicos', 'antAlergicos', 'Alérgicos'],
+      ['cxAntFarmacologicos', 'antFarmacologicos', 'Farmacológicos'],
+      ['cxAntGineco', 'antGineco', 'Gineco-obstétricos']
+    ]},
+    { title: 'V. Examen físico', fields: [
+      ['cxSignosVitales', 'signosVitales', 'Signos vitales'],
+      ['cxPeso', 'peso', 'Peso'],
+      ['cxTalla', 'talla', 'Talla'],
+      ['cxImc', 'imc', 'IMC'],
+      ['cxDescripcionSistemas', 'descripcionSistemas', 'Descripción por sistemas']
+    ]},
+    { title: 'VI. Impresión diagnóstica', fields: [['cxDiagnostico', 'diagnostico', 'Impresión diagnóstica']] },
+    { title: 'VII. Plan de tratamiento y recomendaciones', fields: [['cxPlan', 'plan', 'Plan de tratamiento y recomendaciones']] },
+    { title: 'Notas de seguimiento', fields: [['cxNotas', 'notas', 'Notas de seguimiento']] }
+  ];
+  const CONSULTA_FIELDS = CONSULTA_SECTIONS.flatMap(s => s.fields);
 
   function loadRecords() {
     db.collection('patientRecords').orderBy('name').get().then(snapshot => {
@@ -721,9 +827,7 @@
 
   // --- Modal: nuevo paciente ---
   document.getElementById('newRecordBtn').addEventListener('click', () => {
-    document.getElementById('npName').value = '';
-    document.getElementById('npEmail').value = '';
-    document.getElementById('npPhone').value = '';
+    PATIENT_FIELDS.forEach(([elSuffix]) => { document.getElementById('np' + elSuffix).value = ''; });
     npStatusMsg.textContent = '';
     newPatientOverlay.classList.add('open');
   });
@@ -733,12 +837,8 @@
   document.getElementById('npSaveBtn').addEventListener('click', () => {
     const name = document.getElementById('npName').value.trim();
     if (!name) { npStatusMsg.textContent = 'El nombre del paciente es obligatorio.'; return; }
-    const data = {
-      name,
-      email: document.getElementById('npEmail').value.trim(),
-      phone: document.getElementById('npPhone').value.trim(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    const data = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    PATIENT_FIELDS.forEach(([elSuffix, key]) => { data[key] = document.getElementById('np' + elSuffix).value.trim(); });
     npStatusMsg.textContent = 'Creando...';
     db.collection('patientRecords').add(data).then(ref => {
       newPatientOverlay.classList.remove('open');
@@ -747,14 +847,49 @@
     }).catch(err => { npStatusMsg.textContent = 'Error: ' + err.message; });
   });
 
+  // --- Datos del paciente: ver / editar dentro de la historia ---
+  function renderPatientDataView(r) {
+    patientDataView.innerHTML = PATIENT_FIELDS
+      .filter(([, key]) => r[key])
+      .map(([, key, label]) => `<div><b>${label}:</b> ${r[key]}</div>`)
+      .join('') || '<div>Sin datos adicionales todavía. Dale a "Editar" para completarlos.</div>';
+  }
+
+  document.getElementById('editPatientToggle').addEventListener('click', (e) => {
+    e.preventDefault();
+    const r = allRecords.find(x => x.id === currentPatientId) || {};
+    PATIENT_FIELDS.forEach(([elSuffix, key]) => { document.getElementById('pd' + elSuffix).value = r[key] || ''; });
+    patientDataView.style.display = 'none';
+    patientDataEdit.style.display = 'block';
+  });
+  document.getElementById('pdCancelBtn').addEventListener('click', () => {
+    patientDataEdit.style.display = 'none';
+    patientDataView.style.display = 'block';
+  });
+  document.getElementById('pdSaveBtn').addEventListener('click', () => {
+    if (!currentPatientId) return;
+    const data = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    PATIENT_FIELDS.forEach(([elSuffix, key]) => { data[key] = document.getElementById('pd' + elSuffix).value.trim(); });
+    db.collection('patientRecords').doc(currentPatientId).set(data, { merge: true }).then(() => {
+      loadRecords();
+      const updated = { ...(allRecords.find(x => x.id === currentPatientId) || {}), ...data, id: currentPatientId };
+      renderPatientDataView(updated);
+      patientDataEdit.style.display = 'none';
+      patientDataView.style.display = 'block';
+      recordModalTitle.textContent = 'Historia clínica — ' + (data.name || updated.name);
+    });
+  });
+
   // --- Modal: historia del paciente (timeline + agregar consulta) ---
   function openPatientHistory(id, patientDataIfNew) {
     currentPatientId = id;
     recordStatusMsg.textContent = '';
     consultaForm.style.display = 'none';
+    patientDataEdit.style.display = 'none';
+    patientDataView.style.display = 'block';
     const r = patientDataIfNew || allRecords.find(x => x.id === id);
     recordModalTitle.textContent = 'Historia clínica — ' + r.name;
-    recordPatientInfo.textContent = [r.email, r.phone].filter(Boolean).join(' · ');
+    renderPatientDataView(r);
     consultasTimeline.innerHTML = '<p class="empty">Cargando consultas...</p>';
     recordOverlay.classList.add('open');
 
@@ -771,10 +906,13 @@
     consultasTimeline.innerHTML = currentPatientConsultas.length
       ? currentPatientConsultas.map(c => `
         <div class="consulta-card">
-          <div class="cdate">${formatDateEs(c.date)}</div>
-          ${CONSULTA_FIELDS.filter(([, key]) => c[key]).map(([, key, label]) =>
-            `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`
-          ).join('')}
+          <div class="cdate">Consulta del ${formatDateEs(c.date)}</div>
+          ${CONSULTA_SECTIONS.map(section => {
+            const filled = section.fields.filter(([, key]) => c[key]);
+            if (!filled.length) return '';
+            return `<div class="csection">${section.title}</div>` +
+              filled.map(([, key, label]) => `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`).join('');
+          }).join('')}
         </div>`).join('')
       : '<p class="empty">Todavía no hay consultas registradas para este paciente.</p>';
   }
@@ -819,7 +957,10 @@
       });
   });
 
-  // --- Generación de PDF (incluye todas las consultas, de más antigua a más reciente) ---
+  // --- Generación de PDF, con el formato del formulario impreso: cabecera con logo,
+  //     título "HISTORIA CLÍNICA MÉDICA", barras verdes por sección, campos subrayados,
+  //     marca de agua del logo, firmas al final y número de página. Cada consulta se
+  //     imprime como una página completa del formulario (igual que en papel).
   function loadImageAsDataURL(url) {
     return fetch(url).then(r => r.blob()).then(blob => new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -834,61 +975,176 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const teal = [14, 74, 68];
-      let y = 20;
+      const PAGE_W = 210, MARGIN = 14, CONTENT_W = PAGE_W - MARGIN * 2;
+      const ICON_SIZE = 16;
 
-      // Ícono con tamaño limitado en la cabecera (12x12 mm), a la izquierda del nombre
-      const ICON_SIZE = 12;
-      let textX = 14;
-      if (iconDataUrl) {
-        try { doc.addImage(iconDataUrl, 'PNG', 14, y - 9, ICON_SIZE, ICON_SIZE); textX = 14 + ICON_SIZE + 4; } catch (e) {}
+      function drawWatermark() {
+        if (!iconDataUrl) return;
+        try {
+          doc.saveGraphicsState();
+          doc.setGState(new doc.GState({ opacity: 0.06 }));
+          doc.addImage(iconDataUrl, 'PNG', 55, 90, 100, 100);
+          doc.restoreGraphicsState();
+        } catch (e) {}
       }
 
-      doc.setFontSize(16); doc.setTextColor(...teal);
-      doc.text('Dra. Lorena Velásquez Roa', textX, y);
-      doc.setFontSize(10); doc.setTextColor(100);
-      y += 6;
-      doc.text('Medicina Integral y Antienvejecimiento — Historia clínica', textX, y);
-      y = Math.max(y, 20 - 9 + ICON_SIZE) + 4;
-      doc.setDrawColor(...teal);
-      doc.line(14, y, 196, y);
-      y += 10;
+      function drawHeader() {
+        let y = 16;
+        if (iconDataUrl) {
+          try { doc.addImage(iconDataUrl, 'PNG', MARGIN, y - 5, ICON_SIZE, ICON_SIZE); } catch (e) {}
+        }
+        const textX = MARGIN + ICON_SIZE + 5;
+        doc.setFontSize(13); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
+        doc.text('DRA. LORENA VELÁSQUEZ ROA', textX, y);
+        doc.setFontSize(8.5); doc.setTextColor(100); doc.setFont(undefined, 'normal');
+        doc.text('MEDICINA INTEGRAL Y ANTIENVEJECIMIENTO', textX, y + 5);
 
-      doc.setFontSize(12); doc.setTextColor(20);
-      doc.text(`Paciente: ${r.name}`, 14, y); y += 7;
-      if (r.email) { doc.text(`Correo: ${r.email}`, 14, y); y += 7; }
-      if (r.phone) { doc.text(`Teléfono: ${r.phone}`, 14, y); y += 7; }
-      const fechaDoc = new Date().toLocaleDateString('es-ES');
-      doc.text(`Fecha del documento: ${fechaDoc}`, 14, y); y += 12;
+        doc.setFontSize(14); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
+        doc.text('HISTORIA CLÍNICA', PAGE_W - MARGIN, y - 1, { align: 'right' });
+        doc.text('MÉDICA', PAGE_W - MARGIN, y + 5, { align: 'right' });
+        doc.setFont(undefined, 'normal');
+
+        return y + ICON_SIZE - 2;
+      }
+
+      function sectionBar(y, label) {
+        doc.setFillColor(...teal);
+        doc.rect(MARGIN, y, CONTENT_W, 6.5, 'F');
+        doc.setFontSize(9.5); doc.setTextColor(255, 255, 255); doc.setFont(undefined, 'bold');
+        doc.text(label.toUpperCase(), MARGIN + 3, y + 4.6);
+        doc.setFont(undefined, 'normal');
+        return y + 6.5 + 4;
+      }
+
+      // Campo corto tipo "Etiqueta: ____valor____" con línea inferior
+      function fieldLine(x, y, w, label, value) {
+        doc.setFontSize(9); doc.setTextColor(20); doc.setFont(undefined, 'bold');
+        const labelW = doc.getTextWidth(label + ': ');
+        doc.text(label + ':', x, y);
+        doc.setFont(undefined, 'normal'); doc.setTextColor(60);
+        if (value) doc.text(String(value), x + labelW + 1, y);
+        doc.setDrawColor(190);
+        doc.line(x, y + 1.2, x + w, y + 1.2);
+      }
+
+      // Bloque de texto largo dentro de una caja con borde suave
+      function textBox(y, label, text, minHeight) {
+        y = ensureSpace(y, minHeight + 10);
+        y = sectionBar(y, label);
+        const lines = doc.splitTextToSize(text || '', CONTENT_W - 6);
+        const boxH = Math.max(minHeight, lines.length * 4.6 + 6);
+        doc.setDrawColor(210);
+        doc.rect(MARGIN, y, CONTENT_W, boxH);
+        doc.setFontSize(9.5); doc.setTextColor(40); doc.setFont(undefined, 'normal');
+        doc.text(lines, MARGIN + 3, y + 6);
+        return y + boxH + 6;
+      }
+
+      function ensureSpace(y, needed) {
+        if (y + needed > 275) {
+          doc.addPage();
+          drawWatermark();
+          return drawHeader() + 4;
+        }
+        return y;
+      }
+
+      function renderOnePage(consulta, isFirst) {
+        drawWatermark();
+        let y = drawHeader() + 4;
+
+        // I. DATOS DEL PACIENTE
+        y = sectionBar(y, 'I. Datos del paciente');
+        fieldLine(MARGIN, y, 120, 'Apellidos y nombres', r.name);
+        fieldLine(MARGIN + 125, y, 55, 'C.C. / ID', r.documento);
+        y += 7;
+        fieldLine(MARGIN, y, 80, 'Fecha de nacimiento', r.fechaNacimiento);
+        fieldLine(MARGIN + 85, y, 40, 'Edad', r.edad);
+        fieldLine(MARGIN + 130, y, 50, 'Ocupación', r.ocupacion);
+        y += 7;
+        fieldLine(MARGIN, y, 120, 'Dirección', r.direccion);
+        fieldLine(MARGIN + 125, y, 55, 'Teléfono', r.phone);
+        y += 7;
+        fieldLine(MARGIN, y, 120, 'Aseguradora / EPS', r.aseguradora);
+        fieldLine(MARGIN + 125, y, 55, 'Fecha consulta', formatDateEs(consulta.date));
+        y += 10;
+
+        y = textBox(y, 'II. Motivo de la consulta', consulta.motivo, 12);
+        y = textBox(y, 'III. Enfermedad actual', consulta.enfermedadActual, 12);
+
+        // IV. Antecedentes (líneas cortas)
+        y = ensureSpace(y, 40);
+        y = sectionBar(y, 'IV. Antecedentes');
+        const antecedentes = [
+          ['Personales / Médicos', consulta.antPersonales],
+          ['Familiares', consulta.antFamiliares],
+          ['Quirúrgicos', consulta.antQuirurgicos],
+          ['Alérgicos', consulta.antAlergicos],
+          ['Farmacológicos', consulta.antFarmacologicos],
+          ['Gineco-obstétricos', consulta.antGineco]
+        ];
+        antecedentes.forEach(([label, value]) => {
+          y = ensureSpace(y, 7);
+          fieldLine(MARGIN, y, CONTENT_W, label, value);
+          y += 6;
+        });
+        y += 4;
+
+        // V. Examen físico
+        y = ensureSpace(y, 35);
+        y = sectionBar(y, 'V. Examen físico');
+        fieldLine(MARGIN, y, 40, 'Signos vitales', consulta.signosVitales);
+        fieldLine(MARGIN + 45, y, 35, 'Peso', consulta.peso);
+        fieldLine(MARGIN + 85, y, 35, 'Talla', consulta.talla);
+        fieldLine(MARGIN + 125, y, 35, 'IMC', consulta.imc);
+        y += 9;
+        const sisLines = doc.splitTextToSize(consulta.descripcionSistemas || '', CONTENT_W - 6);
+        const sisH = Math.max(14, sisLines.length * 4.6 + 6);
+        doc.setDrawColor(210); doc.rect(MARGIN, y, CONTENT_W, sisH);
+        doc.setFontSize(8); doc.setTextColor(100);
+        doc.text('Descripción por sistemas:', MARGIN + 3, y + 4.5);
+        doc.setFontSize(9.5); doc.setTextColor(40);
+        doc.text(sisLines, MARGIN + 3, y + 9.5);
+        y += sisH + 6;
+
+        y = textBox(y, 'VI. Impresión diagnóstica', consulta.diagnostico, 14);
+        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', consulta.plan, 16);
+        if (consulta.notas) {
+          y = textBox(y, 'Notas de seguimiento', consulta.notas, 12);
+        }
+
+        // Firmas
+        y = ensureSpace(y, 30);
+        y += 14;
+        doc.setDrawColor(120);
+        doc.line(MARGIN + 5, y, MARGIN + 75, y);
+        doc.line(MARGIN + 110, y, MARGIN + 180, y);
+        doc.setFontSize(8); doc.setTextColor(80);
+        doc.text('FIRMA DEL PACIENTE', MARGIN + 40, y + 5, { align: 'center' });
+        doc.text('DRA. LORENA VELÁSQUEZ ROA', MARGIN + 145, y + 5, { align: 'center' });
+      }
+
+      function stampPageNumbers() {
+        const total = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= total; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8); doc.setTextColor(120);
+          doc.text(`Página ${i}`, PAGE_W - MARGIN, 290, { align: 'right' });
+        }
+      }
 
       const ordered = [...consultas].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
       if (ordered.length === 0) {
-        doc.setFontSize(10); doc.setTextColor(100);
-        doc.text('Este paciente todavía no tiene consultas registradas.', 14, y);
+        renderOnePage({}, true);
+      } else {
+        ordered.forEach((c, idx) => {
+          if (idx > 0) doc.addPage();
+          renderOnePage(c, idx === 0);
+        });
       }
 
-      ordered.forEach((c, idx) => {
-        if (y > 250) { doc.addPage(); y = 20; }
-        doc.setFontSize(12); doc.setTextColor(...teal);
-        doc.text(`Consulta del ${formatDateEs(c.date)}`, 14, y); y += 3;
-        doc.setDrawColor(200); doc.setLineWidth(0.3);
-        doc.line(14, y, 196, y);
-        y += 7;
-
-        CONSULTA_FIELDS.forEach(([, key, label]) => {
-          const text = c[key];
-          if (!text) return;
-          if (y > 260) { doc.addPage(); y = 20; }
-          doc.setFontSize(10); doc.setTextColor(...teal);
-          doc.text(label + ':', 14, y); y += 5;
-          doc.setFontSize(10); doc.setTextColor(40);
-          const lines = doc.splitTextToSize(text, 180);
-          doc.text(lines, 14, y);
-          y += lines.length * 5 + 5;
-        });
-        y += 6;
-      });
-
+      stampPageNumbers();
       return doc;
     });
   }
@@ -910,13 +1166,34 @@
     });
   }
 
+  // Intenta compartir el PDF de verdad (adjunto) usando el menú nativo de "Compartir" del
+  // celular/computador (funciona muy bien en Android y iPhone recientes). Si el navegador no
+  // lo soporta (la mayoría de computadores de escritorio), cae al método anterior: descarga
+  // el PDF y abre WhatsApp/correo con el mensaje, para adjuntarlo a mano.
+  function tryNativeShare(file, title, text) {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title, text }).then(() => true).catch(() => false);
+    }
+    return Promise.resolve(false);
+  }
+
   function shareRecordEmail(id) {
     getPatientAndConsultas(id).then(({ r, consultas }) => {
       buildRecordPdf(r, consultas).then(doc => {
-        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
-        const subject = encodeURIComponent(`Historia clínica — ${r.name}`);
-        const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
-        window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
+        const fileName = `Historia_${r.name.replace(/\s+/g, '_')}.pdf`;
+        const blob = doc.output('blob');
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        const title = `Historia clínica — ${r.name}`;
+        const text = `Hola ${r.name}, adjunto tu historia clínica.`;
+
+        tryNativeShare(file, title, text).then(shared => {
+          if (shared) return;
+          // Alternativa manual si el navegador no permite compartir archivos
+          doc.save(fileName);
+          const subject = encodeURIComponent(title);
+          const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
+          window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
+        });
       });
     });
   }
@@ -924,10 +1201,20 @@
   function shareRecordWhatsapp(id) {
     getPatientAndConsultas(id).then(({ r, consultas }) => {
       buildRecordPdf(r, consultas).then(doc => {
-        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
-        const phone = (r.phone || '').replace(/[^\d]/g, '');
-        const text = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
-        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+        const fileName = `Historia_${r.name.replace(/\s+/g, '_')}.pdf`;
+        const blob = doc.output('blob');
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        const title = `Historia clínica — ${r.name}`;
+        const text = `Hola ${r.name}, te comparto tu historia clínica en PDF.`;
+
+        tryNativeShare(file, title, text).then(shared => {
+          if (shared) return;
+          // Alternativa manual si el navegador no permite compartir archivos
+          doc.save(fileName);
+          const phone = (r.phone || '').replace(/[^\d]/g, '');
+          const waText = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
+          window.open(`https://wa.me/${phone}?text=${waText}`, '_blank');
+        });
       });
     });
   }
