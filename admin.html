@@ -416,6 +416,7 @@
       loadReviews();
       loadContentForm();
       loadRecords();
+      preloadIconDataUrl();
     } else {
       loginBox.style.display = 'block';
       adminPanel.style.display = 'none';
@@ -971,8 +972,17 @@
     }));
   }
 
+  // Se descarga UNA sola vez, al iniciar sesión, para que "Enviar por WhatsApp/correo"
+  // no tenga que esperar a bajar la imagen cada vez (eso es lo que hacía que se perdiera
+  // el permiso de "compartir archivo" en algunos navegadores).
+  let cachedIconDataUrl = null;
+  function preloadIconDataUrl() {
+    loadImageAsDataURL('Icono.png').then(url => { cachedIconDataUrl = url; }).catch(() => {});
+  }
+
   function buildRecordPdf(r, consultas) {
-    return loadImageAsDataURL('Icono.png').catch(() => null).then(iconDataUrl => {
+    const iconPromise = cachedIconDataUrl ? Promise.resolve(cachedIconDataUrl) : loadImageAsDataURL('Icono.png').catch(() => null);
+    return iconPromise.then(iconDataUrl => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const teal = [14, 74, 68];
@@ -1152,6 +1162,12 @@
 
   function getPatientAndConsultas(id) {
     const r = allRecords.find(x => x.id === id);
+    // Si ya tenemos las consultas de este paciente cargadas en memoria (por ejemplo, porque
+    // acabas de tener su historia abierta), las usamos directo sin ir a la base de datos —
+    // así "Enviar por WhatsApp/correo" es instantáneo y no se pierde el permiso de compartir.
+    if (currentPatientId === id && currentPatientConsultas) {
+      return Promise.resolve({ r, consultas: currentPatientConsultas });
+    }
     return db.collection('patientRecords').doc(id).collection('consultas').get().then(snapshot => {
       const consultas = [];
       snapshot.forEach(doc => consultas.push(doc.data()));
