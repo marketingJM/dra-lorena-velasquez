@@ -3,14 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin | Dra. Lorena Velásquez Roa</title>
-<meta name="robots" content="noindex, nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Dra. Lorena Velásquez Roa — Medicina Integral y Antienvejecimiento</title>
+<meta name="description" content="Medicina integral, funcional y antienvejecimiento con la Dra. Lorena Velásquez Roa.">
 
+<!-- Open Graph: hace que el logo y la descripción aparezcan al compartir el enlace -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dra. Lorena Velásquez Roa — Medicina Integral y Antienvejecimiento">
+<meta property="og:description" content="Medicina integral, funcional y antienvejecimiento con la Dra. Lorena Velásquez Roa.">
+<meta property="og:image" content="https://lvrmedicinaintegral.com/Logoo.png">
+<meta property="og:image:width" content="1400">
+<meta property="og:image:height" content="795">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dra. Lorena Velásquez Roa — Medicina Integral y Antienvejecimiento">
+<meta name="twitter:description" content="Medicina integral, funcional y antienvejecimiento con la Dra. Lorena Velásquez Roa.">
+<meta name="twitter:image" content="https://lvrmedicinaintegral.com/Logoo.png">
+<link rel="icon" type="image/png" href="Icono.png">
+
+<!-- ===== Firebase (base de datos de reseñas) ===== -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBUY1oFoZGhztpyHJfHclBSqYpGTttJ7vo",
@@ -22,427 +33,1205 @@
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const auth = firebase.auth();
 </script>
 
+<!-- ===== EmailJS (notificación de reserva nueva) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("jraHTQEiLA8iXEw80");
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ivory:#FAF6EF; --mist:#F2F1EC; --teal:#0E4A44; --teal-deep:#093430;
-    --gold:#A8823D; --ink:#20201C; --ink-soft:#6B6a5F; --line:rgba(32,32,28,0.13);
+    --ivory:#FAF6EF;
+    --mist:#F2F1EC;
+    --teal:#0E4A44;
+    --teal-deep:#093430;
+    --gold:#A8823D;
+    --gold-light:#C9A44E;
+    --ink:#20201C;
+    --ink-soft:#6B6a5F;
+    --line:rgba(32,32,28,0.13);
+    --max:1180px;
   }
   *{box-sizing:border-box;}
-  body{margin:0; background:var(--ivory); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300;}
-  .wrap{max-width:760px; margin:0 auto; padding:24px 24px 80px;}
-  h1{font-size:1.5rem; font-weight:600; margin:0 0 6px;}
-  .sub{color:var(--ink-soft); font-size:0.9rem; margin-bottom:20px;}
+  html{scroll-behavior:auto;}
+  body{margin:0;background:var(--ivory);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:500;color:var(--teal-deep);margin:0;}
+  p{margin:0;}
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;max-width:100%;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px;}
+  ::selection{background:var(--gold-light);color:var(--teal-deep);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important;}}
 
-  #loginBox{max-width:340px; margin:80px auto; text-align:center;}
-  #loginBox input{
-    width:100%; padding:12px 14px; margin-bottom:12px; border:1px solid var(--line);
-    border-radius:10px; font-family:'Jost',sans-serif; font-size:0.95rem;
+  .splash{
+    position:fixed; inset:0; z-index:100; background:var(--ivory);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px; transition:opacity .4s ease, visibility .4s ease;
   }
-  #loginBox button{
-    width:100%; padding:13px; background:var(--teal); color:var(--ivory); border:none;
-    border-radius:10px; font-size:0.95rem; cursor:pointer; font-family:'Jost',sans-serif;
+  .splash.hidden{opacity:0; visibility:hidden; pointer-events:none;}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--teal);
+    color:var(--teal-deep); border-radius:999px; padding:7px 18px; font-size:0.86rem;
+    background:transparent; font-family:'Jost',sans-serif; cursor:pointer;
   }
-  #loginBox button:hover{background:var(--teal-deep);}
-  #loginError{color:#b23; font-size:0.85rem; margin-top:10px; min-height:18px;}
+  .pill.lang{position:absolute; top:24px; right:24px;}
+  .flag{font-size:1rem;}
+  .splash .full-logo{width:min(70%,340px); margin:0 auto;}
+  .splash .enter-btn{
+    display:inline-flex; align-items:center; gap:10px; margin-top:40px; background:var(--teal); color:var(--ivory);
+    padding:17px 44px; border-radius:999px; font-size:1.02rem; letter-spacing:0.01em; border:none;
+    cursor:pointer; transition:background .25s ease, transform .2s ease; font-family:'Jost',sans-serif;
+  }
+  .splash .enter-btn:hover{background:var(--teal-deep); transform:translateY(-2px);}
+  .splash .enter-btn svg{width:18px;height:18px;}
 
-  .topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;}
-  #logoutBtn{
-    background:none; border:1px solid var(--line); border-radius:999px; padding:7px 16px;
-    font-size:0.82rem; cursor:pointer; color:var(--ink-soft);
-  }
+  #site{display:none;}
+  #site.visible{display:block;}
 
-  /* ---------- Pestañas principales ---------- */
-  .admin-tabs{
-    display:flex; gap:6px; margin-bottom:28px; border-bottom:1px solid var(--line);
+  .infobar{
+    position:relative;
+    display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:repeat(2,auto);
+    column-gap:16px; row-gap:10px; align-items:center;
+    padding:18px 28px; max-width:var(--max); margin:0 auto;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .ib-icon{grid-column:1; grid-row:1 / span 2; width:58px; height:auto; align-self:center;}
+  .ib-title{
+    grid-column:2; grid-row:1; align-self:end;
+    font-size:0.72rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink); font-family:'Jost',sans-serif; text-align:left; line-height:1.4;
+  }
+  .ib-lang{grid-column:3; grid-row:1; align-self:start; justify-self:end;}
+  .ib-row2{grid-column:2 / span 2; grid-row:2; display:flex; align-items:center; gap:8px;}
+  .ib-share{
+    background:none; border:none; color:var(--gold); font-size:0.78rem; font-weight:600;
+    text-decoration:underline; cursor:pointer; padding:0; margin-left:2px; font-family:'Jost',sans-serif;
+  }
+  .ib-socials{display:flex; gap:8px;}
+  .pill-ghost{border:1.5px solid var(--teal); color:var(--teal-deep); border-radius:999px; padding:8px 20px; font-size:0.84rem; background:transparent; font-family:'Jost',sans-serif; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--teal); color:var(--teal-deep);
+    display:inline-flex; align-items:center; justify-content:center; flex:none; transition:background .2s ease, color .2s ease;
+  }
+  .icon-btn:hover{background:var(--teal); color:var(--ivory);}
+  .icon-btn svg{width:18px;height:18px;}
+
+  .hero-banner{
+    position:relative; width:100%; min-height:380px; overflow:hidden;
+    background-image:linear-gradient(100deg, rgba(9,52,48,0.82) 0%, rgba(9,52,48,0.55) 45%, rgba(9,52,48,0.18) 100%), url('hero-bg.jpg');
+    background-size:cover; background-position:center 38%;
+    display:flex; align-items:center;
+  }
+  .hero-banner .hero-inner{
+    position:relative; z-index:2; max-width:var(--max); margin:0 auto; width:100%;
+    padding:34px 28px; display:block;
+  }
+  .hero-banner h1{color:var(--ivory); font-size:clamp(1.7rem,3.6vw,2.4rem); line-height:1.2; font-weight:500;}
+  .hero-banner .sub{color:rgba(250,246,239,0.8); margin-top:14px; font-size:0.98rem; max-width:52ch;}
+
+  .location{text-align:center; padding:20px 24px; font-size:0.95rem; color:var(--teal-deep); font-weight:500;}
+  .location svg{width:16px;height:16px; display:inline-block; vertical-align:-3px; margin-right:6px; color:var(--gold);}
+
+  .tabnav{
+    position:sticky; top:0; z-index:40; background:var(--ivory);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  .tabnav ul{
+    list-style:none; display:flex; margin:0; padding:0; max-width:var(--max); margin:0 auto;
     overflow-x:auto;
   }
-  .admin-tab-btn{
-    background:none; border:none; padding:12px 18px; font-size:0.9rem; font-weight:600;
-    color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent;
-    font-family:'Jost',sans-serif; white-space:nowrap; display:flex; align-items:center; gap:8px;
+  .tabnav li{flex:1; min-width:104px;}
+  .tabnav a{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:16px 8px 13px; font-size:0.8rem; color:var(--ink-soft);
+    border-bottom:3px solid transparent; white-space:nowrap;
   }
-  .admin-tab-btn.active{color:var(--teal); border-bottom-color:var(--teal);}
-  .badge{
-    background:var(--gold); color:#fff; font-size:0.72rem; font-weight:700;
-    border-radius:99px; padding:1px 8px; min-width:18px; text-align:center;
-  }
-  .admin-panel{display:none;}
-  .admin-panel.active{display:block;}
+  .tabnav a svg{width:22px;height:22px;}
+  .tabnav a.active{color:var(--teal); border-bottom-color:var(--teal);}
+  .tabnav a:hover{color:var(--teal); cursor:pointer;}
 
-  /* ---------- Sub-pestañas de citas ---------- */
-  .sub-tabs{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
-  .sub-tab-btn{
-    background:var(--mist); border:none; border-radius:999px; padding:8px 16px; font-size:0.84rem;
-    color:var(--ink-soft); cursor:pointer; font-family:'Jost',sans-serif; display:flex; align-items:center; gap:6px;
-  }
-  .sub-tab-btn.active{background:var(--teal); color:var(--ivory);}
-  .sub-tab-btn .badge{background:var(--gold);}
-  .sub-tab-btn.active .badge{background:rgba(255,255,255,0.3);}
-  .booking-panel{display:none;}
-  .booking-panel.active{display:block;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block; animation:panelIn .25s ease;}
+  @keyframes panelIn{from{opacity:0;} to{opacity:1;}}
 
-  h2{font-size:1.1rem; margin-bottom:16px;}
-  .card{
-    background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px;
-    margin-bottom:14px; display:flex; flex-direction:column; gap:8px;
-  }
-  .card .stars{color:var(--gold);}
-  .card .name{font-weight:600;}
-  .card .comment{color:var(--ink-soft); font-style:italic; font-size:0.92rem;}
-  .card .actions{display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;}
-  .card button{
-    border:none; border-radius:8px; padding:8px 16px; font-size:0.85rem; cursor:pointer;
-    font-family:'Jost',sans-serif;
-  }
-  .approve-btn{background:var(--teal); color:var(--ivory);}
-  .approve-btn:hover{background:var(--teal-deep);}
-  .reject-btn, .delete-btn{background:var(--mist); color:var(--ink);}
-  .reject-btn:hover, .delete-btn:hover{background:#e3d9d9;}
-  .cal-btn{background:var(--gold); color:#fff; text-decoration:none; display:inline-block; border:none; cursor:pointer; font-family:'Jost',sans-serif; padding:8px 16px; border-radius:8px; font-size:0.85rem;}
-  .cal-btn:hover{opacity:0.9;}
-  .status-tag{
-    display:inline-block; font-size:0.72rem; font-weight:600; padding:3px 10px; border-radius:99px;
-    width:fit-content;
-  }
-  .status-tag.accepted{background:#DDEEE9; color:var(--teal-deep);}
-  .status-tag.cancelled{background:#F4D9D9; color:#8a2b2b;}
-  .booking-when{font-weight:600; color:var(--teal-deep);}
-  .empty{color:var(--ink-soft); font-size:0.9rem;}
+  section{padding:64px 0 70px;}
+  .section-alt{background:var(--mist);}
+  .head-block{margin-bottom:36px;}
+  .head-block h2{font-size:clamp(1.7rem,3vw,2.15rem); font-family:'Jost',sans-serif; font-weight:700; color:var(--ink);}
+  .head-block .sub{margin-top:8px; color:var(--ink-soft); font-size:1rem;}
 
-  .content-group{margin-bottom:26px; border-top:1px solid var(--line); padding-top:18px;}
-  .content-group h3{font-size:0.95rem; color:var(--teal-deep); margin:0 0 12px;}
-  .content-field{margin-bottom:12px;}
-  .content-field label{display:block; font-size:0.78rem; color:var(--ink-soft); margin-bottom:4px;}
-  .content-field input, .content-field textarea{
-    width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 11px;
-    font-family:'Jost',sans-serif; font-size:0.88rem; color:var(--ink);
+  @keyframes benefFloatIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+  .benefits-grid{background:var(--ivory); border-radius:16px; padding:6px 16px;}
+  .benefit-card{
+    display:flex; gap:14px; align-items:flex-start; padding:18px 4px;
+    border-bottom:1px solid var(--line); transition:transform 0.2s ease;
+    animation:benefFloatIn 0.45s ease backwards; text-align:left;
   }
-  .content-field textarea{min-height:60px; resize:vertical;}
-  #saveContentBtn{
-    background:var(--teal); color:var(--ivory); border:none; border-radius:10px;
-    padding:13px 28px; font-size:0.92rem; cursor:pointer; font-family:'Jost',sans-serif; margin-top:10px;
+  .benefit-card:last-child{border-bottom:none;}
+  .benefit-card:active{transform:scale(0.98);}
+  .benefit-card .icon-wrap{
+    width:46px; height:46px; border-radius:50%; flex:none; display:flex;
+    align-items:center; justify-content:center; transition:transform 0.2s ease;
   }
-  #saveContentBtn:hover{background:var(--teal-deep);}
-  #contentSaveMsg{font-size:0.85rem; margin-top:10px; min-height:18px; color:var(--teal-deep);}
+  .benefit-card:hover .icon-wrap{transform:scale(1.08);}
+  .benefit-card .ico{width:20px;height:20px;}
+  .benefit-card h3{font-family:'Jost',sans-serif; font-weight:600; font-size:1.02rem; color:var(--ink); margin-bottom:5px;}
+  .benefit-card p{font-size:0.88rem; color:var(--ink-soft); line-height:1.55;}
 
-  .cancel-overlay{
-    display:none; position:fixed; inset:0; z-index:200; background:rgba(9,52,48,0.55);
-    align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;
+  .service-subnav{
+    display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto;
+    margin-bottom:32px; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
   }
-  .cancel-overlay.open{display:flex;}
-  .cancel-modal{background:#fff; border-radius:16px; padding:26px 24px; max-width:420px; width:100%; margin-top:20px;}
-  .cancel-modal h3{font-size:1.2rem; margin:0 0 6px;}
-  .cancel-modal .sub{color:var(--ink-soft); font-size:0.85rem; margin-bottom:18px;}
-  .cancel-modal label{display:block; font-size:0.82rem; color:var(--ink-soft); margin-bottom:6px;}
-  .cancel-modal select, .cancel-modal textarea{
-    width:100%; border:1px solid var(--line); border-radius:8px; padding:10px 12px;
-    font-family:'Jost',sans-serif; font-size:0.88rem; margin-bottom:14px;
+  .service-btn{
+    flex:0 0 auto; min-width:104px; background:transparent; border:none; border-bottom:3px solid transparent;
+    color:var(--ink-soft); padding:16px 10px 13px; font-family:'Jost',sans-serif; font-size:0.8rem;
+    cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; white-space:nowrap;
+    transition:color .2s ease;
   }
-  .cancel-modal textarea{min-height:70px; resize:vertical;}
-  .cancel-actions{display:flex; gap:10px; margin-top:6px;}
-  .btn-secondary{background:var(--mist); color:var(--ink); border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
-  .btn-danger{background:#b23; color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
-  #cancelStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
+  .service-btn svg{width:22px;height:22px;}
+  .service-btn:hover{color:var(--teal);}
+  .service-btn.active{color:var(--teal); border-bottom-color:var(--teal);}
 
-  /* ---------- Historias clínicas ---------- */
-  .records-toolbar{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
-  .records-toolbar input{
-    flex:1; min-width:180px; border:1px solid var(--line); border-radius:8px; padding:10px 13px;
-    font-family:'Jost',sans-serif; font-size:0.9rem;
-  }
-  #newRecordBtn{white-space:nowrap;}
-  .record-card-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
-  .record-modal{max-width:520px;}
-  .record-modal label{display:block; font-size:0.78rem; color:var(--ink-soft); margin:12px 0 4px;}
-  .record-modal input, .record-modal textarea{
-    width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px;
-    font-family:'Jost',sans-serif; font-size:0.88rem;
-  }
-  .record-modal textarea{min-height:60px; resize:vertical;}
-  #recordStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
-  .consulta-card{background:var(--mist); border-radius:10px; padding:14px 16px; margin-bottom:10px;}
-  .consulta-card .cdate{font-weight:600; color:var(--teal-deep); font-size:0.88rem; margin-bottom:8px;}
-  .consulta-card .cfield{font-size:0.82rem; margin-bottom:6px;}
-  .consulta-card .cfield b{color:var(--ink); font-weight:600;}
-  .consulta-card .cfield span{color:var(--ink-soft);}
-  .consulta-card .csection{font-weight:700; color:var(--teal-deep); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.03em; margin:10px 0 4px;}
+  .service-panel{display:none;}
+  .service-panel.active{display:block; animation:panelIn .25s ease;}
+  .service-panel h3{font-size:1.5rem; margin-bottom:20px;}
+  .service-media{max-width:420px; border-radius:16px; overflow:hidden; aspect-ratio:4/3; margin-bottom:22px; background:var(--mist);}
+  .service-media img, .service-media svg{width:100%;height:100%;display:block; object-fit:cover;}
+  .service-panel p{color:var(--ink-soft); font-size:0.95rem; margin-top:12px; max-width:60ch;}
+  .service-panel p strong{color:var(--ink); font-weight:600;}
 
-  .form-section-title{
-    background:var(--teal); color:#fff; font-size:0.78rem; font-weight:700;
-    padding:7px 12px; border-radius:6px; margin:16px 0 10px; text-transform:uppercase; letter-spacing:0.02em;
+  .about{display:block;}
+  .about-banner{
+    position:relative; overflow:hidden; border-radius:16px;
+    background:linear-gradient(135deg,var(--teal),var(--teal-deep));
+    padding:30px 24px; margin:24px 0 26px; display:flex; align-items:center; gap:16px;
   }
-  .form-section-title:first-of-type{margin-top:4px;}
-  .vitals-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
-  .vitals-row label{font-size:0.7rem;}
-  .vitals-row input{padding:7px 8px; font-size:0.82rem;}
-  .patient-data-view{background:var(--mist); border-radius:10px; padding:12px 16px; font-size:0.85rem; color:var(--ink-soft); margin-bottom:6px;}
-  .patient-data-view b{color:var(--ink);}
+  .about-banner::before{
+    content:""; position:absolute; right:-40px; top:-40px; width:200px; height:200px;
+    background-image:url('Icono.png'); background-size:contain; background-repeat:no-repeat;
+    opacity:0.12; transform:rotate(8deg);
+  }
+  .about-portrait{
+    position:relative; z-index:1; width:74px; height:74px; border-radius:50%;
+    background:rgba(250,246,239,0.12); border:1.5px solid var(--gold-light);
+    flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .about-portrait img{width:56%;}
+  .about-banner-info{position:relative; z-index:1;}
+  .about-name{font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--ivory); margin:0 0 10px;}
+  .about-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{background:rgba(250,246,239,0.16); color:var(--ivory); font-size:0.72rem; padding:4px 12px; border-radius:99px;}
+  .about-copy p{color:var(--ink-soft); margin-bottom:16px; max-width:60ch;}
+  .about-copy p:last-child{margin-bottom:0;}
+
+  .testimonials{margin-top:64px; padding-top:56px; border-top:1px solid var(--line);}
+  .testimonials-head{display:flex; align-items:center; gap:8px; margin-bottom:28px;}
+  .testimonials-head h3{font-size:1.4rem;}
+  .rating-summary{
+    display:flex; flex-wrap:wrap; gap:36px; align-items:center;
+    background:var(--mist); border-radius:18px; padding:28px 30px; margin-bottom:30px;
+  }
+  .rating-big{text-align:center;}
+  .rating-big .num{font-family:'Cormorant Garamond',serif; font-size:3.2rem; color:var(--teal-deep); line-height:1;}
+  .rating-big .count{margin-top:6px; font-size:0.85rem; color:var(--ink-soft); white-space:nowrap;}
+  .rating-bars{flex:1; min-width:200px; display:flex; flex-direction:column; gap:7px;}
+  .rating-bars .row{display:flex; align-items:center; gap:10px; font-size:0.82rem; color:var(--ink-soft);}
+  .rating-bars .row span:first-child{width:46px; flex:none;}
+  .rating-bars .row span:last-child{width:40px; flex:none; text-align:right;}
+  .bar-track{flex:1; height:7px; border-radius:99px; background:var(--line); overflow:hidden;}
+  .bar-fill{height:100%; background:var(--gold);}
+  .testimonial-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  .testimonial-card{background:var(--ivory); border:1px solid var(--line); border-radius:16px; padding:24px;}
+  .testimonial-card .stars{color:var(--gold); font-size:0.95rem; letter-spacing:2px; margin-bottom:10px;}
+  .testimonial-card .name{font-weight:600; color:var(--ink); margin-bottom:6px; font-size:0.95rem;}
+  .testimonial-card p{color:var(--ink-soft); font-size:0.9rem; font-style:italic;}
+  .testimonial-note{margin-top:20px; font-size:0.78rem; color:var(--ink-soft); background:var(--mist); border-radius:10px; padding:12px 16px;}
+  #bookMsg{font-size:1.05rem; font-weight:600; color:var(--teal-deep); line-height:1.5;}
+  #bookMsg .cal-link{font-size:0.9rem; font-weight:500;}
+  .consent-field{display:flex; align-items:flex-start;}
+  .consent-label{display:flex; gap:9px; align-items:flex-start; font-size:0.78rem; color:var(--ink-soft); cursor:pointer; margin-bottom:0 !important;}
+  .consent-label input[type="checkbox"]{width:16px; height:16px; margin-top:2px; flex:none; accent-color:var(--teal);}
+  .consent-label a{color:var(--teal); text-decoration:underline;}
+
+  .review-form{
+    margin-top:34px; background:var(--mist); border-radius:18px; padding:28px 26px;
+  }
+  .review-form h4{font-size:1.15rem; margin-bottom:6px;}
+  .review-form .hint{color:var(--ink-soft); font-size:0.85rem; margin-bottom:20px;}
+  .review-form .field{margin-bottom:16px;}
+  .review-form label{display:block; font-size:0.82rem; color:var(--ink-soft); margin-bottom:6px;}
+  .review-form input[type="text"], .review-form textarea{
+    width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 14px;
+    font-family:'Jost',sans-serif; font-size:0.92rem; color:var(--ink); background:var(--ivory);
+  }
+  .review-form textarea{resize:vertical; min-height:90px;}
+  .star-picker{display:flex; gap:6px;}
+  .star-picker button{
+    background:none; border:none; font-size:1.6rem; color:var(--line); cursor:pointer; line-height:1; padding:0;
+  }
+  .star-picker button.on{color:var(--gold);}
+  .review-form .send-btn{
+    display:inline-flex; align-items:center; gap:9px; background:var(--teal); color:var(--ivory);
+    border:none; padding:13px 30px; border-radius:999px; font-size:0.92rem; font-family:'Jost',sans-serif;
+    cursor:pointer; transition:background .2s ease;
+  }
+  .review-form .send-btn:hover{background:var(--teal-deep);}
+  .review-form .send-btn svg{width:18px;height:18px;}
+
+  @keyframes bookPulse{0%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 0 rgba(168,130,61,0.55);} 70%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 12px rgba(168,130,61,0);} 100%{box-shadow:0 12px 28px rgba(9,52,48,0.35), 0 0 0 0 rgba(168,130,61,0);}}
+  .book-float-btn{
+    display:none; position:fixed; bottom:26px; right:22px; z-index:80;
+    align-items:center; gap:10px; background:var(--teal); color:var(--ivory);
+    border:2px solid var(--gold-light); border-radius:999px; padding:17px 28px; font-size:1rem;
+    font-weight:600; font-family:'Jost',sans-serif; cursor:pointer;
+    animation:bookPulse 2.2s infinite; transition:background .2s ease, transform .2s ease;
+  }
+  .book-float-btn.visible{display:inline-flex;}
+  .book-float-btn:hover{background:var(--teal-deep); transform:translateY(-2px) scale(1.03);}
+  .book-float-btn svg{width:22px;height:22px;}
+
+  .book-modal-overlay{
+    display:none; position:fixed; inset:0; z-index:120; background:rgba(9,52,48,0.55);
+    align-items:flex-start; justify-content:center; padding:26px 16px; overflow-y:auto;
+  }
+  .book-modal-overlay.open{display:flex;}
+  .book-modal{
+    background:var(--ivory); border-radius:18px; padding:30px 26px; max-width:460px; width:100%;
+    position:relative; margin-top:20px;
+  }
+  .book-modal h3{font-size:1.35rem; margin-bottom:8px;}
+  .book-modal .hint{color:var(--ink-soft); font-size:0.85rem; margin-bottom:18px;}
+  .book-modal .field{margin-bottom:14px;}
+  .book-modal label{display:block; font-size:0.82rem; color:var(--ink-soft); margin-bottom:6px;}
+  .book-modal input, .book-modal select{
+    width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 13px;
+    font-family:'Jost',sans-serif; font-size:0.9rem; color:var(--ink); background:#fff;
+  }
+  .phone-row{display:flex; gap:8px;}
+  .phone-row select{width:auto; flex:0 0 96px;}
+  .phone-row input{flex:1;}
+  .book-close{
+    position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.6rem;
+    color:var(--ink-soft); cursor:pointer; line-height:1;
+  }
+  .time-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .time-slot{
+    border:1px solid var(--line); border-radius:8px; padding:8px 4px; font-size:0.8rem;
+    background:#fff; color:var(--ink); cursor:pointer; text-align:center; font-family:'Jost',sans-serif;
+  }
+  .time-slot:hover{border-color:var(--teal);}
+  .time-slot.selected{background:var(--teal); color:var(--ivory); border-color:var(--teal);}
+  .time-slot.taken{background:var(--mist); color:var(--ink-soft); text-decoration:line-through; cursor:not-allowed;}
+  .cal-link{
+    display:inline-block; margin-top:14px; font-size:0.85rem; color:var(--teal); text-decoration:underline;
+  }
+
+  .ideas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+  .idea-card{background:var(--ivory); border:1px solid var(--line); border-radius:18px; padding:26px 24px;}
+  .idea-card .step{font-family:'Cormorant Garamond',serif; color:var(--gold); font-size:1.6rem; margin-bottom:10px;}
+  .idea-card h3{font-family:'Jost',sans-serif; font-weight:600; font-size:1.02rem; color:var(--ink); margin-bottom:8px;}
+  .idea-card p{font-size:0.9rem;color:var(--ink-soft);}
+
+  .contact-block{text-align:center; padding:70px 24px 80px;}
+  .contact-block p.lede{color:var(--ink-soft); max-width:440px; margin:14px auto 30px;}
+  .cta-pill-big{
+    display:inline-flex; align-items:center; gap:10px; background:var(--teal); color:var(--ivory);
+    padding:16px 38px; border-radius:999px; font-size:0.98rem; transition:background .25s ease;
+  }
+  .cta-pill-big:hover{background:var(--teal-deep);}
+  .cta-pill-big svg{width:19px;height:19px;}
+  .contact-links{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:28px;
+    margin-top:36px; padding-top:30px; border-top:1px solid var(--line);
+  }
+  .contact-links a{
+    display:flex; align-items:center; gap:10px; color:var(--ink-soft); font-size:0.92rem;
+    transition:color .2s ease;
+  }
+  .contact-links a:hover{color:var(--teal);}
+  .contact-links svg{width:20px;height:20px; color:var(--gold); flex:none;}
+
+  .share-menu{
+    display:none; position:absolute; top:64px; right:28px; z-index:60;
+    background:var(--ivory); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 18px 40px rgba(9,52,48,0.18); padding:10px; min-width:210px;
+  }
+  .share-menu.open{display:block;}
+  .share-menu a, .share-menu button{
+    display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px;
+    border-radius:8px; border:none; background:transparent; color:var(--ink);
+    font-family:'Jost',sans-serif; font-size:0.9rem; text-align:left; cursor:pointer;
+  }
+  .share-menu a:hover, .share-menu button:hover{background:var(--mist);}
+  .share-menu svg{width:19px;height:19px; color:var(--teal); flex:none;}
+
+  footer{padding:30px 0; border-top:1px solid var(--line);}
+  footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  footer p{font-size:0.8rem; color:var(--ink-soft);}
+  .footer-legal{font-size:0.76rem !important;}
+  .footer-legal a{color:var(--ink-soft); text-decoration:underline;}
+  .footer-legal a:hover{color:var(--teal);}
+
+  @media (max-width:940px){
+    .benefits-grid{padding:4px 4px;}
+    .gallery{grid-template-columns:repeat(2,1fr);}
+    .ideas-grid{grid-template-columns:1fr;}
+    section{padding:48px 0 56px;}
+  }
+
+  @media (max-width:800px){
+    .infobar{padding:16px 18px; column-gap:12px; row-gap:6px;}
+    .ib-icon{width:44px;}
+    .ib-title{font-size:0.62rem;}
+    .ib-share{font-size:0.7rem;}
+  }
+
+  @media (max-width:600px){
+    .pill-ghost{padding:6px 12px; font-size:0.72rem; white-space:nowrap;}
+    .icon-btn{width:32px; height:32px;}
+    .icon-btn svg{width:15px;height:15px;}
+    .pill-ghost .flag{font-size:0.85rem;}
+    .share-menu{right:14px; top:58px; min-width:190px;}
+
+    .service-media{max-width:100%;}
+    .service-subnav{gap:0;}
+    .service-btn{font-size:0.68rem; padding:12px 8px 10px; min-width:84px;}
+    .service-btn svg{width:19px;height:19px;}
+
+    .hero-banner{min-height:300px; background-position:65% 30%;}
+    .hero-banner .hero-inner{padding:26px 20px;}
+    .hero-banner h1{font-size:1.4rem;}
+    .hero-banner .sub{font-size:0.9rem;}
+
+    .splash .full-logo{width:min(82%,300px);}
+    .splash .enter-btn{padding:14px 32px; font-size:0.92rem;}
+
+    .tabnav a{font-size:0.68rem; padding:12px 4px 10px;}
+    .tabnav a svg{width:19px;height:19px;}
+
+    .testimonial-grid{grid-template-columns:1fr;}
+    .rating-summary{padding:22px 20px; gap:22px;}
+    .book-float-btn{padding:14px 22px; font-size:0.9rem; bottom:18px; right:16px;}
+    .time-grid{grid-template-columns:repeat(3,1fr);}
+    .book-modal{padding:24px 18px;}
+  }
 </style>
 </head>
 <body>
 
-<div id="loginBox">
-  <h1 style="text-align:center;">Administración</h1>
-  <p class="sub" style="text-align:center;">Inicia sesión para gestionar tu página</p>
-  <input type="email" id="loginEmail" placeholder="Correo electrónico">
-  <input type="password" id="loginPass" placeholder="Contraseña">
-  <button id="loginBtn">Entrar</button>
-  <p id="loginError"></p>
+<div class="splash" id="splash">
+  <button class="pill lang lang-toggle" type="button"><span class="flag">🇪🇸</span> <span class="lang-label">ES</span></button>
+  <img class="full-logo" src="Logoo.png" alt="Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento">
+  <button class="enter-btn" id="enterBtn">
+    <span data-i18n="enterBtn">¡Quiero empezar!</span>
+    <svg viewBox="0 0 24 24" fill="none"><path d="M8 3 C5 6 5 10 8 12 C11 14 11 18 8 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3 C13 6 13 10 16 12 C19 14 19 18 16 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8.5" y1="6.5" x2="15.5" y2="6.5" stroke="currentColor" stroke-width="1.6"/><line x1="7.3" y1="12" x2="16.7" y2="12" stroke="currentColor" stroke-width="1.6"/><line x1="8.5" y1="17.5" x2="15.5" y2="17.5" stroke="currentColor" stroke-width="1.6"/></svg>
+  </button>
 </div>
 
-<div class="wrap" id="adminPanel" style="display:none;">
-  <div class="topbar">
-    <h1>Panel de administración</h1>
-    <button id="logoutBtn">Cerrar sesión</button>
-  </div>
+<div id="site">
 
-  <div class="admin-tabs">
-    <button class="admin-tab-btn active" data-panel="reviews">Reseñas</button>
-    <button class="admin-tab-btn" data-panel="bookings">Citas <span class="badge" id="pendingBadgeTop">0</span></button>
-    <button class="admin-tab-btn" data-panel="records">Historias</button>
-    <button class="admin-tab-btn" data-panel="content">Contenido</button>
-  </div>
-
-  <!-- ===== RESEÑAS ===== -->
-  <div class="admin-panel active" id="panel-reviews">
-    <h2>Pendientes de revisión</h2>
-    <div id="pendingList"><p class="empty">Cargando...</p></div>
-
-    <h2 style="margin-top:32px;">Publicadas actualmente</h2>
-    <div id="approvedList"><p class="empty">Cargando...</p></div>
-  </div>
-
-  <!-- ===== CITAS ===== -->
-  <div class="admin-panel" id="panel-bookings">
-    <div class="sub-tabs">
-      <button class="sub-tab-btn active" data-status="pending">Pendientes <span class="badge" id="pendingBadge">0</span></button>
-      <button class="sub-tab-btn" data-status="accepted">Aceptadas</button>
-      <button class="sub-tab-btn" data-status="cancelled">Canceladas</button>
+<div class="infobar">
+  <img src="Icono.png" alt="Icono LVR" class="ib-icon">
+  <h2 data-i18n="infobarTitle" class="ib-title">Medicina integral y antienvejecimiento</h2>
+  <button class="pill-ghost lang-toggle ib-lang" type="button"><span class="flag">🇪🇸</span> <span class="lang-label">ES</span></button>
+  <div class="ib-row2">
+    <div class="ib-socials">
+      <a href="https://www.instagram.com/dravr26?stkn=OTcwMTB6aG9scGRt" target="_blank" rel="noopener" class="icon-btn" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor"/></svg>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M14 8.5 L12.6 8.5 C11.7 8.5 11 9.2 11 10.1 L11 12 M11 12 L9.5 12 M11 12 L11 17 M14 12 L11 12" stroke="currentColor" stroke-width="1.6"/></svg>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="icon-btn" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M16 3 C16 6 18 8 21 8" stroke="currentColor" stroke-width="1.6"/><path d="M16 3 L16 15.5 C16 17.5 14.3 19 12.3 19 C10.3 19 8.7 17.4 8.7 15.5 C8.7 13.6 10.3 12 12.3 12" stroke="currentColor" stroke-width="1.6"/></svg>
+      </a>
     </div>
-
-    <div class="booking-panel active" id="bp-pending"><p class="empty">Cargando...</p></div>
-    <div class="booking-panel" id="bp-accepted"><p class="empty">Cargando...</p></div>
-    <div class="booking-panel" id="bp-cancelled"><p class="empty">Cargando...</p></div>
+    <button type="button" id="shareBtn" class="ib-share" data-i18n="share">Compartir</button>
   </div>
 
-  <!-- ===== HISTORIAS CLÍNICAS ===== -->
-  <div class="admin-panel" id="panel-records">
-    <div class="records-toolbar">
-      <input type="text" id="recordSearch" placeholder="Buscar paciente por nombre...">
-      <button id="newRecordBtn" class="approve-btn">+ Nueva historia</button>
-    </div>
-    <div id="recordsList"><p class="empty">Cargando...</p></div>
-  </div>
-
-  <!-- ===== CONTENIDO ===== -->
-  <div class="admin-panel" id="panel-content">
-    <h2>Contenido del sitio</h2>
-    <p class="sub">Edita los textos de la página. Los cambios se ven al instante para todos los visitantes al guardar.</p>
-    <div id="contentForm"><p class="empty">Cargando...</p></div>
+  <div class="share-menu" id="shareMenu">
+    <a href="#" id="shareWhatsapp" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 C21 16.75 16.75 21 11.5 21 C9.8 21 8.2 20.55 6.8 19.75 L3 21 L4.25 17.2 C3.45 15.8 3 14.2 3 12.5 C3 7.25 7.25 3 12.5 3 C17.75 3 21 6.25 21 11.5 Z" stroke="currentColor" stroke-width="1.4"/></svg>
+      WhatsApp
+    </a>
+    <a href="#" id="shareFacebook" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M14 8.5 L12.6 8.5 C11.7 8.5 11 9.2 11 10.1 L11 12 M11 12 L9.5 12 M11 12 L11 17 M14 12 L11 12" stroke="currentColor" stroke-width="1.4"/></svg>
+      Facebook
+    </a>
+    <a href="#" id="shareLinkedin" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.4"/><line x1="7.5" y1="10" x2="7.5" y2="16" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="7.2" r="1" fill="currentColor"/><path d="M11 16 L11 10 M11 12.5 C11 11 12 10 13.3 10 C14.7 10 15.5 11 15.5 12.5 L15.5 16" stroke="currentColor" stroke-width="1.4"/></svg>
+      LinkedIn
+    </a>
+    <a href="#" id="shareEmail">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5 L12 13 L20 6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span data-i18n="shareEmail">Correo electrónico</span>
+    </a>
+    <button type="button" id="shareCopy">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M16 8 L16 5.5 C16 4.7 15.3 4 14.5 4 L5.5 4 C4.7 4 4 4.7 4 5.5 L4 14.5 C4 15.3 4.7 16 5.5 16 L8 16" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span data-i18n="shareCopy">Copiar enlace</span>
+    </button>
   </div>
 </div>
 
-<!-- ================= MODAL: NUEVO PACIENTE ================= -->
-<div class="cancel-overlay" id="newPatientOverlay">
-  <div class="cancel-modal record-modal">
-    <h3>Nuevo paciente</h3>
-    <div class="form-section-title">I. Datos del paciente</div>
-    <label>Apellidos y nombres</label>
-    <input type="text" id="npName" placeholder="Ej. María González Pérez">
-    <label>C.C. / ID</label>
-    <input type="text" id="npDocumento" placeholder="Documento de identidad">
-    <label>Fecha de nacimiento</label>
-    <input type="date" id="npFechaNacimiento">
-    <label>Edad</label>
-    <input type="text" id="npEdad" placeholder="Ej. 34">
-    <label>Ocupación</label>
-    <input type="text" id="npOcupacion">
-    <label>Dirección</label>
-    <input type="text" id="npDireccion">
-    <label>Teléfono (con código de país, ej. +34600000000)</label>
-    <input type="text" id="npPhone" placeholder="+34600000000">
-    <label>Correo</label>
-    <input type="text" id="npEmail" placeholder="correo@ejemplo.com">
-    <label>Aseguradora / EPS</label>
-    <input type="text" id="npAseguradora">
-    <div class="cancel-actions">
-      <button id="npBackBtn" class="btn-secondary">Cancelar</button>
-      <button id="npSaveBtn" class="approve-btn">Crear y abrir historia</button>
+<div class="hero-banner">
+  <div class="hero-inner">
+    <div>
+      <h1 data-i18n="heroH1">Salud y calidad para cada etapa de tu vida</h1>
+      <p class="sub" data-i18n="heroSub">Descubre los beneficios de la medicina integral y cuida tu cuerpo desde la raíz, con un plan hecho a tu medida.</p>
     </div>
-    <p id="npStatusMsg"></p>
   </div>
 </div>
 
-<!-- ================= MODAL: HISTORIA DEL PACIENTE (ACUMULATIVA) ================= -->
-<div class="cancel-overlay" id="recordOverlay">
-  <div class="cancel-modal record-modal">
-    <h3 id="recordModalTitle">Historia clínica</h3>
+<nav class="tabnav">
+  <ul>
+    <li><a href="#beneficios" class="active">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12.1 20.5 C7 17 3 13.5 3 9.2 C3 6.3 5.2 4 8 4 C9.7 4 11.2 4.9 12.1 6.2 C13 4.9 14.5 4 16.2 4 C19 4 21.2 6.3 21.2 9.2 C21.2 13.5 17.2 17 12.1 20.5 Z" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-i18n="navBeneficios">Beneficios</span>
+    </a></li>
+    <li><a href="#servicios">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 8 L8 6 C8 4.9 8.9 4 10 4 L14 4 C15.1 4 16 4.9 16 6 L16 8" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-i18n="navServicios">Servicios</span>
+    </a></li>
+    <li><a href="#sobre-mi">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="11" x2="12" y2="16" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="8" r="0.9" fill="currentColor"/></svg>
+      <span data-i18n="navSobreMi">Sobre mí</span>
+    </a></li>
+    <li><a href="#proceso">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 3 L18 3 L18 21 L6 21 Z" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="16" x2="13" y2="16" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-i18n="navProceso">Proceso</span>
+    </a></li>
+    <li><a href="#contacto">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 C21 16.75 16.75 21 11.5 21 C9.8 21 8.2 20.55 6.8 19.75 L3 21 L4.25 17.2 C3.45 15.8 3 14.2 3 12.5 C3 7.25 7.25 3 12.5 3 C17.75 3 21 6.25 21 11.5 Z" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span data-i18n="navContacto">Contacto</span>
+    </a></li>
+  </ul>
+</nav>
 
-    <div class="form-section-title">I. Datos del paciente <button id="editPatientToggle" class="btn-secondary" style="float:right; padding:4px 12px; font-size:0.75rem;">Editar</button></div>
-    <div id="patientDataView" class="patient-data-view"></div>
-    <div id="patientDataEdit" style="display:none;">
-      <label>Apellidos y nombres</label>
-      <input type="text" id="pdName">
-      <label>C.C. / ID</label>
-      <input type="text" id="pdDocumento">
-      <label>Fecha de nacimiento</label>
-      <input type="date" id="pdFechaNacimiento">
-      <label>Edad</label>
-      <input type="text" id="pdEdad">
-      <label>Ocupación</label>
-      <input type="text" id="pdOcupacion">
-      <label>Dirección</label>
-      <input type="text" id="pdDireccion">
-      <label>Teléfono</label>
-      <input type="text" id="pdPhone">
-      <label>Correo</label>
-      <input type="text" id="pdEmail">
-      <label>Aseguradora / EPS</label>
-      <input type="text" id="pdAseguradora">
-      <div class="cancel-actions">
-        <button id="pdCancelBtn" class="btn-secondary">Cancelar</button>
-        <button id="pdSaveBtn" class="approve-btn">Guardar datos</button>
+<section id="beneficios" class="tab-panel active">
+  <div class="wrap">
+    <div class="head-block">
+      <h2 data-i18n="benefTitle">Beneficios</h2>
+      <p class="sub" data-i18n="benefSub">Por qué elegir un enfoque de medicina integral</p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card" style="animation-delay:0s;">
+        <div class="icon-wrap" style="background:#0E4A44;">
+          <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FAF6EF" stroke-width="1.6"/><path d="M8 12 L11 15 L16 9" stroke="#FAF6EF" stroke-width="1.6"/></svg>
+        </div>
+        <div>
+          <h3 data-i18n="benef1h">Causa raíz</h3>
+          <p data-i18n="benef1p">Buscamos el origen del síntoma en vez de solo controlarlo.</p>
+        </div>
+      </div>
+      <div class="benefit-card" style="animation-delay:0.08s;">
+        <div class="icon-wrap" style="background:#A8823D;">
+          <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 2 C16 8 16 16 12 22 C8 16 8 8 12 2" stroke="#FAF6EF" stroke-width="1.6"/></svg>
+        </div>
+        <div>
+          <h3 data-i18n="benef2h">Balance hormonal</h3>
+          <p data-i18n="benef2p">Ajustes precisos para recuperar energía, sueño y ánimo.</p>
+        </div>
+      </div>
+      <div class="benefit-card" style="animation-delay:0.16s;">
+        <div class="icon-wrap" style="background:#5DCAA5;">
+          <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 3 L4 7 L4 13 C4 18 8 21 12 22 C16 21 20 18 20 13 L20 7 Z" stroke="#0E4A44" stroke-width="1.6"/></svg>
+        </div>
+        <div>
+          <h3 data-i18n="benef3h">Prevención real</h3>
+          <p data-i18n="benef3p">Marcadores biológicos revisados antes de que aparezca el problema.</p>
+        </div>
+      </div>
+      <div class="benefit-card" style="animation-delay:0.24s;">
+        <div class="icon-wrap" style="background:#C9A44E;">
+          <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 20 L4 10 L9 10 L9 20 M9 20 L9 4 L15 4 L15 20 M15 20 L15 13 L20 13 L20 20" stroke="#093430" stroke-width="1.6"/></svg>
+        </div>
+        <div>
+          <h3 data-i18n="benef4h">Resultados medibles</h3>
+          <p data-i18n="benef4p">Seguimiento con datos claros en cada etapa del plan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="servicios" class="tab-panel section-alt">
+  <div class="wrap">
+    <div class="service-subnav">
+      <button class="service-btn active" data-service="peso">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M12 3 L12 8 L15 10" stroke="currentColor" stroke-width="1.5"/><path d="M6 21 C6 16.5 8.7 14 12 14 C15.3 14 18 16.5 18 21" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span data-i18n="svcBtn1">Control de peso</span>
+      </button>
+      <button class="service-btn" data-service="expresion">
+        <svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="12" rx="6" ry="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 9 C10 8 14 8 15 9" stroke="currentColor" stroke-width="1.4"/><path d="M9 13 L15 13 M9 16 L15 16" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span data-i18n="svcBtn2">Líneas de expresión</span>
+      </button>
+      <button class="service-btn" data-service="lifting">
+        <svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="12" rx="6" ry="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 9 C10 8 14 8 15 9" stroke="currentColor" stroke-width="1.4"/><path d="M12 3 L12 6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span data-i18n="svcBtn3">Lifting facial</span>
+      </button>
+      <button class="service-btn" data-service="armonizacion">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span data-i18n="svcBtn4">Armonización facial</span>
+      </button>
+      <button class="service-btn" data-service="cicatrices">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="7" x2="9" y2="17" stroke="currentColor" stroke-width="1.3"/><line x1="15" y1="7" x2="15" y2="17" stroke="currentColor" stroke-width="1.3"/></svg>
+        <span data-i18n="svcBtn5">Manejo de cicatrices</span>
+      </button>
+      <button class="service-btn" data-service="alopecia">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4 C8 7 8 13 12 16 C16 13 16 7 12 4" stroke="currentColor" stroke-width="1.5"/><path d="M9 17 C10.5 19 13.5 19 15 17" stroke="currentColor" stroke-width="1.3" stroke-dasharray="1.5 3"/></svg>
+        <span data-i18n="svcBtn6">Alopecia androgénica</span>
+      </button>
+      <button class="service-btn" data-service="terapia">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="15" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span data-i18n="svcBtn7">Terapia androgénica</span>
+      </button>
+    </div>
+
+    <div class="service-detail">
+
+      <div class="service-panel active" data-panel="peso">
+        <h3 data-i18n="svcTitle1">Control de sobrepeso y obesidad</h3>
+        <div class="service-media">
+          <img src="1.png" alt="Control de sobrepeso y obesidad">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat1">un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef1">pérdida de peso sostenible en el tiempo, mejora en tus marcadores metabólicos y reducción del riesgo cardiovascular asociado al sobrepeso.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="expresion">
+        <h3 data-i18n="svcTitle2">Tratamiento para líneas de expresión</h3>
+        <div class="service-media">
+          <img src="2.png" alt="Tratamiento para líneas de expresión">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat2">aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef2">piel visiblemente más lisa y descansada, con resultados naturales que respetan la expresividad de tu rostro.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="lifting">
+        <h3 data-i18n="svcTitle3">Lifting facial</h3>
+        <div class="service-media">
+          <img src="3.png" alt="Lifting facial">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat3">un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef3">menos flacidez y rasgos más definidos, sin cirugía ni tiempos de recuperación prolongados.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="armonizacion">
+        <h3 data-i18n="svcTitle4">Armonización facial</h3>
+        <div class="service-media">
+          <img src="4.png" alt="Armonización facial">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat4">un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef4">un rostro más armónico y simétrico, resaltando tus rasgos naturales de forma sutil, sin cambiar tu identidad facial.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="cicatrices">
+        <h3 data-i18n="svcTitle5">Manejo de cicatrices</h3>
+        <div class="service-media">
+          <img src="5.png" alt="Manejo de cicatrices">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat5">evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef5">mejora visible en textura, color y relieve de la piel afectada, con un plan adaptado a tu caso específico.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="alopecia">
+        <h3 data-i18n="svcTitle6">Alopecia androgénica</h3>
+        <div class="service-media">
+          <img src="6.png" alt="Alopecia androgénica">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat6">diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef6">frena la progresión de la caída y favorece la densidad capilar en las zonas donde aún hay folículos activos.</span></p>
+      </div>
+
+      <div class="service-panel" data-panel="terapia">
+        <h3 data-i18n="svcTitle7">Terapia androgénica</h3>
+        <div class="service-media">
+          <img src="7.png" alt="Terapia androgénica">
+        </div>
+        <p><strong data-i18n="lblWhat">Qué es:</strong> <span data-i18n="svcWhat7">manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.</span></p>
+        <p><strong data-i18n="lblBenefit">Beneficio:</strong> <span data-i18n="svcBenef7">mejora en energía, composición corporal, salud capilar y bienestar general asociado al balance hormonal.</span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<button type="button" id="bookFloatBtn" class="book-float-btn">
+  <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="1.5"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="14" r="1.2" fill="currentColor"/><circle cx="12" cy="14" r="1.2" fill="currentColor"/><circle cx="16" cy="14" r="1.2" fill="currentColor"/></svg>
+  <span data-i18n="bookFloatLabel">Reservar cita</span>
+</button>
+
+<div class="book-modal-overlay" id="bookModal">
+  <div class="book-modal">
+    <button type="button" class="book-close" id="bookCloseBtn">&times;</button>
+    <h3 data-i18n="bookTitle">Reserva tu cita</h3>
+    <p class="hint" data-i18n="bookHint">Horario disponible de 7:00 am a 7:00 pm. El cupo se bloquea en cuanto se confirma.</p>
+
+    <div class="field">
+      <label for="bkName" data-i18n="bookName">Nombre del paciente</label>
+      <input type="text" id="bkName" placeholder="Ej. María González">
+    </div>
+
+    <div class="field">
+      <label for="bkService" data-i18n="bookService">Tipo de servicio</label>
+      <select id="bkService">
+        <option value="Control de sobrepeso y obesidad" data-i18n-opt="svcBtn1">Control de peso</option>
+        <option value="Tratamiento para líneas de expresión" data-i18n-opt="svcBtn2">Líneas de expresión</option>
+        <option value="Lifting facial" data-i18n-opt="svcBtn3">Lifting facial</option>
+        <option value="Armonización facial" data-i18n-opt="svcBtn4">Armonización facial</option>
+        <option value="Manejo de cicatrices" data-i18n-opt="svcBtn5">Manejo de cicatrices</option>
+        <option value="Alopecia androgénica" data-i18n-opt="svcBtn6">Alopecia androgénica</option>
+        <option value="Terapia androgénica" data-i18n-opt="svcBtn7">Terapia androgénica</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="bkEmail" data-i18n="bookEmail">Correo del paciente</label>
+      <input type="text" id="bkEmail" placeholder="correo@ejemplo.com">
+    </div>
+
+    <div class="field">
+      <label for="bkPhone" data-i18n="bookPhone">Número del paciente</label>
+      <div class="phone-row">
+        <select id="bkCountryCode">
+          <option value="34" selected>🇪🇸 +34</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="52">🇲🇽 +52</option>
+          <option value="57">🇨🇴 +57</option>
+          <option value="54">🇦🇷 +54</option>
+          <option value="56">🇨🇱 +56</option>
+          <option value="51">🇵🇪 +51</option>
+          <option value="593">🇪🇨 +593</option>
+          <option value="58">🇻🇪 +58</option>
+          <option value="44">🇬🇧 +44</option>
+          <option value="33">🇫🇷 +33</option>
+          <option value="49">🇩🇪 +49</option>
+        </select>
+        <input type="tel" id="bkPhone" placeholder="600 000 000">
       </div>
     </div>
 
-    <div id="consultasTimeline" style="margin-top:20px;"></div>
+    <div class="field">
+      <label for="bkDate" data-i18n="bookDate">Fecha</label>
+      <input type="date" id="bkDate">
+    </div>
 
-    <button id="addConsultaBtn" class="approve-btn" style="margin-top:14px;">+ Agregar nueva consulta</button>
-
-    <!-- Formulario de nueva consulta (oculto hasta que se pulse el botón de arriba) -->
-    <div id="consultaForm" style="display:none; margin-top:18px; border-top:1px solid var(--line); padding-top:16px;">
-      <label>Fecha de la consulta</label>
-      <input type="date" id="cxDate">
-
-      <div class="form-section-title">II. Motivo de la consulta</div>
-      <textarea id="cxMotivo"></textarea>
-
-      <div class="form-section-title">III. Enfermedad actual</div>
-      <textarea id="cxEnfermedadActual"></textarea>
-
-      <div class="form-section-title">IV. Antecedentes</div>
-      <label>Personales / Médicos</label>
-      <input type="text" id="cxAntPersonales">
-      <label>Familiares</label>
-      <input type="text" id="cxAntFamiliares">
-      <label>Quirúrgicos</label>
-      <input type="text" id="cxAntQuirurgicos">
-      <label>Alérgicos</label>
-      <input type="text" id="cxAntAlergicos">
-      <label>Farmacológicos (medicamentos actuales)</label>
-      <input type="text" id="cxAntFarmacologicos">
-      <label>Gineco-obstétricos</label>
-      <input type="text" id="cxAntGineco">
-
-      <div class="form-section-title">V. Examen físico</div>
-      <div class="vitals-row">
-        <div><label>Signos vitales</label><input type="text" id="cxSignosVitales"></div>
-        <div><label>Peso</label><input type="text" id="cxPeso"></div>
-        <div><label>Talla</label><input type="text" id="cxTalla"></div>
-        <div><label>IMC</label><input type="text" id="cxImc"></div>
-      </div>
-      <label>Descripción por sistemas</label>
-      <textarea id="cxDescripcionSistemas"></textarea>
-
-      <div class="form-section-title">VI. Impresión diagnóstica</div>
-      <textarea id="cxDiagnostico"></textarea>
-
-      <div class="form-section-title">VII. Plan de tratamiento y recomendaciones</div>
-      <textarea id="cxPlan"></textarea>
-
-      <div class="form-section-title">Notas de seguimiento</div>
-      <textarea id="cxNotas"></textarea>
-
-      <div class="cancel-actions">
-        <button id="cxCancelBtn" class="btn-secondary">Cancelar</button>
-        <button id="cxSaveBtn" class="approve-btn">Guardar consulta</button>
+    <div class="field">
+      <label data-i18n="bookTime">Hora disponible</label>
+      <div class="time-grid" id="timeGrid">
+        <p class="hint" data-i18n="bookPickDate">Elige primero una fecha.</p>
       </div>
     </div>
 
-    <div class="cancel-actions" style="margin-top:18px;">
-      <button id="recordBackBtn" class="btn-secondary">Cerrar</button>
+    <div class="field consent-field">
+      <label class="consent-label">
+        <input type="checkbox" id="bkConsent">
+        <span>He leído y acepto la <a href="privacidad.html" target="_blank">Política de Privacidad</a>, y doy mi consentimiento para el tratamiento de mis datos con el fin de gestionar esta cita.</span>
+      </label>
     </div>
-    <p id="recordStatusMsg"></p>
+
+    <button type="button" class="send-btn" id="bookConfirmBtn">
+      <span data-i18n="bookConfirm">Confirmar reserva</span>
+    </button>
+    <p class="testimonial-note" id="bookMsg" style="display:none;"></p>
   </div>
 </div>
 
-<!-- ================= MODAL DE CANCELACIÓN ================= -->
-<div class="cancel-overlay" id="cancelOverlay">
-  <div class="cancel-modal">
-    <h3>Cancelar cita</h3>
-    <p class="sub" id="cancelSummary"></p>
+<section id="sobre-mi" class="tab-panel">
+  <div class="wrap about">
+    <div class="about-copy">
+      <div class="about-banner">
+        <div class="about-portrait">
+          <img src="Icono.png" alt="Monograma LVR">
+        </div>
+        <div class="about-banner-info">
+          <p class="about-name">Dra. Lorena Velásquez Roa</p>
+          <div class="about-chips">
+            <span class="chip">Medicina Estética</span>
+            <span class="chip">Nutrición y GLP-1</span>
+          </div>
+        </div>
+      </div>
 
-    <label for="cancelReason">Motivo (se le enviará a la paciente)</label>
-    <select id="cancelReason">
-      <option value="Un imprevisto médico obliga a reprogramar la agenda de la doctora.">Imprevisto médico de la doctora</option>
-      <option value="La doctora tuvo una emergencia y no podrá atender en el horario agendado.">Emergencia de último momento</option>
-      <option value="Por motivos de fuerza mayor, la cita debe ser reprogramada.">Motivo de fuerza mayor</option>
-      <option value="Se presentó un ajuste en la agenda médica por atención prioritaria a otro caso.">Ajuste de agenda</option>
-      <option value="__custom__">Escribir un motivo personalizado...</option>
-    </select>
-    <textarea id="cancelCustomReason" placeholder="Escribe el motivo aquí..." style="display:none;"></textarea>
-
-    <div class="cancel-actions">
-      <button id="cancelBackBtn" class="btn-secondary">Volver</button>
-      <button id="cancelConfirmBtn" class="btn-danger">Cancelar y notificar</button>
+      <p data-i18n="aboutP1">La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.</p>
+      <p data-i18n="aboutP2">Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.</p>
     </div>
-    <p id="cancelStatusMsg"></p>
   </div>
+
+  <div class="wrap testimonials">
+    <div class="testimonials-head">
+      <h3 data-i18n="testiTitle">🎤 Lo que dicen nuestras pacientes</h3>
+    </div>
+
+    <div class="rating-summary" id="ratingSummary">
+      <div class="rating-big">
+        <div class="num" id="ratingAvg">—</div>
+        <div class="count" id="ratingCount">Sin reseñas todavía</div>
+      </div>
+      <div class="rating-bars" id="ratingBars">
+        <div class="row"><span>5 ★</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>4 ★</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>3 ★</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>2 ★</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+        <div class="row"><span>1 ★</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span>0%</span></div>
+      </div>
+    </div>
+
+    <div class="testimonial-grid" id="testimonialGrid">
+      <p class="testimonial-loading" data-i18n="testiLoading">Cargando reseñas...</p>
+    </div>
+
+    <div class="review-form">
+      <h4 data-i18n="reviewFormTitle">¿Nos quieres dejar tu opinión?</h4>
+      <p class="hint" data-i18n="reviewFormHint">Completa el formulario. Tu comentario quedará pendiente de aprobación — la Dra. Velásquez Roa lo revisará antes de publicarlo.</p>
+
+      <div class="field">
+        <label for="revName" data-i18n="reviewName">Tu nombre</label>
+        <input type="text" id="revName" placeholder="Ej. María González">
+      </div>
+
+      <div class="field">
+        <label data-i18n="reviewStars">Calificación</label>
+        <div class="star-picker" id="starPicker">
+          <button type="button" data-star="1">★</button>
+          <button type="button" data-star="2">★</button>
+          <button type="button" data-star="3">★</button>
+          <button type="button" data-star="4">★</button>
+          <button type="button" data-star="5">★</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="revComment" data-i18n="reviewComment">Tu comentario</label>
+        <textarea id="revComment" placeholder="Cuéntanos cómo fue tu experiencia..."></textarea>
+      </div>
+
+      <button type="button" class="send-btn" id="sendReviewBtn">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 12.5 L11 14.5 L15.5 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span data-i18n="reviewSend">Enviar reseña</span>
+      </button>
+      <p class="testimonial-note" id="reviewMsg" style="display:none;"></p>
+    </div>
+  </div>
+</section>
+
+<section id="proceso" class="tab-panel section-alt">
+  <div class="wrap">
+    <div class="head-block">
+      <h2 data-i18n="processTitle">Proceso</h2>
+      <p class="sub" data-i18n="processSub">Ideas claras de cómo empezamos</p>
+    </div>
+    <div class="ideas-grid">
+      <div class="idea-card">
+        <div class="step">01</div>
+        <h3 data-i18n="step1h">Valoración inicial</h3>
+        <p data-i18n="step1p">Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.</p>
+      </div>
+      <div class="idea-card">
+        <div class="step">02</div>
+        <h3 data-i18n="step2h">Estudios y marcadores</h3>
+        <p data-i18n="step2p">Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.</p>
+      </div>
+      <div class="idea-card">
+        <div class="step">03</div>
+        <h3 data-i18n="step3h">Plan y seguimiento</h3>
+        <p data-i18n="step3p">Diseñamos tu protocolo y lo ajustamos con revisiones periódicas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="tab-panel contact-block">
+  <div class="head-block" style="text-align:center;">
+    <h2 data-i18n="contactTitle">Contacto</h2>
+    <p class="sub" data-i18n="contactSub">Nos encantaría saber de ti</p>
+  </div>
+  <p class="lede" data-i18n="contactLede">Escríbenos directamente y te responderemos lo antes posible para agendar tu primera valoración.</p>
+  <a href="https://wa.me/34634322874" target="_blank" rel="noopener" class="cta-pill-big">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 C21 16.75 16.75 21 11.5 21 C9.8 21 8.2 20.55 6.8 19.75 L3 21 L4.25 17.2 C3.45 15.8 3 14.2 3 12.5 C3 7.25 7.25 3 12.5 3 C17.75 3 21 6.25 21 11.5 Z" stroke="currentColor" stroke-width="1.4"/></svg>
+    <span data-i18n="contactBtn">Escríbenos por WhatsApp</span>
+  </a>
+
+  <div class="contact-links">
+    <a href="https://wa.me/34634322874" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 11.5 C21 16.75 16.75 21 11.5 21 C9.8 21 8.2 20.55 6.8 19.75 L3 21 L4.25 17.2 C3.45 15.8 3 14.2 3 12.5 C3 7.25 7.25 3 12.5 3 C17.75 3 21 6.25 21 11.5 Z" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span>+34 634 32 28 74</span>
+    </a>
+    <a href="mailto:Dra.lorena@lvrmedicinaintegral.com">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5 L12 13 L20 6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span>Dra.lorena@lvrmedicinaintegral.com</span>
+    </a>
+    <a href="https://www.instagram.com/dravr26?stkn=OTcwMTB6aG9scGRt" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
+      <span>@dravr26</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p data-i18n="footerCopy">© 2026 Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento.</p>
+    <p data-i18n="footerLoc">Comunidad Cataluña · España | Consulta presencial y online</p>
+    <p class="footer-legal">
+      <a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Política de privacidad</a> · <a href="cookies.html">Política de cookies</a>
+    </p>
+  </div>
+</footer>
+
 </div>
 
 <script>
-  const loginBox = document.getElementById('loginBox');
-  const adminPanel = document.getElementById('adminPanel');
-  const loginError = document.getElementById('loginError');
+  const splash = document.getElementById('splash');
+  const site = document.getElementById('site');
+  document.getElementById('enterBtn').addEventListener('click', () => {
+    splash.classList.add('hidden');
+    site.classList.add('visible');
+  });
 
-  document.getElementById('loginBtn').addEventListener('click', () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const pass = document.getElementById('loginPass').value;
-    loginError.textContent = '';
-    auth.signInWithEmailAndPassword(email, pass).catch(err => {
-      loginError.textContent = 'Correo o contraseña incorrectos.';
+  const tabLinks = document.querySelectorAll('.tabnav a');
+  const navLinks = document.querySelectorAll('.tabnav a');
+  const panels = document.querySelectorAll('.tab-panel');
+  const bookFloatBtn = document.getElementById('bookFloatBtn');
+  tabLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').slice(1);
+      navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + targetId));
+      panels.forEach(p => p.classList.toggle('active', p.id === targetId));
+      bookFloatBtn.classList.toggle('visible', targetId === 'servicios');
+    });
+  });
+  if (document.querySelector('.tabnav a.active')?.getAttribute('href') === '#servicios') {
+    bookFloatBtn.classList.add('visible');
+  }
+
+  const serviceBtns = document.querySelectorAll('.service-btn');
+  const servicePanels = document.querySelectorAll('.service-panel');
+  serviceBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-service');
+      serviceBtns.forEach(b => b.classList.toggle('active', b === btn));
+      servicePanels.forEach(p => p.classList.toggle('active', p.getAttribute('data-panel') === target));
     });
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+  const translations = {
+    es: {
+      enterBtn: "¡Quiero empezar!",
+      share: "Compartir",
+      shareEmail: "Correo electrónico", shareCopy: "Copiar enlace",
+      infobarTitle: "Medicina integral y antienvejecimiento",
+      heroH1: "Salud y calidad para cada etapa de tu vida",
+      heroSub: "Descubre los beneficios de la medicina integral y cuida tu cuerpo desde la raíz, con un plan hecho a tu medida.",
+      navBeneficios: "Beneficios", navServicios: "Servicios", navSobreMi: "Sobre mí", navProceso: "Proceso", navContacto: "Contacto",
+      benefTitle: "Beneficios", benefSub: "Por qué elegir un enfoque de medicina integral",
+      benef1h: "Causa raíz", benef1p: "Buscamos el origen del síntoma en vez de solo controlarlo.",
+      benef2h: "Balance hormonal", benef2p: "Ajustes precisos para recuperar energía, sueño y ánimo.",
+      benef3h: "Prevención real", benef3p: "Marcadores biológicos revisados antes de que aparezca el problema.",
+      benef4h: "Resultados medibles", benef4p: "Seguimiento con datos claros en cada etapa del plan.",
+      svcBtn1: "Control de peso", svcBtn2: "Líneas de expresión", svcBtn3: "Lifting facial",
+      svcBtn4: "Armonización facial", svcBtn5: "Manejo de cicatrices", svcBtn6: "Alopecia androgénica", svcBtn7: "Terapia androgénica",
+      svcTitle1: "Control de sobrepeso y obesidad", svcTitle2: "Tratamiento para líneas de expresión", svcTitle3: "Lifting facial",
+      svcTitle4: "Armonización facial", svcTitle5: "Manejo de cicatrices", svcTitle6: "Alopecia androgénica", svcTitle7: "Terapia androgénica",
+      lblWhat: "Qué es:", lblBenefit: "Beneficio:",
+      svcWhat1: "un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.",
+      svcBenef1: "pérdida de peso sostenible en el tiempo, mejora en tus marcadores metabólicos y reducción del riesgo cardiovascular asociado al sobrepeso.",
+      svcWhat2: "aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.",
+      svcBenef2: "piel visiblemente más lisa y descansada, con resultados naturales que respetan la expresividad de tu rostro.",
+      svcWhat3: "un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.",
+      svcBenef3: "menos flacidez y rasgos más definidos, sin cirugía ni tiempos de recuperación prolongados.",
+      svcWhat4: "un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.",
+      svcBenef4: "un rostro más armónico y simétrico, resaltando tus rasgos naturales de forma sutil, sin cambiar tu identidad facial.",
+      svcWhat5: "evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.",
+      svcBenef5: "mejora visible en textura, color y relieve de la piel afectada, con un plan adaptado a tu caso específico.",
+      svcWhat6: "diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.",
+      svcBenef6: "frena la progresión de la caída y favorece la densidad capilar en las zonas donde aún hay folículos activos.",
+      svcWhat7: "manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.",
+      svcBenef7: "mejora en energía, composición corporal, salud capilar y bienestar general asociado al balance hormonal.",
+      aboutTitle: "Nuestra historia", aboutSub: "Sobre la Dra. Velásquez Roa",
+      aboutP1: "La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.",
+      aboutP2: "Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.",
+      testiTitle: "🎤 Lo que dicen nuestras pacientes", testiCount: "3 reseñas y contando",
+      testi1: "\"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización.\"",
+      testi2: "\"Ejemplo de reseña — reemplázala por el comentario real de una paciente, con su autorización.\"",
+      testiNote: "Estas reseñas son de ejemplo, para mostrar el diseño. Reemplázalas por comentarios reales de tus pacientes (con su permiso) antes de publicar la página.",
+      testiLoading: "Cargando reseñas...",
+      bookFloatLabel: "Reservar cita",
+      bookTitle: "Reserva tu cita", bookHint: "Horario disponible de 7:00 am a 7:00 pm. El cupo se bloquea en cuanto se confirma.",
+      bookName: "Nombre del paciente", bookService: "Tipo de servicio", bookEmail: "Correo del paciente",
+      bookPhone: "Número del paciente", bookDate: "Fecha", bookTime: "Hora disponible",
+      bookPickDate: "Elige primero una fecha.", bookConfirm: "Confirmar reserva",
+      reviewFormTitle: "¿Nos quieres dejar tu opinión?",
+      reviewFormHint: "Completa el formulario. Tu comentario quedará pendiente de aprobación — la Dra. Velásquez Roa lo revisará antes de publicarlo.",
+      reviewName: "Tu nombre", reviewStars: "Calificación", reviewComment: "Tu comentario", reviewSend: "Enviar reseña",
+      processTitle: "Proceso", processSub: "Ideas claras de cómo empezamos",
+      step1h: "Valoración inicial", step1p: "Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.",
+      step2h: "Estudios y marcadores", step2p: "Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.",
+      step3h: "Plan y seguimiento", step3p: "Diseñamos tu protocolo y lo ajustamos con revisiones periódicas.",
+      contactTitle: "Contacto", contactSub: "Nos encantaría saber de ti",
+      contactLede: "Escríbenos directamente y te responderemos lo antes posible para agendar tu primera valoración.",
+      contactBtn: "Escríbenos por WhatsApp",
+      footerCopy: "© 2026 Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento.",
+      footerLoc: "Comunidad Cataluña · España | Consulta presencial y online"
+    },
+    en: {
+      enterBtn: "Let's get started!",
+      share: "Share",
+      shareEmail: "Email", shareCopy: "Copy link",
+      infobarTitle: "Integrative Medicine & Anti-Aging",
+      heroH1: "Health and quality for every stage of your life",
+      heroSub: "Discover the benefits of integrative medicine and care for your body from the root, with a plan made for you.",
+      navBeneficios: "Benefits", navServicios: "Services", navSobreMi: "About", navProceso: "Process", navContacto: "Contact",
+      benefTitle: "Benefits", benefSub: "Why choose an integrative medicine approach",
+      benef1h: "Root cause", benef1p: "We look for the origin of the symptom instead of just managing it.",
+      benef2h: "Hormonal balance", benef2p: "Precise adjustments to restore energy, sleep and mood.",
+      benef3h: "Real prevention", benef3p: "Biological markers reviewed before a problem appears.",
+      benef4h: "Measurable results", benef4p: "Tracking with clear data at every stage of your plan.",
+      svcBtn1: "Weight control", svcBtn2: "Expression lines", svcBtn3: "Facial lifting",
+      svcBtn4: "Facial harmonization", svcBtn5: "Scar management", svcBtn6: "Androgenic alopecia", svcBtn7: "Androgenic therapy",
+      svcTitle1: "Overweight and obesity control", svcTitle2: "Treatment for expression lines", svcTitle3: "Facial lifting",
+      svcTitle4: "Facial harmonization", svcTitle5: "Scar management", svcTitle6: "Androgenic alopecia", svcTitle7: "Androgenic therapy",
+      lblWhat: "What it is:", lblBenefit: "Benefit:",
+      svcWhat1: "a clinical weight-management program that evaluates your metabolism, body composition and eating habits, to design a personalized medical intervention — not a generic diet.",
+      svcBenef1: "sustainable weight loss over time, improved metabolic markers and reduced cardiovascular risk associated with overweight.",
+      svcWhat2: "application of botulinum toxin or other specialized agents to relax the muscles responsible for dynamic wrinkles on the forehead, frown lines and eye contour.",
+      svcBenef2: "visibly smoother, more rested skin, with natural results that respect your facial expressiveness.",
+      svcWhat3: "a non-surgical procedure that stimulates natural collagen production and repositions tissue to firm the facial contour.",
+      svcBenef3: "less sagging and more defined features, without surgery or long recovery times.",
+      svcWhat4: "a set of techniques — fillers, biostimulators and botulinum toxin — that balance facial proportions respecting your individual anatomy.",
+      svcBenef4: "a more harmonious and symmetrical face, subtly highlighting your natural features without changing your facial identity.",
+      svcWhat5: "personalized evaluation and treatment (laser, microneedling or infiltrations) based on the type, depth and origin of each scar.",
+      svcBenef5: "visible improvement in texture, color and relief of the affected skin, with a plan adapted to your specific case.",
+      svcWhat6: "specialized diagnosis of hair loss of hormonal and genetic origin, with medical treatment and/or complementary hair procedures.",
+      svcBenef6: "slows the progression of hair loss and promotes density in areas where active follicles remain.",
+      svcWhat7: "specialized hormonal management to balance androgen levels according to your individual biochemical profile.",
+      svcBenef7: "improved energy, body composition, hair health and overall wellbeing linked to hormonal balance.",
+      aboutTitle: "Our story", aboutSub: "About Dr. Velásquez Roa",
+      aboutP1: "Dr. Lorena Velásquez Roa was born from the conviction that medicine should look at the whole person, not just the symptom. She combines functional, hormonal and clinical nutrition medicine in a single plan.",
+      aboutP2: "Every assessment starts from your real history and your biological markers, so treatment responds to your body — not to a generic formula.",
+      testiTitle: "🎤 What our patients say", testiCount: "3 reviews and counting",
+      testi1: "\"Example review — replace it with a real patient comment, with their permission.\"",
+      testi2: "\"Example review — replace it with a real patient comment, with their permission.\"",
+      testiNote: "These reviews are placeholders to show the design. Replace them with real patient comments (with their consent) before publishing the page.",
+      testiLoading: "Loading reviews...",
+      bookFloatLabel: "Book appointment",
+      bookTitle: "Book your appointment", bookHint: "Available hours from 7:00 am to 7:00 pm. The slot is blocked as soon as it's confirmed.",
+      bookName: "Patient name", bookService: "Service type", bookEmail: "Patient email",
+      bookPhone: "Patient phone", bookDate: "Date", bookTime: "Available time",
+      bookPickDate: "Pick a date first.", bookConfirm: "Confirm booking",
+      reviewFormTitle: "Want to leave us your feedback?",
+      reviewFormHint: "Fill out the form. Your comment will remain pending approval — Dr. Velásquez Roa will review it before publishing.",
+      reviewName: "Your name", reviewStars: "Rating", reviewComment: "Your comment", reviewSend: "Send review",
+      processTitle: "Process", processSub: "A clear idea of how we start",
+      step1h: "Initial assessment", step1p: "We review your medical history, habits and goals in the first consultation.",
+      step2h: "Studies and markers", step2p: "We analyze your hormonal, metabolic and nutritional profile in depth.",
+      step3h: "Plan and follow-up", step3p: "We design your protocol and adjust it with periodic reviews.",
+      contactTitle: "Contact", contactSub: "We'd love to hear from you",
+      contactLede: "Write to us directly and we'll get back to you as soon as possible to schedule your first assessment.",
+      contactBtn: "Message us on WhatsApp",
+      footerCopy: "© 2026 Dr. Lorena Velásquez Roa — Integrative medicine & anti-aging.",
+      footerLoc: "Catalonia · Spain | In-person and online consultations"
+    }
+  };
 
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      loginBox.style.display = 'none';
-      adminPanel.style.display = 'block';
-      loadReviews();
-      loadContentForm();
-      loadRecords();
+  let currentLang = 'es';
+  const langToggles = document.querySelectorAll('.lang-toggle');
+
+  function applyLanguage(lang) {
+    currentLang = lang;
+    document.documentElement.setAttribute('lang', lang);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[lang] && translations[lang][key] !== undefined) {
+        el.textContent = translations[lang][key];
+      }
+    });
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+      const key = el.getAttribute('data-i18n-opt');
+      if (translations[lang] && translations[lang][key] !== undefined) {
+        el.textContent = translations[lang][key];
+      }
+    });
+    langToggles.forEach(btn => {
+      const flag = btn.querySelector('.flag');
+      const label = btn.querySelector('.lang-label');
+      if (lang === 'es') {
+        flag.textContent = '🇪🇸';
+        label.textContent = 'ES';
+      } else {
+        flag.textContent = '🇬🇧';
+        label.textContent = 'EN';
+      }
+    });
+  }
+
+  langToggles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyLanguage(currentLang === 'es' ? 'en' : 'es');
+    });
+  });
+
+  const EDITABLE_KEYS = [
+    'heroH1','heroSub',
+    'benef1h','benef1p','benef2h','benef2p','benef3h','benef3p','benef4h','benef4p',
+    'svcTitle1','svcWhat1','svcBenef1','svcTitle2','svcWhat2','svcBenef2',
+    'svcTitle3','svcWhat3','svcBenef3','svcTitle4','svcWhat4','svcBenef4',
+    'svcTitle5','svcWhat5','svcBenef5','svcTitle6','svcWhat6','svcBenef6',
+    'svcTitle7','svcWhat7','svcBenef7',
+    'aboutP1','aboutP2',
+    'step1h','step1p','step2h','step2p','step3h','step3p'
+  ];
+  db.collection('content').doc('site').get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      EDITABLE_KEYS.forEach(key => {
+        if (data[key] !== undefined && data[key] !== '') {
+          translations.es[key] = data[key];
+        }
+      });
+      applyLanguage(currentLang);
+    }
+  }).catch(() => { });
+
+  const shareBtn = document.getElementById('shareBtn');
+  const shareMenu = document.getElementById('shareMenu');
+  const shareData = {
+    title: 'Dra. Lorena Velásquez Roa — Medicina integral y antienvejecimiento',
+    text: 'Conoce la medicina integral y antienvejecimiento de la Dra. Lorena Velásquez Roa.',
+    url: window.location.href
+  };
+
+  shareBtn.addEventListener('click', async () => {
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (err) { }
     } else {
-      loginBox.style.display = 'block';
-      adminPanel.style.display = 'none';
+      shareMenu.classList.toggle('open');
     }
   });
 
-  // ---- Navegación entre pestañas principales ----
-  document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+  document.addEventListener('click', (e) => {
+    if (!shareMenu.contains(e.target) && e.target !== shareBtn) {
+      shareMenu.classList.remove('open');
+    }
+  });
+
+  const encodedUrl = encodeURIComponent(shareData.url);
+  const encodedText = encodeURIComponent(shareData.text);
+  document.getElementById('shareWhatsapp').href = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+  document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  document.getElementById('shareLinkedin').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+  document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodedText}%20${encodedUrl}`;
+  document.getElementById('shareCopy').addEventListener('click', () => {
+    navigator.clipboard.writeText(shareData.url).then(() => {
+      const label = document.querySelector('#shareCopy [data-i18n="shareCopy"]');
+      const original = label.textContent;
+      label.textContent = currentLang === 'es' ? '¡Enlace copiado!' : 'Link copied!';
+      setTimeout(() => { label.textContent = original; }, 2000);
+    });
+    shareMenu.classList.remove('open');
+  });
+
+  let selectedStars = 5;
+  const starButtons = document.querySelectorAll('#starPicker button');
+  function paintStars(n) {
+    starButtons.forEach(b => b.classList.toggle('on', Number(b.dataset.star) <= n));
+  }
+  paintStars(selectedStars);
+  starButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const target = btn.getAttribute('data-panel');
-      document.querySelectorAll('.admin-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + target));
+      selectedStars = Number(btn.dataset.star);
+      paintStars(selectedStars);
     });
   });
 
-  // ---- Navegación entre sub-pestañas de citas ----
-  document.querySelectorAll('.sub-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const status = btn.getAttribute('data-status');
-      document.querySelectorAll('.booking-panel').forEach(p => p.classList.toggle('active', p.id === 'bp-' + status));
+  const reviewMsg = document.getElementById('reviewMsg');
+  function showReviewMsg(text, isError) {
+    reviewMsg.textContent = text;
+    reviewMsg.style.display = 'block';
+    reviewMsg.style.background = isError ? '#f4d9d9' : 'var(--mist)';
+  }
+
+  document.getElementById('sendReviewBtn').addEventListener('click', () => {
+    const name = document.getElementById('revName').value.trim();
+    const comment = document.getElementById('revComment').value.trim();
+    if (!name || !comment) {
+      showReviewMsg(currentLang === 'es'
+        ? 'Por favor completa tu nombre y tu comentario antes de enviar.'
+        : 'Please fill in your name and comment before sending.', true);
+      return;
+    }
+    db.collection('reviews').add({
+      name: name,
+      stars: selectedStars,
+      comment: comment,
+      approved: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      document.getElementById('revName').value = '';
+      document.getElementById('revComment').value = '';
+      selectedStars = 5;
+      paintStars(5);
+      showReviewMsg(currentLang === 'es'
+        ? '¡Gracias! Tu reseña quedó enviada y será revisada antes de publicarse.'
+        : 'Thank you! Your review was sent and will be reviewed before publishing.', false);
+    }).catch(() => {
+      showReviewMsg(currentLang === 'es'
+        ? 'No se pudo enviar tu reseña. Intenta de nuevo más tarde.'
+        : 'Your review could not be sent. Please try again later.', true);
     });
   });
 
-  function starRow(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+  const testimonialGrid = document.getElementById('testimonialGrid');
+  const ratingAvg = document.getElementById('ratingAvg');
+  const ratingCount = document.getElementById('ratingCount');
+  const ratingBars = document.getElementById('ratingBars');
+
+  db.collection('reviews').where('approved', '==', true)
+    .orderBy('createdAt', 'desc')
+    .get()
+    .then(snapshot => {
+      const reviews = [];
+      snapshot.forEach(doc => reviews.push(doc.data()));
+
+      if (reviews.length === 0) {
+        testimonialGrid.innerHTML = `<p class="testimonial-note">${currentLang === 'es' ? 'Todavía no hay reseñas publicadas. ¡Sé la primera persona en dejar la tuya!' : 'No reviews published yet. Be the first to leave yours!'}</p>`;
+        return;
+      }
+
+      testimonialGrid.innerHTML = reviews.map(r => `
+        <div class="testimonial-card">
+          <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+          <div class="name">${r.name}</div>
+          <p>"${r.comment}"</p>
+        </div>
+      `).join('');
+
+      const total = reviews.length;
+      const sum = reviews.reduce((acc, r) => acc + r.stars, 0);
+      const avg = (sum / total).toFixed(1);
+      ratingAvg.textContent = avg;
+      ratingCount.textContent = currentLang === 'es' ? `${total} reseña${total === 1 ? '' : 's'} y contando` : `${total} review${total === 1 ? '' : 's'} and counting`;
+
+      const counts = [0, 0, 0, 0, 0];
+      reviews.forEach(r => counts[r.stars - 1]++);
+      const rows = ratingBars.querySelectorAll('.row');
+      for (let i = 0; i < 5; i++) {
+        const starLevel = 5 - i;
+        const pct = Math.round((counts[starLevel - 1] / total) * 100);
+        rows[i].querySelector('.bar-fill').style.width = pct + '%';
+        rows[i].querySelector('span:last-child').textContent = pct + '%';
+      }
+    })
+    .catch(() => {
+      testimonialGrid.innerHTML = `<p class="testimonial-note">${currentLang === 'es' ? 'No se pudieron cargar las reseñas.' : 'Reviews could not be loaded.'}</p>`;
+    });
+
+  const HOURS = ['07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30'];
   function addMinutes(hhmm, mins) {
     const [h, m] = hhmm.split(':').map(Number);
     const total = h * 60 + m + mins;
@@ -450,809 +1239,184 @@
     const nm = String(total % 60).padStart(2, '0');
     return `${nh}${nm}`;
   }
+  const bookModal = document.getElementById('bookModal');
+  const bkDate = document.getElementById('bkDate');
 
-  function loadReviews() {
-    const pendingList = document.getElementById('pendingList');
-    const approvedList = document.getElementById('approvedList');
-
-    db.collection('reviews').orderBy('createdAt', 'desc').get().then(snapshot => {
-      const pending = [];
-      const approved = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        if (data.approved) approved.push(data); else pending.push(data);
-      });
-
-      pendingList.innerHTML = pending.length
-        ? pending.map(r => `
-          <div class="card">
-            <div class="stars">${starRow(r.stars)}</div>
-            <div class="name">${r.name}</div>
-            <div class="comment">"${r.comment}"</div>
-            <div class="actions">
-              <button class="approve-btn" onclick="approveReview('${r.id}')">Aprobar y publicar</button>
-              <button class="reject-btn" onclick="deleteReview('${r.id}')">Rechazar</button>
-            </div>
-          </div>`).join('')
-        : '<p class="empty">No hay reseñas pendientes.</p>';
-
-      approvedList.innerHTML = approved.length
-        ? approved.map(r => `
-          <div class="card">
-            <div class="stars">${starRow(r.stars)}</div>
-            <div class="name">${r.name}</div>
-            <div class="comment">"${r.comment}"</div>
-            <div class="actions">
-              <button class="delete-btn" onclick="deleteReview('${r.id}')">Eliminar</button>
-            </div>
-          </div>`).join('')
-        : '<p class="empty">Todavía no hay reseñas publicadas.</p>';
-    });
-
-    loadBookings();
-  }
-
-  function calUrlFor(b) {
-    const [y, m, d] = b.date.split('-');
-    const startDT = `${y}${m}${d}T${b.time.replace(':', '')}00`;
-    const endHM = addMinutes(b.time, 30);
-    const endDT = `${y}${m}${d}T${endHM}00`;
-    const calText = encodeURIComponent(`Cita: ${b.service} — ${b.name}`);
-    const calDetails = encodeURIComponent(`Paciente: ${b.name}\nServicio: ${b.service}\nCorreo: ${b.email}\nTeléfono: ${b.phone}`);
-    const rawUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
-    // Fuerza que el evento se agregue siempre a este correo, sin importar qué cuenta de Google esté activa en el navegador
-    return `https://accounts.google.com/AccountChooser?Email=dravelasquezroa%40gmail.com&continue=${encodeURIComponent(rawUrl)}`;
-  }
-
-  function loadBookings() {
-    db.collection('bookings').get().then(snapshot => {
-      const bookings = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        if (!data.status) data.status = 'pending'; // compatibilidad con citas creadas antes de este cambio
-        bookings.push(data);
-      });
-      bookings.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-      window.currentBookings = bookings;
-
-      const pending = bookings.filter(b => b.status === 'pending');
-      const accepted = bookings.filter(b => b.status === 'accepted');
-      const cancelled = bookings.filter(b => b.status === 'cancelled');
-
-      document.getElementById('pendingBadge').textContent = pending.length;
-      document.getElementById('pendingBadgeTop').textContent = pending.length;
-
-      document.getElementById('bp-pending').innerHTML = pending.length
-        ? pending.map(b => `
-          <div class="card">
-            <div class="booking-when">${b.date} — ${b.time}</div>
-            <div class="name">${b.name} (${b.service})</div>
-            <div class="comment">${b.email} · ${b.phone}</div>
-            <div class="actions">
-              <button class="cal-btn" onclick="acceptBooking('${b.id}')">Agregar a Google Calendar</button>
-              <button class="delete-btn" onclick="cancelBooking('${b.id}')">Cancelar cita</button>
-            </div>
-          </div>`).join('')
-        : '<p class="empty">No hay citas pendientes.</p>';
-
-      document.getElementById('bp-accepted').innerHTML = accepted.length
-        ? accepted.map(b => `
-          <div class="card">
-            <div class="booking-when">${b.date} — ${b.time}</div>
-            <span class="status-tag accepted">✓ En el calendario</span>
-            <div class="name">${b.name} (${b.service})</div>
-            <div class="comment">${b.email} · ${b.phone}</div>
-            <div class="actions">
-              <a class="cal-btn" href="${calUrlFor(b)}" target="_blank" rel="noopener">Ver en Google Calendar</a>
-              <button class="delete-btn" onclick="cancelBooking('${b.id}')">Cancelar cita</button>
-            </div>
-          </div>`).join('')
-        : '<p class="empty">Todavía no hay citas aceptadas.</p>';
-
-      document.getElementById('bp-cancelled').innerHTML = cancelled.length
-        ? cancelled.map(b => `
-          <div class="card">
-            <div class="booking-when">${b.date} — ${b.time}</div>
-            <span class="status-tag cancelled">✕ Cancelada</span>
-            <div class="name">${b.name} (${b.service})</div>
-            <div class="comment">${b.email} · ${b.phone}</div>
-            ${b.cancelReason ? `<div class="comment">Motivo: ${b.cancelReason}</div>` : ''}
-          </div>`).join('')
-        : '<p class="empty">No hay citas canceladas.</p>';
-    }).catch(err => {
-      document.getElementById('bp-pending').innerHTML = `<p class="empty">No se pudieron cargar las citas (${err.message}).</p>`;
-    });
-  }
-
-  function acceptBooking(id) {
-    const booking = (window.currentBookings || []).find(b => b.id === id);
-    if (!booking) return;
-    window.open(calUrlFor(booking), '_blank');
-    db.collection('bookings').doc(id).update({ status: 'accepted' }).then(loadBookings);
-  }
-
-  function cancelBooking(id) {
-    const booking = (window.currentBookings || []).find(b => b.id === id);
-    if (!booking) return;
-    openCancelModal(booking);
-  }
-
-  const cancelOverlay = document.getElementById('cancelOverlay');
-  const cancelSummary = document.getElementById('cancelSummary');
-  const cancelReasonSelect = document.getElementById('cancelReason');
-  const cancelCustomReason = document.getElementById('cancelCustomReason');
-  const cancelStatusMsg = document.getElementById('cancelStatusMsg');
-  let bookingToCancel = null;
-
-  function openCancelModal(booking) {
-    bookingToCancel = booking;
-    cancelSummary.textContent = `${booking.name} — ${booking.date} a las ${booking.time} (${booking.service})`;
-    cancelReasonSelect.value = cancelReasonSelect.options[0].value;
-    cancelCustomReason.style.display = 'none';
-    cancelCustomReason.value = '';
-    cancelStatusMsg.textContent = '';
-    cancelOverlay.classList.add('open');
-  }
-
-  function closeCancelModal() {
-    cancelOverlay.classList.remove('open');
-    bookingToCancel = null;
-  }
-
-  document.getElementById('cancelBackBtn').addEventListener('click', closeCancelModal);
-  cancelOverlay.addEventListener('click', (e) => { if (e.target === cancelOverlay) closeCancelModal(); });
-
-  cancelReasonSelect.addEventListener('change', () => {
-    cancelCustomReason.style.display = cancelReasonSelect.value === '__custom__' ? 'block' : 'none';
+  const bkPhoneInput = document.getElementById('bkPhone');
+  bkPhoneInput.addEventListener('input', () => {
+    bkPhoneInput.value = bkPhoneInput.value.replace(/[^\d]/g, '');
   });
+  const timeGrid = document.getElementById('timeGrid');
+  const bookMsg = document.getElementById('bookMsg');
+  let selectedTime = null;
 
-  document.getElementById('cancelConfirmBtn').addEventListener('click', () => {
-    if (!bookingToCancel) return;
-    const b = bookingToCancel;
-    const reason = cancelReasonSelect.value === '__custom__'
-      ? (cancelCustomReason.value.trim() || 'Debemos reprogramar tu cita por motivos de agenda.')
-      : cancelReasonSelect.value;
+  // Siempre calcula la fecha/hora según el horario de España (Europa/Madrid),
+  // sin importar desde qué país o zona horaria se conecte quien visita la página.
+  function getMadridNow() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Madrid',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(new Date());
+    const map = {};
+    parts.forEach(p => { map[p.type] = p.value; });
+    let hour = parseInt(map.hour, 10);
+    if (hour === 24) hour = 0;
+    return {
+      dateStr: `${map.year}-${map.month}-${map.day}`,
+      minutes: hour * 60 + parseInt(map.minute, 10)
+    };
+  }
+  const todayStr = getMadridNow().dateStr;
+  bkDate.setAttribute('min', todayStr);
 
-    cancelStatusMsg.textContent = 'Cancelando y notificando...';
-
-    // 1) WhatsApp al teléfono de la paciente (abre pestaña con el mensaje ya escrito)
-    const waPhone = (b.phone || '').replace(/[^\d]/g, '');
-    const waText = `Hola ${b.name}, te escribimos de la Dra. Lorena Velásquez Roa.\n\nLamentamos informarte que tu cita del ${b.date} a las ${b.time} (${b.service}) debe ser reprogramada.\n\nMotivo: ${reason}\n\nPor favor contáctanos para agendar un nuevo horario. ¡Disculpa las molestias!`;
-    if (waPhone) {
-      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`, '_blank');
+  function openBookModal() {
+    const activeBtn = document.querySelector('.service-btn.active');
+    if (activeBtn) {
+      const key = activeBtn.getAttribute('data-service');
+      const map = { peso:0, expresion:1, lifting:2, armonizacion:3, cicatrices:4, alopecia:5, terapia:6 };
+      const select = document.getElementById('bkService');
+      if (map[key] !== undefined) select.selectedIndex = map[key];
     }
+    bookModal.classList.add('open');
+  }
+  function closeBookModal() { bookModal.classList.remove('open'); }
 
-    // 2) Pasa la cita a "Cancelada" (se conserva como registro) y libera el horario
-    db.collection('bookings').doc(b.id).update({ status: 'cancelled', cancelReason: reason })
-      .then(() => db.collection('slots').doc(`${b.date}_${b.time}`).delete())
-      .then(() => {
-        closeCancelModal();
-        loadBookings();
+  bookFloatBtn.addEventListener('click', openBookModal);
+  document.getElementById('bookCloseBtn').addEventListener('click', closeBookModal);
+  bookModal.addEventListener('click', (e) => { if (e.target === bookModal) closeBookModal(); });
+
+  function renderTimeGrid(takenTimes, forDate) {
+    const isToday = forDate === todayStr;
+    const nowMinutes = getMadridNow().minutes;
+
+    timeGrid.innerHTML = HOURS.map(h => {
+      const [hh, mm] = h.split(':').map(Number);
+      const slotMinutes = hh * 60 + mm;
+      const isPast = isToday && slotMinutes <= nowMinutes;
+      const isTaken = takenTimes.includes(h) || isPast;
+      return `<button type="button" class="time-slot${isTaken ? ' taken' : ''}" data-time="${h}" ${isTaken ? 'disabled' : ''}>${h}</button>`;
+    }).join('');
+    timeGrid.querySelectorAll('.time-slot:not(.taken)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeGrid.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedTime = btn.getAttribute('data-time');
       });
-  });
-
-  // ---- Contenido editable del sitio ----
-  const DEFAULT_CONTENT = {
-    heroH1: "Salud y calidad para cada etapa de tu vida",
-    heroSub: "Descubre los beneficios de la medicina integral y cuida tu cuerpo desde la raíz, con un plan hecho a tu medida.",
-    benef1h: "Causa raíz", benef1p: "Buscamos el origen del síntoma en vez de solo controlarlo.",
-    benef2h: "Balance hormonal", benef2p: "Ajustes precisos para recuperar energía, sueño y ánimo.",
-    benef3h: "Prevención real", benef3p: "Marcadores biológicos revisados antes de que aparezca el problema.",
-    benef4h: "Resultados medibles", benef4p: "Seguimiento con datos claros en cada etapa del plan.",
-    svcTitle1: "Control de sobrepeso y obesidad",
-    svcWhat1: "un programa clínico de manejo de peso que evalúa tu metabolismo, composición corporal y hábitos alimenticios, para diseñar una intervención médica personalizada — no una dieta genérica.",
-    svcBenef1: "pérdida de peso sostenible en el tiempo, mejora en tus marcadores metabólicos y reducción del riesgo cardiovascular asociado al sobrepeso.",
-    svcTitle2: "Tratamiento para líneas de expresión",
-    svcWhat2: "aplicación de toxina botulínica u otros agentes especializados para relajar los músculos responsables de las arrugas dinámicas en frente, entrecejo y contorno de ojos.",
-    svcBenef2: "piel visiblemente más lisa y descansada, con resultados naturales que respetan la expresividad de tu rostro.",
-    svcTitle3: "Lifting facial",
-    svcWhat3: "un procedimiento no quirúrgico que estimula la producción natural de colágeno y reposiciona los tejidos para reafirmar el óvalo facial.",
-    svcBenef3: "menos flacidez y rasgos más definidos, sin cirugía ni tiempos de recuperación prolongados.",
-    svcTitle4: "Armonización facial",
-    svcWhat4: "un conjunto de técnicas — rellenos, bioestimuladores y toxina botulínica — que equilibran las proporciones del rostro respetando tu anatomía individual.",
-    svcBenef4: "un rostro más armónico y simétrico, resaltando tus rasgos naturales de forma sutil, sin cambiar tu identidad facial.",
-    svcTitle5: "Manejo de cicatrices",
-    svcWhat5: "evaluación y tratamiento personalizado (láser, microneedling o infiltraciones) según el tipo, la profundidad y el origen de cada cicatriz.",
-    svcBenef5: "mejora visible en textura, color y relieve de la piel afectada, con un plan adaptado a tu caso específico.",
-    svcTitle6: "Alopecia androgénica",
-    svcWhat6: "diagnóstico especializado de la caída de cabello de origen hormonal y genético, con tratamiento médico y/o procedimientos capilares complementarios.",
-    svcBenef6: "frena la progresión de la caída y favorece la densidad capilar en las zonas donde aún hay folículos activos.",
-    svcTitle7: "Terapia androgénica",
-    svcWhat7: "manejo hormonal especializado para equilibrar los niveles de andrógenos según tu perfil bioquímico individual.",
-    svcBenef7: "mejora en energía, composición corporal, salud capilar y bienestar general asociado al balance hormonal.",
-    aboutP1: "La Dra. Lorena Velásquez Roa nació de la convicción de que la medicina debe mirar a la persona completa, no solo al síntoma. Combina medicina funcional, hormonal y nutrición clínica en un mismo plan.",
-    aboutP2: "Cada valoración parte de tu historia real y tus marcadores biológicos, para que el tratamiento responda a tu cuerpo y no a una fórmula genérica.",
-    step1h: "Valoración inicial", step1p: "Revisamos tu historia clínica, hábitos y objetivos en la primera consulta.",
-    step2h: "Estudios y marcadores", step2p: "Analizamos tu perfil hormonal, metabólico y nutricional en profundidad.",
-    step3h: "Plan y seguimiento", step3p: "Diseñamos tu protocolo y lo ajustamos con revisiones periódicas."
-  };
-
-  const CONTENT_GROUPS = [
-    { title: 'Portada', fields: [
-      ['heroH1', 'Título principal', 'input'], ['heroSub', 'Subtítulo', 'textarea']
-    ]},
-    { title: 'Beneficios', fields: [
-      ['benef1h','Beneficio 1 - título','input'], ['benef1p','Beneficio 1 - texto','textarea'],
-      ['benef2h','Beneficio 2 - título','input'], ['benef2p','Beneficio 2 - texto','textarea'],
-      ['benef3h','Beneficio 3 - título','input'], ['benef3p','Beneficio 3 - texto','textarea'],
-      ['benef4h','Beneficio 4 - título','input'], ['benef4p','Beneficio 4 - texto','textarea']
-    ]},
-    { title: 'Servicios', fields: [
-      ['svcTitle1','Servicio 1 - título','input'], ['svcWhat1','Servicio 1 - Qué es','textarea'], ['svcBenef1','Servicio 1 - Beneficio','textarea'],
-      ['svcTitle2','Servicio 2 - título','input'], ['svcWhat2','Servicio 2 - Qué es','textarea'], ['svcBenef2','Servicio 2 - Beneficio','textarea'],
-      ['svcTitle3','Servicio 3 - título','input'], ['svcWhat3','Servicio 3 - Qué es','textarea'], ['svcBenef3','Servicio 3 - Beneficio','textarea'],
-      ['svcTitle4','Servicio 4 - título','input'], ['svcWhat4','Servicio 4 - Qué es','textarea'], ['svcBenef4','Servicio 4 - Beneficio','textarea'],
-      ['svcTitle5','Servicio 5 - título','input'], ['svcWhat5','Servicio 5 - Qué es','textarea'], ['svcBenef5','Servicio 5 - Beneficio','textarea'],
-      ['svcTitle6','Servicio 6 - título','input'], ['svcWhat6','Servicio 6 - Qué es','textarea'], ['svcBenef6','Servicio 6 - Beneficio','textarea'],
-      ['svcTitle7','Servicio 7 - título','input'], ['svcWhat7','Servicio 7 - Qué es','textarea'], ['svcBenef7','Servicio 7 - Beneficio','textarea']
-    ]},
-    { title: 'Sobre mí', fields: [
-      ['aboutP1','Párrafo 1','textarea'], ['aboutP2','Párrafo 2','textarea']
-    ]},
-    { title: 'Proceso', fields: [
-      ['step1h','Paso 1 - título','input'], ['step1p','Paso 1 - texto','textarea'],
-      ['step2h','Paso 2 - título','input'], ['step2p','Paso 2 - texto','textarea'],
-      ['step3h','Paso 3 - título','input'], ['step3p','Paso 3 - texto','textarea']
-    ]}
-  ];
-
-  function loadContentForm() {
-    const form = document.getElementById('contentForm');
-    db.collection('content').doc('site').get().then(doc => {
-      const current = Object.assign({}, DEFAULT_CONTENT, doc.exists ? doc.data() : {});
-      form.innerHTML = CONTENT_GROUPS.map(group => `
-        <div class="content-group">
-          <h3>${group.title}</h3>
-          ${group.fields.map(([key, label, type]) => `
-            <div class="content-field">
-              <label>${label}</label>
-              ${type === 'textarea'
-                ? `<textarea data-key="${key}">${current[key] || ''}</textarea>`
-                : `<input type="text" data-key="${key}" value="${(current[key] || '').replace(/"/g, '&quot;')}">`}
-            </div>
-          `).join('')}
-        </div>
-      `).join('') + `<button id="saveContentBtn">Guardar cambios</button><p id="contentSaveMsg"></p>`;
-
-      document.getElementById('saveContentBtn').addEventListener('click', saveContent);
     });
   }
 
-  function saveContent() {
-    const values = {};
-    document.querySelectorAll('#contentForm [data-key]').forEach(el => {
-      values[el.getAttribute('data-key')] = el.value;
-    });
-    const msg = document.getElementById('contentSaveMsg');
-    msg.textContent = 'Guardando...';
-    db.collection('content').doc('site').set(values, { merge: true }).then(() => {
-      msg.textContent = '¡Guardado! Los cambios ya se ven en la página.';
-      setTimeout(() => { msg.textContent = ''; }, 3000);
-    }).catch(err => {
-      msg.textContent = 'Error al guardar: ' + err.message;
-    });
-  }
-
-  // ---- Historias clínicas (acumulativas: paciente + consultas) ----
-  const recordsList = document.getElementById('recordsList');
-  const recordSearch = document.getElementById('recordSearch');
-  const recordOverlay = document.getElementById('recordOverlay');
-  const recordModalTitle = document.getElementById('recordModalTitle');
-  const recordStatusMsg = document.getElementById('recordStatusMsg');
-  const consultasTimeline = document.getElementById('consultasTimeline');
-  const consultaForm = document.getElementById('consultaForm');
-  const newPatientOverlay = document.getElementById('newPatientOverlay');
-  const npStatusMsg = document.getElementById('npStatusMsg');
-  const patientDataView = document.getElementById('patientDataView');
-  const patientDataEdit = document.getElementById('patientDataEdit');
-
-  let allRecords = [];
-  let currentPatientId = null;
-  let currentPatientConsultas = [];
-
-  // Datos fijos del paciente (encabezado de la historia)
-  const PATIENT_FIELDS = [
-    ['Name', 'name', 'Apellidos y nombres'],
-    ['Documento', 'documento', 'C.C. / ID'],
-    ['FechaNacimiento', 'fechaNacimiento', 'Fecha de nacimiento'],
-    ['Edad', 'edad', 'Edad'],
-    ['Ocupacion', 'ocupacion', 'Ocupación'],
-    ['Direccion', 'direccion', 'Dirección'],
-    ['Phone', 'phone', 'Teléfono'],
-    ['Email', 'email', 'Correo'],
-    ['Aseguradora', 'aseguradora', 'Aseguradora / EPS']
-  ];
-
-  // Campos de cada consulta, agrupados igual que las secciones del formulario en papel
-  const CONSULTA_SECTIONS = [
-    { title: 'II. Motivo de la consulta', fields: [['cxMotivo', 'motivo', 'Motivo de la consulta']] },
-    { title: 'III. Enfermedad actual', fields: [['cxEnfermedadActual', 'enfermedadActual', 'Enfermedad actual']] },
-    { title: 'IV. Antecedentes', fields: [
-      ['cxAntPersonales', 'antPersonales', 'Personales / Médicos'],
-      ['cxAntFamiliares', 'antFamiliares', 'Familiares'],
-      ['cxAntQuirurgicos', 'antQuirurgicos', 'Quirúrgicos'],
-      ['cxAntAlergicos', 'antAlergicos', 'Alérgicos'],
-      ['cxAntFarmacologicos', 'antFarmacologicos', 'Farmacológicos'],
-      ['cxAntGineco', 'antGineco', 'Gineco-obstétricos']
-    ]},
-    { title: 'V. Examen físico', fields: [
-      ['cxSignosVitales', 'signosVitales', 'Signos vitales'],
-      ['cxPeso', 'peso', 'Peso'],
-      ['cxTalla', 'talla', 'Talla'],
-      ['cxImc', 'imc', 'IMC'],
-      ['cxDescripcionSistemas', 'descripcionSistemas', 'Descripción por sistemas']
-    ]},
-    { title: 'VI. Impresión diagnóstica', fields: [['cxDiagnostico', 'diagnostico', 'Impresión diagnóstica']] },
-    { title: 'VII. Plan de tratamiento y recomendaciones', fields: [['cxPlan', 'plan', 'Plan de tratamiento y recomendaciones']] },
-    { title: 'Notas de seguimiento', fields: [['cxNotas', 'notas', 'Notas de seguimiento']] }
-  ];
-  const CONSULTA_FIELDS = CONSULTA_SECTIONS.flatMap(s => s.fields);
-
-  function loadRecords() {
-    db.collection('patientRecords').orderBy('name').get().then(snapshot => {
-      allRecords = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        data.id = doc.id;
-        allRecords.push(data);
-      });
-      renderRecordsList(allRecords);
-    }).catch(err => {
-      recordsList.innerHTML = `<p class="empty">No se pudieron cargar las historias (${err.message}).</p>`;
-    });
-  }
-
-  function renderRecordsList(records) {
-    recordsList.innerHTML = records.length
-      ? records.map(r => `
-        <div class="card">
-          <div class="name">${r.name}</div>
-          <div class="comment">${r.email || ''} ${r.phone ? '· ' + r.phone : ''}</div>
-          <div class="record-card-actions">
-            <button class="approve-btn" onclick="openPatientHistory('${r.id}')">Abrir historia</button>
-            <button class="cal-btn" onclick="downloadRecordPdf('${r.id}')">Descargar PDF</button>
-            <button class="delete-btn" onclick="shareRecordEmail('${r.id}')">Enviar por correo</button>
-            <button class="delete-btn" onclick="shareRecordWhatsapp('${r.id}')">Enviar por WhatsApp</button>
-            <button class="delete-btn" onclick="deletePatientRecord('${r.id}')" style="background:#f4d9d9; color:#8a2b2b;">Eliminar</button>
-          </div>
-        </div>`).join('')
-      : '<p class="empty">No hay historias clínicas guardadas todavía.</p>';
-  }
-
-  recordSearch.addEventListener('input', () => {
-    const q = recordSearch.value.trim().toLowerCase();
-    renderRecordsList(allRecords.filter(r => r.name.toLowerCase().includes(q)));
-  });
-
-  // --- Modal: nuevo paciente ---
-  document.getElementById('newRecordBtn').addEventListener('click', () => {
-    PATIENT_FIELDS.forEach(([elSuffix]) => { document.getElementById('np' + elSuffix).value = ''; });
-    npStatusMsg.textContent = '';
-    newPatientOverlay.classList.add('open');
-  });
-  document.getElementById('npBackBtn').addEventListener('click', () => newPatientOverlay.classList.remove('open'));
-  newPatientOverlay.addEventListener('click', (e) => { if (e.target === newPatientOverlay) newPatientOverlay.classList.remove('open'); });
-
-  document.getElementById('npSaveBtn').addEventListener('click', () => {
-    const name = document.getElementById('npName').value.trim();
-    if (!name) { npStatusMsg.textContent = 'El nombre del paciente es obligatorio.'; return; }
-    const data = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-    PATIENT_FIELDS.forEach(([elSuffix, key]) => { data[key] = document.getElementById('np' + elSuffix).value.trim(); });
-    npStatusMsg.textContent = 'Creando...';
-    db.collection('patientRecords').add(data).then(ref => {
-      newPatientOverlay.classList.remove('open');
-      loadRecords();
-      openPatientHistory(ref.id, { ...data, id: ref.id });
-    }).catch(err => { npStatusMsg.textContent = 'Error: ' + err.message; });
-  });
-
-  // --- Datos del paciente: ver / editar dentro de la historia ---
-  function renderPatientDataView(r) {
-    patientDataView.innerHTML = PATIENT_FIELDS
-      .filter(([, key]) => r[key])
-      .map(([, key, label]) => `<div><b>${label}:</b> ${r[key]}</div>`)
-      .join('') || '<div>Sin datos adicionales todavía. Dale a "Editar" para completarlos.</div>';
-  }
-
-  document.getElementById('editPatientToggle').addEventListener('click', (e) => {
-    e.preventDefault();
-    const r = allRecords.find(x => x.id === currentPatientId) || {};
-    PATIENT_FIELDS.forEach(([elSuffix, key]) => { document.getElementById('pd' + elSuffix).value = r[key] || ''; });
-    patientDataView.style.display = 'none';
-    patientDataEdit.style.display = 'block';
-  });
-  document.getElementById('pdCancelBtn').addEventListener('click', () => {
-    patientDataEdit.style.display = 'none';
-    patientDataView.style.display = 'block';
-  });
-  document.getElementById('pdSaveBtn').addEventListener('click', () => {
-    if (!currentPatientId) return;
-    const data = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-    PATIENT_FIELDS.forEach(([elSuffix, key]) => { data[key] = document.getElementById('pd' + elSuffix).value.trim(); });
-    db.collection('patientRecords').doc(currentPatientId).set(data, { merge: true }).then(() => {
-      loadRecords();
-      const updated = { ...(allRecords.find(x => x.id === currentPatientId) || {}), ...data, id: currentPatientId };
-      renderPatientDataView(updated);
-      patientDataEdit.style.display = 'none';
-      patientDataView.style.display = 'block';
-      recordModalTitle.textContent = 'Historia clínica — ' + (data.name || updated.name);
-    });
-  });
-
-  // --- Modal: historia del paciente (timeline + agregar consulta) ---
-  function openPatientHistory(id, patientDataIfNew) {
-    currentPatientId = id;
-    recordStatusMsg.textContent = '';
-    consultaForm.style.display = 'none';
-    patientDataEdit.style.display = 'none';
-    patientDataView.style.display = 'block';
-    const r = patientDataIfNew || allRecords.find(x => x.id === id);
-    recordModalTitle.textContent = 'Historia clínica — ' + r.name;
-    renderPatientDataView(r);
-    consultasTimeline.innerHTML = '<p class="empty">Cargando consultas...</p>';
-    recordOverlay.classList.add('open');
-
-    db.collection('patientRecords').doc(id).collection('consultas').orderBy('date', 'desc').get().then(snapshot => {
-      currentPatientConsultas = [];
-      snapshot.forEach(doc => currentPatientConsultas.push({ id: doc.id, ...doc.data() }));
-      renderConsultasTimeline();
+  bkDate.addEventListener('change', () => {
+    selectedTime = null;
+    timeGrid.innerHTML = `<p class="hint">${currentLang === 'es' ? 'Buscando horarios disponibles...' : 'Checking available times...'}</p>`;
+    const date = bkDate.value;
+    if (!date) return;
+    db.collection('slots').where('date', '==', date).get().then(snapshot => {
+      const taken = [];
+      snapshot.forEach(doc => taken.push(doc.data().time));
+      renderTimeGrid(taken, date);
     }).catch(() => {
-      consultasTimeline.innerHTML = '<p class="empty">No se pudieron cargar las consultas.</p>';
+      renderTimeGrid([], date);
     });
-  }
-
-  function renderConsultasTimeline() {
-    consultasTimeline.innerHTML = currentPatientConsultas.length
-      ? currentPatientConsultas.map(c => `
-        <div class="consulta-card">
-          <div class="cdate">Consulta del ${formatDateEs(c.date)}</div>
-          ${CONSULTA_SECTIONS.map(section => {
-            const filled = section.fields.filter(([, key]) => c[key]);
-            if (!filled.length) return '';
-            return `<div class="csection">${section.title}</div>` +
-              filled.map(([, key, label]) => `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`).join('');
-          }).join('')}
-        </div>`).join('')
-      : '<p class="empty">Todavía no hay consultas registradas para este paciente.</p>';
-  }
-
-  function formatDateEs(isoDate) {
-    if (!isoDate) return '';
-    const [y, m, d] = isoDate.split('-');
-    return `${d}/${m}/${y}`;
-  }
-
-  document.getElementById('recordBackBtn').addEventListener('click', () => {
-    recordOverlay.classList.remove('open');
-    currentPatientId = null;
-  });
-  recordOverlay.addEventListener('click', (e) => { if (e.target === recordOverlay) { recordOverlay.classList.remove('open'); currentPatientId = null; } });
-
-  // --- Agregar nueva consulta ---
-  const todayStrAdmin = new Date().toISOString().split('T')[0];
-  document.getElementById('addConsultaBtn').addEventListener('click', () => {
-    document.getElementById('cxDate').value = todayStrAdmin;
-    CONSULTA_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
-    consultaForm.style.display = 'block';
-  });
-  document.getElementById('cxCancelBtn').addEventListener('click', () => { consultaForm.style.display = 'none'; });
-
-  document.getElementById('cxSaveBtn').addEventListener('click', () => {
-    if (!currentPatientId) return;
-    const date = document.getElementById('cxDate').value;
-    if (!date) { recordStatusMsg.textContent = 'Elige la fecha de la consulta.'; return; }
-    const data = { date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-    CONSULTA_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
-
-    recordStatusMsg.textContent = 'Guardando consulta...';
-    db.collection('patientRecords').doc(currentPatientId).collection('consultas').add(data)
-      .then(() => db.collection('patientRecords').doc(currentPatientId).update({ updatedAt: firebase.firestore.FieldValue.serverTimestamp() }))
-      .then(() => {
-        recordStatusMsg.textContent = '';
-        consultaForm.style.display = 'none';
-        openPatientHistory(currentPatientId);
-      }).catch(err => {
-        recordStatusMsg.textContent = 'Error al guardar: ' + err.message;
-      });
   });
 
-  // --- Generación de PDF, con el formato del formulario impreso: cabecera con logo,
-  //     título "HISTORIA CLÍNICA MÉDICA", barras verdes por sección, campos subrayados,
-  //     marca de agua del logo, firmas al final y número de página. Cada consulta se
-  //     imprime como una página completa del formulario (igual que en papel).
-  function loadImageAsDataURL(url) {
-    return fetch(url).then(r => r.blob()).then(blob => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    }));
+  function showBookMsg(text, isError) {
+    bookMsg.innerHTML = text;
+    bookMsg.style.display = 'block';
+    bookMsg.style.background = isError ? '#f4d9d9' : 'var(--mist)';
+    bookMsg.style.color = isError ? '#8a2b2b' : 'var(--teal-deep)';
   }
 
-  function buildRecordPdf(r, consultas) {
-    return loadImageAsDataURL('Icono.png').catch(() => null).then(iconDataUrl => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const teal = [14, 74, 68];
-      const PAGE_W = 210, MARGIN = 14, CONTENT_W = PAGE_W - MARGIN * 2;
-      const ICON_SIZE = 16;
+  document.getElementById('bookConfirmBtn').addEventListener('click', () => {
+    const name = document.getElementById('bkName').value.trim();
+    const service = document.getElementById('bkService').value;
+    const email = document.getElementById('bkEmail').value.trim();
+    const countryCode = document.getElementById('bkCountryCode').value;
+    const phoneDigits = document.getElementById('bkPhone').value.trim();
+    const phone = phoneDigits ? `+${countryCode}${phoneDigits}` : '';
+    const date = bkDate.value;
 
-      function drawWatermark() {
-        if (!iconDataUrl) return;
-        try {
-          doc.saveGraphicsState();
-          doc.setGState(new doc.GState({ opacity: 0.06 }));
-          doc.addImage(iconDataUrl, 'PNG', 55, 90, 100, 100);
-          doc.restoreGraphicsState();
-        } catch (e) {}
-      }
-
-      function drawHeader() {
-        let y = 16;
-        if (iconDataUrl) {
-          try { doc.addImage(iconDataUrl, 'PNG', MARGIN, y - 5, ICON_SIZE, ICON_SIZE); } catch (e) {}
-        }
-        const textX = MARGIN + ICON_SIZE + 5;
-        doc.setFontSize(13); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
-        doc.text('DRA. LORENA VELÁSQUEZ ROA', textX, y);
-        doc.setFontSize(8.5); doc.setTextColor(100); doc.setFont(undefined, 'normal');
-        doc.text('MEDICINA INTEGRAL Y ANTIENVEJECIMIENTO', textX, y + 5);
-
-        doc.setFontSize(14); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
-        doc.text('HISTORIA CLÍNICA', PAGE_W - MARGIN, y - 1, { align: 'right' });
-        doc.text('MÉDICA', PAGE_W - MARGIN, y + 5, { align: 'right' });
-        doc.setFont(undefined, 'normal');
-
-        return y + ICON_SIZE - 2;
-      }
-
-      function sectionBar(y, label) {
-        doc.setFillColor(...teal);
-        doc.rect(MARGIN, y, CONTENT_W, 6.5, 'F');
-        doc.setFontSize(9.5); doc.setTextColor(255, 255, 255); doc.setFont(undefined, 'bold');
-        doc.text(label.toUpperCase(), MARGIN + 3, y + 4.6);
-        doc.setFont(undefined, 'normal');
-        return y + 6.5 + 4;
-      }
-
-      // Campo corto tipo "Etiqueta: ____valor____" con línea inferior
-      function fieldLine(x, y, w, label, value) {
-        doc.setFontSize(9); doc.setTextColor(20); doc.setFont(undefined, 'bold');
-        const labelW = doc.getTextWidth(label + ': ');
-        doc.text(label + ':', x, y);
-        doc.setFont(undefined, 'normal'); doc.setTextColor(60);
-        if (value) doc.text(String(value), x + labelW + 1, y);
-        doc.setDrawColor(190);
-        doc.line(x, y + 1.2, x + w, y + 1.2);
-      }
-
-      // Bloque de texto largo dentro de una caja con borde suave
-      function textBox(y, label, text, minHeight) {
-        y = ensureSpace(y, minHeight + 10);
-        y = sectionBar(y, label);
-        const lines = doc.splitTextToSize(text || '', CONTENT_W - 6);
-        const boxH = Math.max(minHeight, lines.length * 4.6 + 6);
-        doc.setDrawColor(210);
-        doc.rect(MARGIN, y, CONTENT_W, boxH);
-        doc.setFontSize(9.5); doc.setTextColor(40); doc.setFont(undefined, 'normal');
-        doc.text(lines, MARGIN + 3, y + 6);
-        return y + boxH + 6;
-      }
-
-      function ensureSpace(y, needed) {
-        if (y + needed > 275) {
-          doc.addPage();
-          drawWatermark();
-          return drawHeader() + 4;
-        }
-        return y;
-      }
-
-      function renderOnePage(consulta, isFirst) {
-        drawWatermark();
-        let y = drawHeader() + 4;
-
-        // I. DATOS DEL PACIENTE
-        y = sectionBar(y, 'I. Datos del paciente');
-        fieldLine(MARGIN, y, 120, 'Apellidos y nombres', r.name);
-        fieldLine(MARGIN + 125, y, 55, 'C.C. / ID', r.documento);
-        y += 7;
-        fieldLine(MARGIN, y, 80, 'Fecha de nacimiento', r.fechaNacimiento);
-        fieldLine(MARGIN + 85, y, 40, 'Edad', r.edad);
-        fieldLine(MARGIN + 130, y, 50, 'Ocupación', r.ocupacion);
-        y += 7;
-        fieldLine(MARGIN, y, 120, 'Dirección', r.direccion);
-        fieldLine(MARGIN + 125, y, 55, 'Teléfono', r.phone);
-        y += 7;
-        fieldLine(MARGIN, y, 120, 'Aseguradora / EPS', r.aseguradora);
-        fieldLine(MARGIN + 125, y, 55, 'Fecha consulta', formatDateEs(consulta.date));
-        y += 10;
-
-        y = textBox(y, 'II. Motivo de la consulta', consulta.motivo, 12);
-        y = textBox(y, 'III. Enfermedad actual', consulta.enfermedadActual, 12);
-
-        // IV. Antecedentes (líneas cortas)
-        y = ensureSpace(y, 40);
-        y = sectionBar(y, 'IV. Antecedentes');
-        const antecedentes = [
-          ['Personales / Médicos', consulta.antPersonales],
-          ['Familiares', consulta.antFamiliares],
-          ['Quirúrgicos', consulta.antQuirurgicos],
-          ['Alérgicos', consulta.antAlergicos],
-          ['Farmacológicos', consulta.antFarmacologicos],
-          ['Gineco-obstétricos', consulta.antGineco]
-        ];
-        antecedentes.forEach(([label, value]) => {
-          y = ensureSpace(y, 7);
-          fieldLine(MARGIN, y, CONTENT_W, label, value);
-          y += 6;
-        });
-        y += 4;
-
-        // V. Examen físico
-        y = ensureSpace(y, 35);
-        y = sectionBar(y, 'V. Examen físico');
-        fieldLine(MARGIN, y, 40, 'Signos vitales', consulta.signosVitales);
-        fieldLine(MARGIN + 45, y, 35, 'Peso', consulta.peso);
-        fieldLine(MARGIN + 85, y, 35, 'Talla', consulta.talla);
-        fieldLine(MARGIN + 125, y, 35, 'IMC', consulta.imc);
-        y += 9;
-        const sisLines = doc.splitTextToSize(consulta.descripcionSistemas || '', CONTENT_W - 6);
-        const sisH = Math.max(14, sisLines.length * 4.6 + 6);
-        doc.setDrawColor(210); doc.rect(MARGIN, y, CONTENT_W, sisH);
-        doc.setFontSize(8); doc.setTextColor(100);
-        doc.text('Descripción por sistemas:', MARGIN + 3, y + 4.5);
-        doc.setFontSize(9.5); doc.setTextColor(40);
-        doc.text(sisLines, MARGIN + 3, y + 9.5);
-        y += sisH + 6;
-
-        y = textBox(y, 'VI. Impresión diagnóstica', consulta.diagnostico, 14);
-        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', consulta.plan, 16);
-        if (consulta.notas) {
-          y = textBox(y, 'Notas de seguimiento', consulta.notas, 12);
-        }
-
-        // Firmas
-        y = ensureSpace(y, 30);
-        y += 14;
-        doc.setDrawColor(120);
-        doc.line(MARGIN + 5, y, MARGIN + 75, y);
-        doc.line(MARGIN + 110, y, MARGIN + 180, y);
-        doc.setFontSize(8); doc.setTextColor(80);
-        doc.text('FIRMA DEL PACIENTE', MARGIN + 40, y + 5, { align: 'center' });
-        doc.text('DRA. LORENA VELÁSQUEZ ROA', MARGIN + 145, y + 5, { align: 'center' });
-      }
-
-      function stampPageNumbers() {
-        const total = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= total; i++) {
-          doc.setPage(i);
-          doc.setFontSize(8); doc.setTextColor(120);
-          doc.text(`Página ${i}`, PAGE_W - MARGIN, 290, { align: 'right' });
-        }
-      }
-
-      const ordered = [...consultas].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-
-      if (ordered.length === 0) {
-        renderOnePage({}, true);
-      } else {
-        ordered.forEach((c, idx) => {
-          if (idx > 0) doc.addPage();
-          renderOnePage(c, idx === 0);
-        });
-      }
-
-      stampPageNumbers();
-      return doc;
-    });
-  }
-
-  function getPatientAndConsultas(id) {
-    const r = allRecords.find(x => x.id === id);
-    return db.collection('patientRecords').doc(id).collection('consultas').get().then(snapshot => {
-      const consultas = [];
-      snapshot.forEach(doc => consultas.push(doc.data()));
-      return { r, consultas };
-    });
-  }
-
-  function downloadRecordPdf(id) {
-    getPatientAndConsultas(id).then(({ r, consultas }) => {
-      return buildRecordPdf(r, consultas).then(doc => {
-        doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
-      });
-    });
-  }
-
-  // Intenta compartir el PDF de verdad (adjunto) usando el menú nativo de "Compartir" del
-  // celular/computador (funciona muy bien en Android y iPhone recientes). Si el navegador no
-  // lo soporta (la mayoría de computadores de escritorio), cae al método anterior: descarga
-  // el PDF y abre WhatsApp/correo con el mensaje, para adjuntarlo a mano.
-  function tryNativeShare(file, title, text) {
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      return navigator.share({ files: [file], title, text }).then(() => true).catch(() => false);
-    }
-    return Promise.resolve(false);
-  }
-
-  function shareRecordEmail(id) {
-    getPatientAndConsultas(id).then(({ r, consultas }) => {
-      buildRecordPdf(r, consultas).then(doc => {
-        const fileName = `Historia_${r.name.replace(/\s+/g, '_')}.pdf`;
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
-        const title = `Historia clínica — ${r.name}`;
-        const text = `Hola ${r.name}, adjunto tu historia clínica.`;
-
-        tryNativeShare(file, title, text).then(shared => {
-          if (shared) return;
-          // Alternativa manual si el navegador no permite compartir archivos
-          doc.save(fileName);
-          const subject = encodeURIComponent(title);
-          const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
-          window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
-        });
-      });
-    });
-  }
-
-  function shareRecordWhatsapp(id) {
-    getPatientAndConsultas(id).then(({ r, consultas }) => {
-      buildRecordPdf(r, consultas).then(doc => {
-        const fileName = `Historia_${r.name.replace(/\s+/g, '_')}.pdf`;
-        const blob = doc.output('blob');
-        const file = new File([blob], fileName, { type: 'application/pdf' });
-        const title = `Historia clínica — ${r.name}`;
-        const text = `Hola ${r.name}, te comparto tu historia clínica en PDF.`;
-
-        tryNativeShare(file, title, text).then(shared => {
-          if (shared) return;
-          // Alternativa manual si el navegador no permite compartir archivos
-          doc.save(fileName);
-          const phone = (r.phone || '').replace(/[^\d]/g, '');
-          const waText = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
-          window.open(`https://wa.me/${phone}?text=${waText}`, '_blank');
-        });
-      });
-    });
-  }
-
-  const DELETE_RECORD_PASSWORD = 'Johanpipe1';
-
-  function deletePatientRecord(id) {
-    const pass = window.prompt('Para eliminar esta historia clínica, escribe la clave de confirmación:');
-    if (pass === null) return; // canceló
-    if (pass !== DELETE_RECORD_PASSWORD) {
-      alert('Clave incorrecta. No se eliminó la historia.');
+    if (!name || !email || !phone || !date || !selectedTime) {
+      showBookMsg(currentLang === 'es'
+        ? 'Completa todos los campos y elige un horario disponible.'
+        : 'Please fill in all fields and pick an available time.', true);
       return;
     }
-    const r = allRecords.find(x => x.id === id);
-    if (!confirm(`¿Seguro que quieres eliminar la historia de ${r ? r.name : 'este paciente'}? Esto borrará también todas sus consultas y no se puede deshacer.`)) return;
 
-    db.collection('patientRecords').doc(id).collection('consultas').get().then(snapshot => {
-      const batch = db.batch();
-      snapshot.forEach(doc => batch.delete(doc.ref));
-      batch.delete(db.collection('patientRecords').doc(id));
-      return batch.commit();
-    }).then(loadRecords).catch(err => {
-      alert('No se pudo eliminar: ' + err.message);
-    });
-  }
-
-  function approveReview(id) {
-    db.collection('reviews').doc(id).update({ approved: true }).then(loadReviews);
-  }
-
-  function deleteReview(id) {
-    if (confirm('¿Seguro que quieres eliminar esta reseña?')) {
-      db.collection('reviews').doc(id).delete().then(loadReviews);
+    if (!document.getElementById('bkConsent').checked) {
+      showBookMsg(currentLang === 'es'
+        ? 'Debes aceptar la Política de Privacidad para poder reservar tu cita.'
+        : 'You must accept the Privacy Policy to book your appointment.', true);
+      return;
     }
-  }
+
+    const waWindow = window.open('', '_blank');
+
+    const slotId = `${date}_${selectedTime}`;
+    db.collection('slots').doc(slotId).set({ date, time: selectedTime, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(() => {
+        return db.collection('bookings').add({
+          name, service, email, phone, date, time: selectedTime,
+          status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      })
+      .then(() => {
+        const [y, m, d] = date.split('-');
+        const startDT = `${y}${m}${d}T${selectedTime.replace(':','')}00`;
+        const endHM = addMinutes(selectedTime, 30);
+        const endDT = `${y}${m}${d}T${endHM}00`;
+        const calText = encodeURIComponent(`Cita: ${service} — ${name}`);
+        const calDetails = encodeURIComponent(`Paciente: ${name}\nServicio: ${service}\nCorreo: ${email}\nTeléfono: ${phone}`);
+        const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calText}&dates=${startDT}/${endDT}&details=${calDetails}`;
+
+        emailjs.send('service_orhl7ec', 'template_vbtwuve', {
+          patient_name: name,
+          service: service,
+          date: date,
+          time: selectedTime,
+          patient_email: email,
+          patient_phone: phone
+        }).catch(() => { });
+
+        emailjs.send('service_orhl7ec', 'template_ger44ar', {
+          patient_name: name,
+          service: service,
+          date: date,
+          time: selectedTime,
+          patient_email: email,
+          patient_phone: phone
+        }).catch(() => { });
+
+        const waText = currentLang === 'es'
+          ? `Hola, acabo de reservar una cita:\n\nNombre: ${name}\nServicio: ${service}\nFecha: ${date}\nHora: ${selectedTime}\n\n¿Me podrías confirmar el costo de la cita? ¡Gracias!`
+          : `Hi, I just booked an appointment:\n\nName: ${name}\nService: ${service}\nDate: ${date}\nTime: ${selectedTime}\n\nCould you confirm the cost of the appointment? Thank you!`;
+        const waUrl = `https://wa.me/34634322874?text=${encodeURIComponent(waText)}`;
+        if (waWindow) { waWindow.location.href = waUrl; }
+
+        const okMsg = currentLang === 'es'
+          ? `¡Cita confirmada para el ${date} a las ${selectedTime}!`
+          : `Appointment confirmed for ${date} at ${selectedTime}!`;
+        const calLabel = currentLang === 'es' ? 'Agregar a Google Calendar' : 'Add to Google Calendar';
+        const waLabel = currentLang === 'es' ? 'Enviar por WhatsApp' : 'Send via WhatsApp';
+        showBookMsg(`${okMsg}<br><a class="cal-link" href="${calUrl}" target="_blank" rel="noopener">${calLabel}</a> · <a class="cal-link" href="${waUrl}" target="_blank" rel="noopener">${waLabel}</a>`, false);
+
+        document.getElementById('bkName').value = '';
+        document.getElementById('bkEmail').value = '';
+        document.getElementById('bkPhone').value = '';
+        document.getElementById('bkConsent').checked = false;
+        selectedTime = null;
+        bkDate.dispatchEvent(new Event('change'));
+      })
+      .catch(() => {
+        if (waWindow) { waWindow.close(); }
+        showBookMsg(currentLang === 'es'
+          ? 'Ese horario se acaba de ocupar. Por favor elige otro.'
+          : 'That time slot was just taken. Please choose another.', true);
+        bkDate.dispatchEvent(new Event('change'));
+      });
+  });
 </script>
 
 </body>
 </html>
-
