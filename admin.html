@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBUY1oFoZGhztpyHJfHclBSqYpGTttJ7vo",
@@ -145,6 +146,23 @@
   .btn-secondary{background:var(--mist); color:var(--ink); border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
   .btn-danger{background:#b23; color:#fff; border:none; border-radius:8px; padding:10px 18px; font-size:0.85rem; cursor:pointer;}
   #cancelStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
+
+  /* ---------- Historias clínicas ---------- */
+  .records-toolbar{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
+  .records-toolbar input{
+    flex:1; min-width:180px; border:1px solid var(--line); border-radius:8px; padding:10px 13px;
+    font-family:'Jost',sans-serif; font-size:0.9rem;
+  }
+  #newRecordBtn{white-space:nowrap;}
+  .record-card-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .record-modal{max-width:520px;}
+  .record-modal label{display:block; font-size:0.78rem; color:var(--ink-soft); margin:12px 0 4px;}
+  .record-modal input, .record-modal textarea{
+    width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 12px;
+    font-family:'Jost',sans-serif; font-size:0.88rem;
+  }
+  .record-modal textarea{min-height:60px; resize:vertical;}
+  #recordStatusMsg{font-size:0.82rem; margin-top:12px; color:var(--teal-deep); min-height:18px;}
 </style>
 </head>
 <body>
@@ -167,6 +185,7 @@
   <div class="admin-tabs">
     <button class="admin-tab-btn active" data-panel="reviews">Reseñas</button>
     <button class="admin-tab-btn" data-panel="bookings">Citas <span class="badge" id="pendingBadgeTop">0</span></button>
+    <button class="admin-tab-btn" data-panel="records">Historias</button>
     <button class="admin-tab-btn" data-panel="content">Contenido</button>
   </div>
 
@@ -192,11 +211,53 @@
     <div class="booking-panel" id="bp-cancelled"><p class="empty">Cargando...</p></div>
   </div>
 
+  <!-- ===== HISTORIAS CLÍNICAS ===== -->
+  <div class="admin-panel" id="panel-records">
+    <div class="records-toolbar">
+      <input type="text" id="recordSearch" placeholder="Buscar paciente por nombre...">
+      <button id="newRecordBtn" class="approve-btn">+ Nueva historia</button>
+    </div>
+    <div id="recordsList"><p class="empty">Cargando...</p></div>
+  </div>
+
   <!-- ===== CONTENIDO ===== -->
   <div class="admin-panel" id="panel-content">
     <h2>Contenido del sitio</h2>
     <p class="sub">Edita los textos de la página. Los cambios se ven al instante para todos los visitantes al guardar.</p>
     <div id="contentForm"><p class="empty">Cargando...</p></div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE HISTORIA CLÍNICA ================= -->
+<div class="cancel-overlay" id="recordOverlay">
+  <div class="cancel-modal record-modal">
+    <h3 id="recordModalTitle">Historia clínica</h3>
+    <label>Nombre del paciente</label>
+    <input type="text" id="recName" placeholder="Ej. María González">
+    <label>Correo</label>
+    <input type="text" id="recEmail" placeholder="correo@ejemplo.com">
+    <label>Teléfono (con código de país, ej. +34600000000)</label>
+    <input type="text" id="recPhone" placeholder="+34600000000">
+    <label>Motivo de consulta</label>
+    <textarea id="recMotivo"></textarea>
+    <label>Antecedentes médicos</label>
+    <textarea id="recAntecedentes"></textarea>
+    <label>Exploración / hallazgos</label>
+    <textarea id="recExploracion"></textarea>
+    <label>Diagnóstico</label>
+    <textarea id="recDiagnostico"></textarea>
+    <label>Medicamentos</label>
+    <textarea id="recMedicamentos"></textarea>
+    <label>Plan de tratamiento</label>
+    <textarea id="recPlan"></textarea>
+    <label>Notas de seguimiento</label>
+    <textarea id="recNotas"></textarea>
+
+    <div class="cancel-actions">
+      <button id="recordBackBtn" class="btn-secondary">Cerrar</button>
+      <button id="recordSaveBtn" class="approve-btn">Guardar historia</button>
+    </div>
+    <p id="recordStatusMsg"></p>
   </div>
 </div>
 
@@ -246,6 +307,7 @@
       adminPanel.style.display = 'block';
       loadReviews();
       loadContentForm();
+      loadRecords();
     } else {
       loginBox.style.display = 'block';
       adminPanel.style.display = 'none';
@@ -563,6 +625,174 @@
     }).catch(err => {
       msg.textContent = 'Error al guardar: ' + err.message;
     });
+  }
+
+  // ---- Historias clínicas ----
+  const recordsList = document.getElementById('recordsList');
+  const recordSearch = document.getElementById('recordSearch');
+  const recordOverlay = document.getElementById('recordOverlay');
+  const recordModalTitle = document.getElementById('recordModalTitle');
+  const recordStatusMsg = document.getElementById('recordStatusMsg');
+  let currentRecordId = null;
+  let allRecords = [];
+
+  const RECORD_FIELDS = [
+    ['recName', 'name'], ['recEmail', 'email'], ['recPhone', 'phone'],
+    ['recMotivo', 'motivo'], ['recAntecedentes', 'antecedentes'], ['recExploracion', 'exploracion'],
+    ['recDiagnostico', 'diagnostico'], ['recMedicamentos', 'medicamentos'],
+    ['recPlan', 'plan'], ['recNotas', 'notas']
+  ];
+
+  function loadRecords() {
+    db.collection('patientRecords').orderBy('name').get().then(snapshot => {
+      allRecords = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        data.id = doc.id;
+        allRecords.push(data);
+      });
+      renderRecordsList(allRecords);
+    }).catch(err => {
+      recordsList.innerHTML = `<p class="empty">No se pudieron cargar las historias (${err.message}).</p>`;
+    });
+  }
+
+  function renderRecordsList(records) {
+    recordsList.innerHTML = records.length
+      ? records.map(r => `
+        <div class="card">
+          <div class="name">${r.name}</div>
+          <div class="comment">${r.email || ''} ${r.phone ? '· ' + r.phone : ''}</div>
+          <div class="record-card-actions">
+            <button class="approve-btn" onclick="openRecordModal('${r.id}')">Editar</button>
+            <button class="cal-btn" onclick="downloadRecordPdf('${r.id}')">Descargar PDF</button>
+            <button class="delete-btn" onclick="shareRecordEmail('${r.id}')">Enviar por correo</button>
+            <button class="delete-btn" onclick="shareRecordWhatsapp('${r.id}')">Enviar por WhatsApp</button>
+          </div>
+        </div>`).join('')
+      : '<p class="empty">No hay historias clínicas guardadas todavía.</p>';
+  }
+
+  recordSearch.addEventListener('input', () => {
+    const q = recordSearch.value.trim().toLowerCase();
+    renderRecordsList(allRecords.filter(r => r.name.toLowerCase().includes(q)));
+  });
+
+  document.getElementById('newRecordBtn').addEventListener('click', () => openRecordModal(null));
+  document.getElementById('recordBackBtn').addEventListener('click', closeRecordModal);
+  recordOverlay.addEventListener('click', (e) => { if (e.target === recordOverlay) closeRecordModal(); });
+
+  function openRecordModal(id) {
+    currentRecordId = id;
+    recordStatusMsg.textContent = '';
+    if (id) {
+      const r = allRecords.find(x => x.id === id);
+      recordModalTitle.textContent = 'Editar historia — ' + r.name;
+      RECORD_FIELDS.forEach(([elId, key]) => { document.getElementById(elId).value = r[key] || ''; });
+    } else {
+      recordModalTitle.textContent = 'Nueva historia clínica';
+      RECORD_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
+    }
+    recordOverlay.classList.add('open');
+  }
+
+  function closeRecordModal() {
+    recordOverlay.classList.remove('open');
+    currentRecordId = null;
+  }
+
+  document.getElementById('recordSaveBtn').addEventListener('click', () => {
+    const data = {};
+    RECORD_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
+    if (!data.name) {
+      recordStatusMsg.textContent = 'El nombre del paciente es obligatorio.';
+      return;
+    }
+    data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    recordStatusMsg.textContent = 'Guardando...';
+
+    const ref = currentRecordId
+      ? db.collection('patientRecords').doc(currentRecordId)
+      : db.collection('patientRecords').doc();
+
+    ref.set(data, { merge: true }).then(() => {
+      closeRecordModal();
+      loadRecords();
+    }).catch(err => {
+      recordStatusMsg.textContent = 'Error al guardar: ' + err.message;
+    });
+  });
+
+  function buildRecordPdf(r) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const teal = [14, 74, 68];
+    let y = 20;
+
+    doc.setFontSize(16); doc.setTextColor(...teal);
+    doc.text('Dra. Lorena Velásquez Roa', 14, y);
+    doc.setFontSize(10); doc.setTextColor(100);
+    y += 6;
+    doc.text('Medicina Integral y Antienvejecimiento — Historia clínica', 14, y);
+    y += 10;
+    doc.setDrawColor(...teal);
+    doc.line(14, y, 196, y);
+    y += 10;
+
+    doc.setFontSize(12); doc.setTextColor(20);
+    doc.text(`Paciente: ${r.name}`, 14, y); y += 7;
+    if (r.email) { doc.text(`Correo: ${r.email}`, 14, y); y += 7; }
+    if (r.phone) { doc.text(`Teléfono: ${r.phone}`, 14, y); y += 7; }
+    const fecha = new Date().toLocaleDateString('es-ES');
+    doc.text(`Fecha del documento: ${fecha}`, 14, y); y += 12;
+
+    const sections = [
+      ['Motivo de consulta', r.motivo],
+      ['Antecedentes médicos', r.antecedentes],
+      ['Exploración / hallazgos', r.exploracion],
+      ['Diagnóstico', r.diagnostico],
+      ['Medicamentos', r.medicamentos],
+      ['Plan de tratamiento', r.plan],
+      ['Notas de seguimiento', r.notas]
+    ];
+
+    sections.forEach(([label, text]) => {
+      if (!text) return;
+      if (y > 260) { doc.addPage(); y = 20; }
+      doc.setFontSize(11); doc.setTextColor(...teal);
+      doc.text(label, 14, y); y += 6;
+      doc.setFontSize(10); doc.setTextColor(40);
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 14, y);
+      y += lines.length * 5 + 8;
+    });
+
+    return doc;
+  }
+
+  function downloadRecordPdf(id) {
+    const r = allRecords.find(x => x.id === id);
+    if (!r) return;
+    const doc = buildRecordPdf(r);
+    doc.save(`Historia_${r.name.replace(/\s+/g, '_')}.pdf`);
+  }
+
+  function shareRecordEmail(id) {
+    const r = allRecords.find(x => x.id === id);
+    if (!r) return;
+    downloadRecordPdf(id);
+    const subject = encodeURIComponent(`Historia clínica — ${r.name}`);
+    const body = encodeURIComponent(`Hola ${r.name},\n\nAdjunto tu historia clínica.\n\n(El PDF ya se descargó a tu computador — adjúntalo aquí antes de enviar el correo).\n\nDra. Lorena Velásquez Roa`);
+    window.open(`mailto:${r.email || ''}?subject=${subject}&body=${body}`, '_blank');
+  }
+
+  function shareRecordWhatsapp(id) {
+    const r = allRecords.find(x => x.id === id);
+    if (!r) return;
+    downloadRecordPdf(id);
+    const phone = (r.phone || '').replace(/[^\d]/g, '');
+    const text = encodeURIComponent(`Hola ${r.name}, te comparto tu historia clínica en PDF (recuerda adjuntar el archivo que se acaba de descargar antes de enviar este mensaje).`);
+    window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
   }
 
   function approveReview(id) {
