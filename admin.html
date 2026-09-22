@@ -1059,46 +1059,56 @@
     }));
   }
 
-  // Obtiene el ancho/alto real de una imagen para poder dibujarla sin deformarla
-  function getImageNaturalSize(dataUrl) {
+  // Reduce el tamaño de la imagen (a "maxDim" píxeles de lado máximo) antes de meterla al PDF.
+  // Los logos originales pueden pesar varios MB a su resolución real — como se dibujan en cada
+  // página (cabecera + marca de agua), eso multiplicaba el peso final del archivo. Al achicarlos
+  // aquí una sola vez, el PDF queda muchísimo más liviano sin perderse nada visualmente.
+  function resizeImageDataUrl(dataUrl, maxDim) {
     return new Promise(resolve => {
       const img = new Image();
-      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
-      img.onerror = () => resolve({ w: 1, h: 1 });
+      img.onload = () => {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        const scale = Math.min(1, maxDim / Math.max(w, h));
+        w = Math.max(1, Math.round(w * scale));
+        h = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve({ url: canvas.toDataURL('image/png'), w, h });
+      };
+      img.onerror = () => resolve({ url: dataUrl, w: 1, h: 1 });
       img.src = dataUrl;
     });
   }
 
-  // Se descargan UNA sola vez, al iniciar sesión, para que "Enviar por WhatsApp/correo"
-  // no tenga que esperar a bajar las imágenes cada vez (eso es lo que hacía que se perdiera
+  // Se descargan y se achican UNA sola vez, al iniciar sesión, para que "Enviar por
+  // WhatsApp/correo" no tenga que esperar cada vez (eso además evitaba que se perdiera
   // el permiso de "compartir archivo" en algunos navegadores).
   let cachedIconDataUrl = null, cachedIconSize = null;
   let cachedLogoDataUrl = null, cachedLogoSize = null;
   function preloadIconDataUrl() {
-    loadImageAsDataURL('Icono.png').then(url => {
-      cachedIconDataUrl = url;
-      return getImageNaturalSize(url);
-    }).then(size => { cachedIconSize = size; }).catch(() => {});
-    loadImageAsDataURL('Logoo.png').then(url => {
-      cachedLogoDataUrl = url;
-      return getImageNaturalSize(url);
-    }).then(size => { cachedLogoSize = size; }).catch(() => {});
+    loadImageAsDataURL('Icono.png')
+      .then(url => resizeImageDataUrl(url, 300))
+      .then(({ url, w, h }) => { cachedIconDataUrl = url; cachedIconSize = { w, h }; }).catch(() => {});
+    loadImageAsDataURL('Logoo.png')
+      .then(url => resizeImageDataUrl(url, 500))
+      .then(({ url, w, h }) => { cachedLogoDataUrl = url; cachedLogoSize = { w, h }; }).catch(() => {});
   }
 
   function buildRecordPdf(r, consultas) {
     const iconPromise = cachedIconDataUrl
       ? Promise.resolve({ url: cachedIconDataUrl, size: cachedIconSize })
-      : loadImageAsDataURL('Icono.png').then(url => getImageNaturalSize(url).then(size => ({ url, size }))).catch(() => ({ url: null, size: null }));
+      : loadImageAsDataURL('Icono.png').then(url => resizeImageDataUrl(url, 300)).then(({ url, w, h }) => ({ url, size: { w, h } })).catch(() => ({ url: null, size: null }));
     const logoPromise = cachedLogoDataUrl
       ? Promise.resolve({ url: cachedLogoDataUrl, size: cachedLogoSize })
-      : loadImageAsDataURL('Logoo.png').then(url => getImageNaturalSize(url).then(size => ({ url, size }))).catch(() => ({ url: null, size: null }));
+      : loadImageAsDataURL('Logoo.png').then(url => resizeImageDataUrl(url, 500)).then(({ url, w, h }) => ({ url, size: { w, h } })).catch(() => ({ url: null, size: null }));
 
     return Promise.all([iconPromise, logoPromise]).then(([icon, logo]) => {
       const iconDataUrl = icon.url, iconSize = icon.size;
       const logoDataUrl = logo.url, logoSize = logo.size;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      const teal = [14, 74, 68];
+      const teal = [47, 85, 72]; // color exacto tomado del logo (las letras LVR)
       const PAGE_W = 210, MARGIN = 14, CONTENT_W = PAGE_W - MARGIN * 2;
       const ICON_SIZE = 16;
 
