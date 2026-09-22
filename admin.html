@@ -182,6 +182,12 @@
   .vitals-row input{padding:7px 8px; font-size:0.82rem;}
   .patient-data-view{background:var(--mist); border-radius:10px; padding:12px 16px; font-size:0.85rem; color:var(--ink-soft); margin-bottom:6px;}
   .patient-data-view b{color:var(--ink);}
+  .examen-row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+  .examen-row select{flex:1; margin-bottom:0;}
+  .examen-remove{
+    background:var(--mist); border:none; border-radius:6px; width:30px; height:34px; flex:none;
+    color:var(--ink-soft); cursor:pointer; font-size:1rem; line-height:1;
+  }
   .phone-row{display:flex; gap:8px; margin-bottom:12px;}
   .phone-row select{width:auto; flex:0 0 96px; margin-bottom:0;}
   .phone-row input{flex:1; margin-bottom:0;}
@@ -378,6 +384,12 @@
 
       <div class="form-section-title">VII. Plan de tratamiento y recomendaciones</div>
       <textarea id="cxPlan"></textarea>
+
+      <label>Exámenes a solicitar</label>
+      <div id="examenesContainer"></div>
+
+      <label>Exámenes de laboratorio a solicitar</label>
+      <div id="cxExamenesContainer"></div>
 
       <div class="form-section-title">Notas de seguimiento</div>
       <textarea id="cxNotas"></textarea>
@@ -796,6 +808,63 @@
     ['Aseguradora', 'aseguradora', 'Aseguradora / EPS']
   ];
 
+  // ---- Exámenes a solicitar: listas desplegables que se van agregando solas ----
+  const EXAM_OPTIONS = [
+    'Perfil lipídico',
+    'Perfil tiroideo (TSH, T3, T4 libre)',
+    'Perfil hepático (transaminasas, gama glutil transferasa)',
+    'Hemograma',
+    'Función renal (creatinina y filtrado glomerular)',
+    'Glucosa central',
+    'Vitamina D',
+    'Ferritina sérica',
+    'Hemoglobina glicosilada'
+  ];
+  const examenesContainer = document.getElementById('examenesContainer');
+
+  function addExamenRow(selectedValue) {
+    const row = document.createElement('div');
+    row.className = 'examen-row';
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="">Selecciona un examen...</option>' +
+      EXAM_OPTIONS.map(op => `<option value="${op}">${op}</option>`).join('');
+    if (selectedValue) select.value = selectedValue;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'examen-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', () => {
+      row.remove();
+      if (!examenesContainer.querySelector('select')) addExamenRow();
+    });
+
+    select.addEventListener('change', () => {
+      const isLast = row === examenesContainer.lastElementChild;
+      if (select.value && isLast) addExamenRow();
+    });
+
+    row.appendChild(select);
+    row.appendChild(removeBtn);
+    examenesContainer.appendChild(row);
+  }
+
+  function resetExamenesRows(existingValues) {
+    examenesContainer.innerHTML = '';
+    if (existingValues && existingValues.length) {
+      existingValues.forEach(v => addExamenRow(v));
+      addExamenRow();
+    } else {
+      addExamenRow();
+    }
+  }
+
+  function getSelectedExamenes() {
+    return Array.from(examenesContainer.querySelectorAll('select'))
+      .map(s => s.value)
+      .filter(Boolean);
+  }
+
   // Campos de cada consulta, agrupados igual que las secciones del formulario en papel
   const CONSULTA_SECTIONS = [
     { title: 'II. Motivo de la consulta', fields: [['cxMotivo', 'motivo', 'Motivo de la consulta']] },
@@ -1013,6 +1082,10 @@
             return `<div class="csection">${section.title}</div>` +
               filled.map(([, key, label]) => `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`).join('');
           }).join('')}
+          ${(c.examenes && c.examenes.length) ? `
+            <div class="csection">Exámenes solicitados</div>
+            <div class="cfield">${c.examenes.map(ex => `<span class="file-chip">🧪 ${ex}</span>`).join(' ')}</div>
+          ` : ''}
           ${(c.archivos && c.archivos.length) ? `
             <div class="csection">Archivos adjuntos</div>
             <div class="cfield">${c.archivos.map(a => `<a href="${a.url}" target="_blank" rel="noopener" class="file-chip">📎 ${a.name}</a>`).join(' ')}</div>
@@ -1039,6 +1112,7 @@
     document.getElementById('cxDate').value = todayStrAdmin;
     CONSULTA_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
     document.getElementById('cxArchivos').value = '';
+    resetExamenesRows();
     consultaForm.style.display = 'block';
   });
   document.getElementById('cxCancelBtn').addEventListener('click', () => { consultaForm.style.display = 'none'; });
@@ -1049,6 +1123,7 @@
     if (!date) { recordStatusMsg.textContent = 'Elige la fecha de la consulta.'; return; }
     const data = { date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
     CONSULTA_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
+    data.examenes = getSelectedExamenes();
 
     const files = Array.from(document.getElementById('cxArchivos').files || []);
     const patientId = currentPatientId;
@@ -1276,6 +1351,10 @@
 
         y = textBox(y, 'VI. Impresión diagnóstica', consulta.diagnostico, 14);
         y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', consulta.plan, 16);
+        if (consulta.examenes && consulta.examenes.length) {
+          const listaExamenes = consulta.examenes.map(ex => '• ' + ex).join('   ');
+          y = textBox(y, 'Exámenes solicitados', listaExamenes, 12);
+        }
         if (consulta.notas) {
           y = textBox(y, 'Notas de seguimiento', consulta.notas, 12);
         }
