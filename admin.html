@@ -1359,6 +1359,38 @@
         return y + boxH + 6;
       }
 
+      // Recuadro de "Exámenes solicitados" organizado en 3 columnas
+      function examenesBox(y, examenes) {
+        y = ensureSpace(y, 24);
+        y = sectionBar(y, 'Exámenes solicitados');
+
+        const colGap = 5;
+        const colW = (CONTENT_W - colGap * 2) / 3;
+        const cols = [[], [], []];
+        examenes.forEach((ex, i) => cols[i % 3].push(ex));
+
+        doc.setFontSize(8.7);
+        const colLines = cols.map(items => {
+          let lines = [];
+          items.forEach(item => {
+            lines = lines.concat(doc.splitTextToSize('• ' + item, colW - 4));
+          });
+          return lines;
+        });
+        const maxLines = Math.max(1, ...colLines.map(l => l.length));
+        const boxH = Math.max(14, maxLines * 4.4 + 8);
+
+        doc.setDrawColor(210);
+        doc.rect(MARGIN, y, CONTENT_W, boxH);
+        doc.setTextColor(40); doc.setFont(undefined, 'normal');
+        colLines.forEach((lines, i) => {
+          const x = MARGIN + 3 + i * (colW + colGap);
+          doc.text(lines, x, y + 6);
+        });
+
+        return y + boxH + 6;
+      }
+
       function ensureSpace(y, needed) {
         if (y + needed > 275) {
           doc.addPage();
@@ -1427,12 +1459,10 @@
         y += sisH + 6;
 
         y = textBox(y, 'VI. Impresión diagnóstica', consulta.diagnostico, 14);
-        let planTexto = consulta.plan || '';
+        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', consulta.plan, 16);
         if (consulta.examenes && consulta.examenes.length) {
-          const listaExamenes = 'Exámenes solicitados: ' + consulta.examenes.join(', ');
-          planTexto = planTexto ? planTexto + '.   ' + listaExamenes : listaExamenes;
+          y = examenesBox(y, consulta.examenes);
         }
-        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', planTexto, 16);
         if (consulta.notas) {
           y = textBox(y, 'Notas de seguimiento', consulta.notas, 12);
         }
