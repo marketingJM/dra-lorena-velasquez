@@ -182,8 +182,16 @@
   .vitals-row input{padding:7px 8px; font-size:0.82rem;}
   .patient-data-view{background:var(--mist); border-radius:10px; padding:12px 16px; font-size:0.85rem; color:var(--ink-soft); margin-bottom:6px;}
   .patient-data-view b{color:var(--ink);}
-  .examen-row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
-  .examen-row select{flex:1; margin-bottom:0;}
+  .plan-box{border:1px solid var(--line); border-radius:10px; padding:14px; background:#fff;}
+  .plan-box-label{display:block; font-size:0.78rem; color:var(--ink-soft); margin-bottom:6px;}
+  .plan-box textarea{margin-bottom:0;}
+  .consent-label{display:flex; gap:8px; align-items:flex-start; font-size:0.85rem; color:var(--ink); cursor:pointer;}
+  .consent-label input[type="checkbox"]{width:16px; height:16px; margin-top:2px; flex:none; accent-color:var(--teal);}
+  .examen-row{display:flex; gap:8px; margin-bottom:6px; align-items:center; flex-wrap:wrap;}
+  .examen-row select{flex:1; min-width:160px; margin-bottom:0;}
+  .examen-note-toggle{display:flex; align-items:center; gap:5px; font-size:0.75rem; color:var(--ink-soft); flex:none; white-space:nowrap;}
+  .examen-note-toggle input{width:15px; height:15px; accent-color:var(--teal);}
+  .examen-note-input{flex:1 1 100%; margin:0 0 6px 0; padding:7px 10px; border:1px solid var(--line); border-radius:6px; font-family:'Jost',sans-serif; font-size:0.82rem;}
   .examen-remove{
     background:var(--mist); border:none; border-radius:6px; width:30px; height:34px; flex:none;
     color:var(--ink-soft); cursor:pointer; font-size:1rem; line-height:1;
@@ -383,13 +391,15 @@
       <textarea id="cxDiagnostico"></textarea>
 
       <div class="form-section-title">VII. Plan de tratamiento y recomendaciones</div>
-      <textarea id="cxPlan"></textarea>
-
-      <label>Exámenes a solicitar</label>
-      <div id="examenesContainer"></div>
-
-      <label>Exámenes de laboratorio a solicitar</label>
-      <div id="cxExamenesContainer"></div>
+      <div class="plan-box">
+        <label class="consent-label" style="margin-bottom:10px;">
+          <input type="checkbox" id="cxPlanToggle">
+          <span>Escribir una recomendación en el plan</span>
+        </label>
+        <textarea id="cxPlan" style="display:none;"></textarea>
+        <label class="plan-box-label" style="margin-top:8px;">Exámenes a solicitar</label>
+        <div id="examenesContainer"></div>
+      </div>
 
       <div class="form-section-title">Notas de seguimiento</div>
       <textarea id="cxNotas"></textarea>
@@ -794,6 +804,7 @@
   let allRecords = [];
   let currentPatientId = null;
   let currentPatientConsultas = [];
+  let currentEditingConsultaId = null;
 
   // Datos fijos del paciente (encabezado de la historia)
   const PATIENT_FIELDS = [
@@ -822,6 +833,24 @@
   ];
   const examenesContainer = document.getElementById('examenesContainer');
 
+  document.getElementById('cxPlanToggle').addEventListener('change', (e) => {
+    document.getElementById('cxPlan').style.display = e.target.checked ? 'block' : 'none';
+  });
+
+  // Recalcula las opciones de CADA select para que un examen ya elegido en otra fila
+  // desaparezca de las demás (pero se mantenga disponible en su propia fila, para poder cambiarlo)
+  function refreshExamenOptions() {
+    const selects = Array.from(examenesContainer.querySelectorAll('select'));
+    const chosen = selects.map(s => s.value).filter(Boolean);
+    selects.forEach(select => {
+      const current = select.value;
+      const available = EXAM_OPTIONS.filter(op => op === current || !chosen.includes(op));
+      select.innerHTML = '<option value="">Selecciona un examen...</option>' +
+        available.map(op => `<option value="${op}">${op}</option>`).join('');
+      select.value = current;
+    });
+  }
+
   function addExamenRow(selectedValue) {
     const row = document.createElement('div');
     row.className = 'examen-row';
@@ -837,11 +866,13 @@
     removeBtn.addEventListener('click', () => {
       row.remove();
       if (!examenesContainer.querySelector('select')) addExamenRow();
+      refreshExamenOptions();
     });
 
     select.addEventListener('change', () => {
       const isLast = row === examenesContainer.lastElementChild;
       if (select.value && isLast) addExamenRow();
+      refreshExamenOptions();
     });
 
     row.appendChild(select);
@@ -857,6 +888,7 @@
     } else {
       addExamenRow();
     }
+    refreshExamenOptions();
   }
 
   function getSelectedExamenes() {
@@ -1078,18 +1110,23 @@
           <div class="cdate">Consulta del ${formatDateEs(c.date)}</div>
           ${CONSULTA_SECTIONS.map(section => {
             const filled = section.fields.filter(([, key]) => c[key]);
-            if (!filled.length) return '';
-            return `<div class="csection">${section.title}</div>` +
+            const isPlanSection = section.title.indexOf('VII.') === 0;
+            const hasExams = isPlanSection && c.examenes && c.examenes.length;
+            if (!filled.length && !hasExams) return '';
+            let html = `<div class="csection">${section.title}</div>` +
               filled.map(([, key, label]) => `<div class="cfield"><b>${label}:</b> <span>${c[key]}</span></div>`).join('');
+            if (hasExams) {
+              html += `<div class="cfield"><b>Exámenes solicitados:</b> ${c.examenes.map(ex => `<span class="file-chip">🧪 ${ex}</span>`).join(' ')}</div>`;
+            }
+            return html;
           }).join('')}
-          ${(c.examenes && c.examenes.length) ? `
-            <div class="csection">Exámenes solicitados</div>
-            <div class="cfield">${c.examenes.map(ex => `<span class="file-chip">🧪 ${ex}</span>`).join(' ')}</div>
-          ` : ''}
           ${(c.archivos && c.archivos.length) ? `
             <div class="csection">Archivos adjuntos</div>
             <div class="cfield">${c.archivos.map(a => `<a href="${a.url}" target="_blank" rel="noopener" class="file-chip">📎 ${a.name}</a>`).join(' ')}</div>
           ` : ''}
+          <div class="record-card-actions" style="margin-top:10px;">
+            <button class="approve-btn" onclick="editConsulta('${c.id}')">Editar esta consulta</button>
+          </div>
         </div>`).join('')
       : '<p class="empty">Todavía no hay consultas registradas para este paciente.</p>';
   }
@@ -1108,42 +1145,82 @@
 
   // --- Agregar nueva consulta ---
   const todayStrAdmin = new Date().toISOString().split('T')[0];
+  const cxSaveBtn = document.getElementById('cxSaveBtn');
+
   document.getElementById('addConsultaBtn').addEventListener('click', () => {
+    currentEditingConsultaId = null;
     document.getElementById('cxDate').value = todayStrAdmin;
     CONSULTA_FIELDS.forEach(([elId]) => { document.getElementById(elId).value = ''; });
     document.getElementById('cxArchivos').value = '';
+    document.getElementById('cxPlanToggle').checked = false;
+    document.getElementById('cxPlan').style.display = 'none';
     resetExamenesRows();
+    cxSaveBtn.textContent = 'Guardar consulta';
     consultaForm.style.display = 'block';
   });
-  document.getElementById('cxCancelBtn').addEventListener('click', () => { consultaForm.style.display = 'none'; });
+  document.getElementById('cxCancelBtn').addEventListener('click', () => {
+    consultaForm.style.display = 'none';
+    currentEditingConsultaId = null;
+  });
 
-  document.getElementById('cxSaveBtn').addEventListener('click', () => {
+  function editConsulta(id) {
+    const c = currentPatientConsultas.find(x => x.id === id);
+    if (!c) return;
+    currentEditingConsultaId = id;
+    document.getElementById('cxDate').value = c.date || todayStrAdmin;
+    CONSULTA_FIELDS.forEach(([elId, key]) => { document.getElementById(elId).value = c[key] || ''; });
+    document.getElementById('cxArchivos').value = '';
+    const hasPlanText = !!(c.plan && c.plan.trim());
+    document.getElementById('cxPlanToggle').checked = hasPlanText;
+    document.getElementById('cxPlan').style.display = hasPlanText ? 'block' : 'none';
+    resetExamenesRows(c.examenes || []);
+    cxSaveBtn.textContent = 'Guardar cambios';
+    consultaForm.style.display = 'block';
+    consultaForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  cxSaveBtn.addEventListener('click', () => {
     if (!currentPatientId) return;
     const date = document.getElementById('cxDate').value;
     if (!date) { recordStatusMsg.textContent = 'Elige la fecha de la consulta.'; return; }
-    const data = { date, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+    const data = { date };
     CONSULTA_FIELDS.forEach(([elId, key]) => { data[key] = document.getElementById(elId).value.trim(); });
+    if (!document.getElementById('cxPlanToggle').checked) data.plan = '';
     data.examenes = getSelectedExamenes();
 
     const files = Array.from(document.getElementById('cxArchivos').files || []);
     const patientId = currentPatientId;
+    const editingId = currentEditingConsultaId;
 
     recordStatusMsg.textContent = 'Guardando consulta...';
-    db.collection('patientRecords').doc(patientId).collection('consultas').add(data)
+
+    function subirArchivosNuevos(consultaId, archivosPrevios) {
+      if (files.length === 0) return Promise.resolve(archivosPrevios || []);
+      recordStatusMsg.textContent = `Subiendo ${files.length} archivo(s)...`;
+      const uploads = files.map(file => {
+        const path = `patientRecords/${patientId}/consultas/${consultaId}/${Date.now()}_${file.name}`;
+        const ref = storage.ref(path);
+        return ref.put(file).then(() => ref.getDownloadURL()).then(url => ({ name: file.name, url }));
+      });
+      return Promise.all(uploads).then(nuevos => [...(archivosPrevios || []), ...nuevos]);
+    }
+
+    const consultaRefPromise = editingId
+      ? Promise.resolve(db.collection('patientRecords').doc(patientId).collection('consultas').doc(editingId))
+      : db.collection('patientRecords').doc(patientId).collection('consultas').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+    consultaRefPromise
       .then(consultaRef => {
-        if (files.length === 0) return consultaRef;
-        recordStatusMsg.textContent = `Subiendo ${files.length} archivo(s)...`;
-        const uploads = files.map(file => {
-          const path = `patientRecords/${patientId}/consultas/${consultaRef.id}/${Date.now()}_${file.name}`;
-          const ref = storage.ref(path);
-          return ref.put(file).then(() => ref.getDownloadURL()).then(url => ({ name: file.name, url }));
+        const previos = editingId ? ((currentPatientConsultas.find(x => x.id === editingId) || {}).archivos || []) : [];
+        return subirArchivosNuevos(consultaRef.id, previos).then(archivos => {
+          return consultaRef.set(editingId ? { ...data, archivos } : { archivos }, { merge: true });
         });
-        return Promise.all(uploads).then(archivos => consultaRef.update({ archivos }));
       })
       .then(() => db.collection('patientRecords').doc(patientId).update({ updatedAt: firebase.firestore.FieldValue.serverTimestamp() }))
       .then(() => {
         recordStatusMsg.textContent = '';
         consultaForm.style.display = 'none';
+        currentEditingConsultaId = null;
         openPatientHistory(patientId);
       }).catch(err => {
         recordStatusMsg.textContent = 'Error al guardar: ' + err.message;
@@ -1350,11 +1427,12 @@
         y += sisH + 6;
 
         y = textBox(y, 'VI. Impresión diagnóstica', consulta.diagnostico, 14);
-        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', consulta.plan, 16);
+        let planTexto = consulta.plan || '';
         if (consulta.examenes && consulta.examenes.length) {
-          const listaExamenes = consulta.examenes.map(ex => '• ' + ex).join('   ');
-          y = textBox(y, 'Exámenes solicitados', listaExamenes, 12);
+          const listaExamenes = 'Exámenes solicitados: ' + consulta.examenes.join(', ');
+          planTexto = planTexto ? planTexto + '.   ' + listaExamenes : listaExamenes;
         }
+        y = textBox(y, 'VII. Plan de tratamiento y recomendaciones', planTexto, 16);
         if (consulta.notas) {
           y = textBox(y, 'Notas de seguimiento', consulta.notas, 12);
         }
