@@ -1059,17 +1059,43 @@
     }));
   }
 
-  // Se descarga UNA sola vez, al iniciar sesión, para que "Enviar por WhatsApp/correo"
-  // no tenga que esperar a bajar la imagen cada vez (eso es lo que hacía que se perdiera
+  // Obtiene el ancho/alto real de una imagen para poder dibujarla sin deformarla
+  function getImageNaturalSize(dataUrl) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = () => resolve({ w: 1, h: 1 });
+      img.src = dataUrl;
+    });
+  }
+
+  // Se descargan UNA sola vez, al iniciar sesión, para que "Enviar por WhatsApp/correo"
+  // no tenga que esperar a bajar las imágenes cada vez (eso es lo que hacía que se perdiera
   // el permiso de "compartir archivo" en algunos navegadores).
-  let cachedIconDataUrl = null;
+  let cachedIconDataUrl = null, cachedIconSize = null;
+  let cachedLogoDataUrl = null, cachedLogoSize = null;
   function preloadIconDataUrl() {
-    loadImageAsDataURL('Icono.png').then(url => { cachedIconDataUrl = url; }).catch(() => {});
+    loadImageAsDataURL('Icono.png').then(url => {
+      cachedIconDataUrl = url;
+      return getImageNaturalSize(url);
+    }).then(size => { cachedIconSize = size; }).catch(() => {});
+    loadImageAsDataURL('Logoo.png').then(url => {
+      cachedLogoDataUrl = url;
+      return getImageNaturalSize(url);
+    }).then(size => { cachedLogoSize = size; }).catch(() => {});
   }
 
   function buildRecordPdf(r, consultas) {
-    const iconPromise = cachedIconDataUrl ? Promise.resolve(cachedIconDataUrl) : loadImageAsDataURL('Icono.png').catch(() => null);
-    return iconPromise.then(iconDataUrl => {
+    const iconPromise = cachedIconDataUrl
+      ? Promise.resolve({ url: cachedIconDataUrl, size: cachedIconSize })
+      : loadImageAsDataURL('Icono.png').then(url => getImageNaturalSize(url).then(size => ({ url, size }))).catch(() => ({ url: null, size: null }));
+    const logoPromise = cachedLogoDataUrl
+      ? Promise.resolve({ url: cachedLogoDataUrl, size: cachedLogoSize })
+      : loadImageAsDataURL('Logoo.png').then(url => getImageNaturalSize(url).then(size => ({ url, size }))).catch(() => ({ url: null, size: null }));
+
+    return Promise.all([iconPromise, logoPromise]).then(([icon, logo]) => {
+      const iconDataUrl = icon.url, iconSize = icon.size;
+      const logoDataUrl = logo.url, logoSize = logo.size;
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const teal = [14, 74, 68];
@@ -1077,32 +1103,36 @@
       const ICON_SIZE = 16;
 
       function drawWatermark() {
-        if (!iconDataUrl) return;
+        if (!iconDataUrl || !iconSize) return;
         try {
+          const targetH = 100;
+          const targetW = targetH * (iconSize.w / iconSize.h);
+          const x = (PAGE_W - targetW) / 2;
+          const y = 90;
           doc.saveGraphicsState();
           doc.setGState(new doc.GState({ opacity: 0.06 }));
-          doc.addImage(iconDataUrl, 'PNG', 55, 90, 100, 100);
+          doc.addImage(iconDataUrl, 'PNG', x, y, targetW, targetH);
           doc.restoreGraphicsState();
         } catch (e) {}
       }
 
       function drawHeader() {
-        let y = 16;
-        if (iconDataUrl) {
-          try { doc.addImage(iconDataUrl, 'PNG', MARGIN, y - 5, ICON_SIZE, ICON_SIZE); } catch (e) {}
+        let y = 14;
+        let logoBottom = y;
+        if (logoDataUrl && logoSize) {
+          const targetH = 20;
+          const targetW = targetH * (logoSize.w / logoSize.h);
+          try { doc.addImage(logoDataUrl, 'PNG', MARGIN, y - 4, targetW, targetH); } catch (e) {}
+          logoBottom = y - 4 + targetH;
+        } else {
+          logoBottom = y + ICON_SIZE - 4;
         }
-        const textX = MARGIN + ICON_SIZE + 5;
-        doc.setFontSize(13); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
-        doc.text('DRA. LORENA VELÁSQUEZ ROA', textX, y);
-        doc.setFontSize(8.5); doc.setTextColor(100); doc.setFont(undefined, 'normal');
-        doc.text('MEDICINA INTEGRAL Y ANTIENVEJECIMIENTO', textX, y + 5);
 
         doc.setFontSize(14); doc.setTextColor(...teal); doc.setFont(undefined, 'bold');
-        doc.text('HISTORIA CLÍNICA', PAGE_W - MARGIN, y - 1, { align: 'right' });
-        doc.text('MÉDICA', PAGE_W - MARGIN, y + 5, { align: 'right' });
+        doc.text('HISTORIA CLÍNICA MÉDICA', PAGE_W / 2, y + 6, { align: 'center' });
         doc.setFont(undefined, 'normal');
 
-        return y + ICON_SIZE - 2;
+        return Math.max(logoBottom, y + 10);
       }
 
       function sectionBar(y, label) {
