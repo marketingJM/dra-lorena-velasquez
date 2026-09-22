@@ -267,7 +267,7 @@
     <label>Fecha de nacimiento</label>
     <input type="date" id="npFechaNacimiento">
     <label>Edad</label>
-    <input type="text" id="npEdad" placeholder="Ej. 34">
+    <input type="text" id="npEdad" placeholder="Se calcula solo al poner la fecha de nacimiento" readonly>
     <label>Ocupación</label>
     <input type="text" id="npOcupacion">
     <label>Dirección</label>
@@ -317,7 +317,7 @@
       <label>Fecha de nacimiento</label>
       <input type="date" id="pdFechaNacimiento">
       <label>Edad</label>
-      <input type="text" id="pdEdad">
+      <input type="text" id="pdEdad" readonly>
       <label>Ocupación</label>
       <input type="text" id="pdOcupacion">
       <label>Dirección</label>
@@ -873,6 +873,34 @@
   // Clave de acceso público = ID del paciente + fecha de nacimiento (los dos datos que
   // pedimos en la página para que pueda descargar su propia historia). Se guarda en una
   // colección aparte, separada de patientRecords, para que nadie pueda "listar" pacientes.
+  // Calcula "X años y Y días" a partir de la fecha de nacimiento, contando desde el último cumpleaños hasta hoy
+  function calcularEdadTexto(fechaNacimientoStr) {
+    if (!fechaNacimientoStr) return '';
+    const [y, m, d] = fechaNacimientoStr.split('-').map(Number);
+    const nacimiento = new Date(y, m - 1, d);
+    const hoy = new Date();
+    if (isNaN(nacimiento.getTime()) || nacimiento > hoy) return '';
+
+    let anios = hoy.getFullYear() - nacimiento.getFullYear();
+    let ultimoCumple = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+    if (ultimoCumple > hoy) {
+      anios--;
+      ultimoCumple = new Date(hoy.getFullYear() - 1, nacimiento.getMonth(), nacimiento.getDate());
+    }
+    const dias = Math.round((hoy - ultimoCumple) / (1000 * 60 * 60 * 24));
+
+    const aniosTxt = `${anios} año${anios === 1 ? '' : 's'}`;
+    const diasTxt = `${dias} día${dias === 1 ? '' : 's'}`;
+    return dias > 0 ? `${aniosTxt} y ${diasTxt}` : aniosTxt;
+  }
+
+  document.getElementById('npFechaNacimiento').addEventListener('change', () => {
+    document.getElementById('npEdad').value = calcularEdadTexto(document.getElementById('npFechaNacimiento').value);
+  });
+  document.getElementById('pdFechaNacimiento').addEventListener('change', () => {
+    document.getElementById('pdEdad').value = calcularEdadTexto(document.getElementById('pdFechaNacimiento').value);
+  });
+
   function buildAccessKey(documento, fechaNacimiento) {
     const doc = (documento || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const fn = (fechaNacimiento || '').trim();
@@ -928,6 +956,7 @@
     e.preventDefault();
     const r = allRecords.find(x => x.id === currentPatientId) || {};
     PATIENT_FIELDS.forEach(([elSuffix, key]) => { document.getElementById('pd' + elSuffix).value = r[key] || ''; });
+    document.getElementById('pdEdad').value = calcularEdadTexto(r.fechaNacimiento) || r.edad || '';
     patientDataView.style.display = 'none';
     patientDataEdit.style.display = 'block';
   });
